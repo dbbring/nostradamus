@@ -354,3 +354,5 @@ MigrationBackup/
 
 # V Env
 .env/
+.env/lib
+.env/lib64
