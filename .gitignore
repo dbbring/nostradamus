@@ -351,3 +351,6 @@ MigrationBackup/
 
 # Ignore vs code settings
 .vscode/
+
+# V Env
+.env/
