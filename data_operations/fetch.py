@@ -1,5 +1,4 @@
-from utils.helper_functions import FinViz
-from database.database_helpers import DB
+from utils.scrapers import *
 
 test = FinViz()
 test.get_tickers()
