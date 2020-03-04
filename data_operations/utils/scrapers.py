@@ -1,5 +1,7 @@
 import utils.helpers as util
 from bs4 import BeautifulSoup
+import unicodedata
+from datetime import datetime, timedelta
 
 
 
@@ -8,17 +10,25 @@ from bs4 import BeautifulSoup
  # ======================================================= #
 
 
-class Bloomberg(Singleton, Scaper):
+class Bloomberg(util.Scaper):
+    _instance = None
+    sectors = {}
 
-    def __init__(self, ticker):
-        # scrape here, singleton class, and maintain state of array of arrays %gains
-        self.base = super()
-        self.ticker = ticker
-        return
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(Bloomberg, cls).__new__(cls)
+            soup = super().get_data(cls, '../nostradamus_files/bloomberg.html')
+            table_rows = soup.find_all('div', class_='sector-data-table__sector-row')
+            for row in table_rows:
+                sector_name = row.contents[1].get_text().strip().lower()
+                sector_performance = row.contents[3].get_text().strip()
+                sector_performance = sector_performance[:(len(sector_performance) - 1)]
+                cls.sectors[sector_name] = sector_performance
+        return cls._instance
 
-    def get_sector_performance(self, sector):
-        # 
-        return
+
+    def get_sector_performance(self, sector: str) -> str:
+        return self.sectors[sector].lower()
 
 
  # ======================================================= # 
@@ -26,60 +36,55 @@ class Bloomberg(Singleton, Scaper):
  # ======================================================= #
 
 
-class FinViz(Scaper):
+class FinViz(util.Scaper):
     
-    def __init__(self):
+    def __init__(self, path: str):
         self.base = super()
+        self.soup = self.base.get_data(path)
         return
     
-    def get_tickers(self):
-        # call get data incrementing path by 20 ( starting at 21)
-        tickers = []
-        soup = self.base.get_data('../finviz.html')
-        table = soup.find('table', attrs={'bgcolor': '#d3d3d3', 'border': '0', 'cellpadding': '3', 'cellspacing': '1', 'width': '100%'})
-        table_rows = table.find_all('tr')
+
+    def get_tickers(self, upper_threshold: float, lower_threhold: float) -> list:
+        tickers =[]
+        self.table = self.soup.find('table', attrs={'bgcolor': '#d3d3d3', 'border': '0', 'cellpadding': '3', 'cellspacing': '1', 'width': '100%'})
+        table_rows = self.table.find_all('tr')
         for row in table_rows:
             change = self.base.get_table_cell(row, 9, True)
-            print(util.isValidFloat(change[:-1]))
+            change = change[:-1]
+            if (util.isValidFloat(change)):
+                if (lower_threhold <= float(change) <= upper_threshold):
+                    tickers.append(self.base.get_table_cell(row, 1, True))
+        return tickers
 
-    def has_finviz_news(self):
+
+    def get_last_finviz_row_id(self) -> int:
+        table_rows = self.table.find_all('tr')
+        for row in table_rows:
+            last_id = self.base.get_table_cell(row, 0, True)
+            if (util.isValidInt(last_id)):
+                last_id = int(last_id)
+        return last_id
+
+
+    def has_finviz_news(self) -> bool:
+        row_count = 0
         table = self.soup.find('table', id='news-table')
         table_rows = table.find_all('tr')
+
         for row in table_rows:
+            if (row_count >= 15):
+                break
+
             latest_news_date = self.base.get_table_cell(row, 0, True)
+            latest_news_date = unicodedata.normalize('NFKD', latest_news_date).strip()  # Drop Ending Bytes
             latest_news_date = util.string_to_date(latest_news_date)
+            row_count += 1
 
-            if (latest_news_date != None and latest_news_date == util.current_date()):
-                return True
+            if (latest_news_date != None):
+                for date in util.get_date_ranges():
+                    if (latest_news_date == date):
+                        return True
         return False
-
-
- # ======================================================= # 
- #            Naked Short Report scraper                   #
- # ======================================================= #
-
-
-class Naked_Short_Report(Scaper):
-
-    def __init__(self, ticker):
-        # scrape here, singleton class, and maintain state of array of arrays %gains
-        self.base = super()
-        self.ticker = ticker
-        return
-
-
- # ======================================================= # 
- #            Nasdaq scraper                               #
- # ======================================================= #
-
-
-class Nasdaq(Scaper):
-
-    def __init__(self, ticker):
-        # scrape here, singleton class, and maintain state of array of arrays %gains
-        self.base = super()
-        self.ticker = ticker
-        return
 
 
  # ======================================================= # 
@@ -87,24 +92,55 @@ class Nasdaq(Scaper):
  # ======================================================= #
 
 
-class TDAmeritrade(Scaper):
+class TDAmeritrade(util.Scaper):
 
-    def __init__(self, ticker):
+    def __init__(self, ticker: str):
         self.base = super()
         # self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/summary?fromPage=overview&display=&fromSearch=true&symbol=' + ticker)
+        self.soup = self.base.get_data('../nostradamus_files/td-' + ticker + '.html')
         return
 
-    def has_td_news(self):
+
+    def has_td_news(self) -> bool:
         table = self.soup.find('table', class_='latestNews')
         table_section = table.find_all('tbody')
-        lastest_news_date = table_section[0].find('tr > th')
-        if (lastest_news_date != None):
-            lastest_news_date = lastest_news_date.get_text()
-            lastest_news_date = util.string_to_date(lastest_news_date)
-            if (lastest_news_date != None and lastest_news_date == util.current_date()):
-                return True
+        latest_news_date = table_section[0].find('tr').get_text()
+        latest_news_date = util.string_to_date(latest_news_date)
+        if (latest_news_date != None):
+            for date in util.get_date_ranges():
+                if (latest_news_date == date):
+                    return True
         return False
 
-    def get_sector(self):
-        sector = self.soup.find(class_='company-detail-container > company-detail-information').get_text()
-        return sector
+
+    def get_sector(self) -> str:
+        # keep in mind this for the current day of gaining 10%. We need the previous days because the current means nothing to us.
+        sector = self.soup.find('div', class_='company-detail-information')
+        sector = sector.get_text().split(':') 
+        sector = unicodedata.normalize('NFKD', sector[0]).strip()       
+        return sector.lower()
+
+    
+    def get_shares_outstanding(self) -> int:
+        shares_outstanding = self.soup.find('dt', text="Shares Outstanding")
+        shares_outstanding = shares_outstanding.find_next_sibling('dd')
+        return util.string_to_int_abbv(shares_outstanding.get_text())
+
+
+    def get_tute_ownership(self) -> float:
+        tutes = self.soup.find('a', text="% Held by Institutions")
+        tutes = tutes.parent.parent.find_next_sibling('dd')
+        if util.isValidFloat(tutes.get_text()):
+            return float(tutes.get_text())
+        return 0
+
+
+    def get_short_intrest(self) -> float:
+        shorties = self.soup.find('a', text="Short Interest")
+        shorties = shorties.parent.parent.find_next_sibling('dd')
+        if util.isValidFloat(shorties.get_text()):
+            return float(shorties.get_text())
+        return 0
+
+
+    

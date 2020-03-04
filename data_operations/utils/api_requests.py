@@ -1,4 +1,4 @@
-from utils.helpers import API_Request
+from utils.helpers import * as util
 
 
  # ======================================================= # 
@@ -6,7 +6,7 @@ from utils.helpers import API_Request
  # ======================================================= #
 
 
-class AlphaVantage(API_Request):
+class AlphaVantage(util.API_Request):
 
     def __init__(self, ticker):
         # scrape here, singleton class, and maintain state of array of arrays %gains
@@ -24,7 +24,7 @@ class AlphaVantage(API_Request):
  # ======================================================= #
 
 
-class Fin_Mod_Prep(API_Request):
+class Fin_Mod_Prep(util.API_Request):
 
     def __init__(self, ticker):
         # scrape here, singleton class, and maintain state of array of arrays %gains
@@ -42,7 +42,7 @@ class Fin_Mod_Prep(API_Request):
  # ======================================================= #
 
 
-class IEX(API_Request):
+class IEX(util.API_Request):
 
     def __init__(self, ticker):
         # scrape here, singleton class, and maintain state of array of arrays %gains

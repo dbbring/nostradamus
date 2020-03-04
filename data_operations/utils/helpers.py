@@ -1,17 +1,32 @@
 from bs4 import BeautifulSoup
-from datetime import datetime, date
+from datetime import datetime, timedelta
 
-def current_date():
-    return date.today()
+# Date ranges to check for a news event. Today plus 3 days ago.
+def get_date_ranges() -> list:
+    today = datetime.today()
+    one_day_ago = (today - timedelta(days=1))
+    two_days_ago = (today - timedelta(days=2))
+    three_days_ago = (today - timedelta(days=3))
+    return [today.date(), one_day_ago.date(), two_days_ago.date(), three_days_ago.date()]
 
-def isValidFloat(str):
+def isValidFloat(str: str) -> bool:
     try: 
         float(str)
         return True
     except ValueError:
             return False
 
-def string_to_date(date_string):
+def isValidInt(str: str) -> bool:
+    try: 
+        int(str)
+        return True
+    except ValueError:
+            return False
+
+def string_to_date(date_string: str) -> datetime:
+    if (date_string == None):
+        return date_string
+
     # Format must be June 1, 2005.
     try:
         dateObj = datetime.strptime(date_string, '%B %d, %Y').date()
@@ -25,9 +40,35 @@ def string_to_date(date_string):
     return dateObj
 
 
+def string_to_int_abbv(strToConvert: str) -> int:
+    # Cast to float because of decmial point. (126.60M) then int for whole number.
+    try:
+        return float(strToConvert)
+    except ValueError:
+        last_letter = strToConvert[len(strToConvert) - 1:]
+        int_only = strToConvert[:len(strToConvert) - 1]
+        if last_letter.upper() == 'B':
+            return int(float(int_only) * 1000000000)
+        elif last_letter.upper() == 'M':
+            return int(float(int_only) * 1000000)
+        elif last_letter.upper() == 'K':
+            return int(float(int_only) * 1000)
+        else:
+            return 0
+
+
  # ======================================================= # 
  #            Abstract Classes                             #
  # ======================================================= #
+
+
+class Base_Model(object):
+
+
+     def __init__(self):
+         # Just a number that is way outside the normal range so we can instaniate an property 
+         self.initial_float = 999999.99
+         return
 
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -43,7 +84,7 @@ class Scaper(object):
     def __init__(self):
         return
 
-    def get_data(self, path):
+    def get_data(self, path: str) -> BeautifulSoup:
         dummy_html = open(path, encoding='utf-8')
         soup = BeautifulSoup(dummy_html, 'html.parser')
         return soup
@@ -55,12 +96,4 @@ class Scaper(object):
             return table_cells[column].get_text()
         return table_cells[column]
 
-
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-class Singleton(object):
-    _instance = None
-    def __new__(cls, *args, **kwargs):
-        if not isinstance(cls._instance, cls):
-            cls._instance = object.__new__(cls, *args, **kwargs)
-        return cls._instance
 
