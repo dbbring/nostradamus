@@ -355,3 +355,7 @@ MigrationBackup/
 # V Env
 .env/
 .env/*
+.env/**.*
+.venv
+.venv/*
+.venv/**.*

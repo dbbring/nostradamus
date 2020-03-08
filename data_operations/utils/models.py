@@ -18,6 +18,32 @@ class Ticker(object):
 
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+# ======================================================= #
+#                 Sectors Table                           #
+# ======================================================= #
+
+# All Values are already percentages! No need to * 100 to get a true percent value.
+# These sectors are based on the S and P sectors.
+
+class Sectors(Base_Model):
+
+  def __init__(self):
+    self.sector_id = -1
+    self.date = ''
+    self. s_p = super().initial_float
+    self.real_estate = super().initial_float
+    self.consumer_staples = super().initial_float
+    self.health_care = super().initial_float
+    self.utilites = super().initial_float
+    self.materials = super().initial_float
+    self.industrials = super().initial_float
+    self.financials = super().initial_float
+    self.energy = super().initial_float
+    self.communication_services = super().initial_float
+    self.consumer_discretionary = super().initial_float
+    self.information_technology = super().initial_float
+    return
  
 # ======================================================= #
 #                Transaction Table                        #
@@ -190,6 +216,74 @@ class Technical_Indicators(Base_Model):
 class Fundamental_Indicators(Base_Model):
 
   def __init__(self):
+    self.transaction_d = -1
+    self.fundemental_date = ''
+    # profile
+    self.beta = super().initial_float
+    self.company_name = ''
+    # income statement
+    self.revenue = super().initial_float
+    self.revenue_growth = super().initial_float
+    self.gross_profit = super().initial_float
+    self.eps = super().initial_float
+    self.eps_diluted = super().initial_float
+    self.divided_per_share = super().initial_float
+    self.ebitda_margin = super().initial_float
+    self.profit_margin = super().initial_float
+    self.ebitda = super().initial_float
+    self.net_profit_margin = super().initial_float
+    self.free_cash_flow_margin = super().initial_float
+    # Balance sheet
+    self.cash_and_equivalents = super().initial_float
+    self.short_term_debt = super().initial_float
+    self.total_current_liabilites = super().initial_float
+    self.total_debt = super().initial_float
+    self.total_shareholder_equity = super().initial_float
+    self.tax_assets = super().initial_float
+    # cash-flow
+    self.stock_based_compensationg = super().initial_float
+    self.operating_cash_flow = super().initial_float
+    self.capital_expenditure  = super().initial_float
+    self.free_cash_flow = super().initial_float
+    # finicial ratios
+    self.price_book_value_ratio  = super().initial_float
+    self.price_to_book_ratio  = super().initial_float
+    self.price_to_sales_ratio = super().initial_float
+    self.price_earnings_ratio  = super().initial_float
+    self.price_to_free_cash_flow_ratio = super().initial_float
+    self.price_to_cash_flow_ratio = super().initial_float
+    self.earnings_to_growth = super().initial_float
+    self.price_sales_ratio = super().initial_float
+    self.price_fair_value = super().initial_float
+    self.gross_profit_margin = super().initial_float
+    self.return_on_assets = super().initial_float
+    self.liquidity_current_ratio = super().initial_float
+    self.debt_ratio = super().initial_float
+    self.debt_equity_ratio = super().initial_float
+    self.operating_cash_flows_per_share = super().initial_float
+    self.free_cash_flow_per_share = super().initial_float
+    # enterprise value
+    self.shares_outstanding = super().initial_float
+    self.market_cap = super().initial_float
+    self.enterprise_value = super().initial_float
+    self.revenue_per_share = super().initial_float
+    self.cash_per_share = super().initial_float
+    self.book_value_per_share = super().initial_float
+    self.intrest_debt_per_share = super().initial_float
+    self.pe_ratio = super().initial_float
+    self.ebitda_enterprise_value = super().initial_float
+    self.debt_to_equity = super().initial_float
+    self.graham_number = super().initial_float
+    self.graham_net_net = super().initial_float
+    self.working_capital = super().initial_float
+    self.capex_per_share = super().initial_float
+    # growth
+    self.gross_profit_growth = super().initial_float
+    self.operating_income_growth = super().initial_float
+    self.net_income_growth = super().initial_float
+    self.eps_growth = super().initial_float
+    # dcf
+    self.discounted_cash_flow = super().initial_float
     return
 
 

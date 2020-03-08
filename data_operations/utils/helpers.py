@@ -1,6 +1,9 @@
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
-
+import requests
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+ 
 # Date ranges to check for a news event. Today plus 3 days ago.
 def get_date_ranges() -> list:
     today = datetime.today()
@@ -77,6 +80,10 @@ class API_Request(object):
     def __init__(self):
         return
 
+    def get_request(self, _url):
+        r = requests.get(url=_url)
+        return r.json()
+
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 class Scaper(object):
@@ -85,8 +92,16 @@ class Scaper(object):
         return
 
     def get_data(self, path: str) -> BeautifulSoup:
-        dummy_html = open(path, encoding='utf-8')
-        soup = BeautifulSoup(dummy_html, 'html.parser')
+        try:
+            html = open(path, encoding='utf-8')
+        except:
+            options = Options()
+            options.headless = True
+            browser = webdriver.Firefox(executable_path='/home/derek/Desktop/nostradamus/.venv/lib/geckodriver',options=options)
+            browser.get(path)
+            html = browser.page_source
+            browser.close()
+        soup = BeautifulSoup(html, 'html.parser')
         return soup
 
     # @returns value of specified cell or cell html contents

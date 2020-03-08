@@ -11,24 +11,19 @@ from datetime import datetime, timedelta
 
 
 class Bloomberg(util.Scaper):
-    _instance = None
-    sectors = {}
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(Bloomberg, cls).__new__(cls)
-            soup = super().get_data(cls, '../nostradamus_files/bloomberg.html')
-            table_rows = soup.find_all('div', class_='sector-data-table__sector-row')
-            for row in table_rows:
-                sector_name = row.contents[1].get_text().strip().lower()
-                sector_performance = row.contents[3].get_text().strip()
-                sector_performance = sector_performance[:(len(sector_performance) - 1)]
-                cls.sectors[sector_name] = sector_performance
-        return cls._instance
+    def __init__(self):
+        self.sectors = {}
+        soup = super().get_data('https://www.bloomberg.com/markets/sectors')
+        table_rows = soup.find_all('div', class_='sector-data-table__sector-row')
+        for row in table_rows:
+            sector_name = row.contents[1].get_text().strip().lower()
+            sector_performance = row.contents[3].get_text().strip()
+            sector_performance = sector_performance[:(len(sector_performance) - 1)]
+            if (util.isValidFloat(sector_performance)):
+                self.sectors[sector_name] = float(sector_performance)
+        return
 
-
-    def get_sector_performance(self, sector: str) -> str:
-        return self.sectors[sector].lower()
 
 
  # ======================================================= # 
