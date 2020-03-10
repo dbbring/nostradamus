@@ -65,16 +65,6 @@ def string_to_int_abbv(strToConvert: str) -> int:
  # ======================================================= #
 
 
-class Base_Model(object):
-
-
-     def __init__(self):
-         # Just a number that is way outside the normal range so we can instaniate an property 
-         self.initial_float = 999999.99
-         return
-
-
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 class API_Request(object):
     
     def __init__(self):
@@ -91,16 +81,20 @@ class Scaper(object):
     def __init__(self):
         return
 
-    def get_data(self, path: str) -> BeautifulSoup:
+    def get_data(self, path: str, use_firefox=False) -> BeautifulSoup:
         try:
             html = open(path, encoding='utf-8')
         except:
-            options = Options()
-            options.headless = True
-            browser = webdriver.Firefox(executable_path='/home/derek/Desktop/nostradamus/.venv/lib/geckodriver',options=options)
-            browser.get(path)
-            html = browser.page_source
-            browser.close()
+            if (use_firefox):
+                options = Options()
+                options.headless = True
+                browser = webdriver.Firefox(executable_path='/home/derek/Desktop/nostradamus/.venv/lib/geckodriver',options=options)
+                browser.get(path)
+                html = browser.page_source
+                browser.close()
+            else:
+                res = requests.get(url=path)
+                html = res.text
         soup = BeautifulSoup(html, 'html.parser')
         return soup
 

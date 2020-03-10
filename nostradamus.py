@@ -1,12 +1,10 @@
 import sys
 from utils.scrapers import *
 from utils.api_requests import *
+from database.helpers import *
 # ============== TODO =========================
 # Not thrilled about how we have to create a ton of new objects in FinViz
 # Figure out a way to move the date objects out of news
-# on bloomberg, do we strip all whitespace? eg healthcare or health care
-# bb = Bloomberg()
-# print(bb.get_sector_performance('health care'))
 # maybe we need to store off price from finvix and compare to api call to make sure we are getting the right ticker
 # check date on fundmental (fin model prep api) some are wicked out of date, maybe hit another source?
 
@@ -43,12 +41,5 @@ for ticker in tickers:
 av = AlphaVantage('mcf')
 '''
 
-
-
-#===================================================================================
-'''
-if (len(sys.argv) > 1):
-  bb = Bloomberg()
-  print(bb.sectors)
-'''  
-#====================================================================================
+db = DB()
+print(type(db).__name__)

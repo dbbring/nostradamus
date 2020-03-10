@@ -1,4 +1,4 @@
-import utils.helpers as util
+import data_operations.utils.helpers as util
 from bs4 import BeautifulSoup
 import unicodedata
 from datetime import datetime, timedelta
@@ -14,7 +14,7 @@ class Bloomberg(util.Scaper):
 
     def __init__(self):
         self.sectors = {}
-        soup = super().get_data('https://www.bloomberg.com/markets/sectors')
+        soup = super().get_data('https://www.bloomberg.com/markets/sectors', True)
         table_rows = soup.find_all('div', class_='sector-data-table__sector-row')
         for row in table_rows:
             sector_name = row.contents[1].get_text().strip().lower()
