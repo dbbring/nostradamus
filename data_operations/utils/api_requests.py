@@ -1,4 +1,4 @@
-import utils.helpers as util
+import data_operations.utils.helpers as util
 import requests
 
 
@@ -15,20 +15,23 @@ class AlphaVantage(util.API_Request):
     def __init__(self, ticker):
         self.base = super()
         self.ticker = ticker
-        self.api_keys = ['KBE1FWN6A9NDD5JR']
+        self.api_keys = ['KBE1FWN6A9NDD5JR', 'F0JH3005KCFVO1U9']
         self.api_key_counter = 0
         self.data = self.try_api_call(ticker)
         return
+
 
     def get_eod_data(self):
         # use our eod_table model here and go back how many days?
         return
 
-    def try_api_call(self, ticker):
+
+    def try_api_call(self, ticker: str):
         r = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=' + ticker + '&apikey=' + self.api_keys[self.api_key_counter])
         res = r.json()
-        # if api timed out error use another api key
-        return res
+        # if api timed out error use another api key or
+        # api return "note" : "you excceded the limit"
+        return res['Time Series (Daily)']
         
 
  # ======================================================= # 
@@ -38,16 +41,22 @@ class AlphaVantage(util.API_Request):
 
 class Fin_Mod_Prep(util.API_Request):
 
-    def __init__(self, ticker):
-        # scrape here, singleton class, and maintain state of array of arrays %gains
+    def __init__(self):
         self.base = super()
-        self.ticker = ticker
         return
 
-    def get_sector_performance(sector):
-        # 
-        return
-        
+
+    def try_api_call(self, ticker: str):
+        r = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=' + ticker + '&apikey=' + self.api_keys[self.api_key_counter])
+        res = r.json()
+        # if api timed out error use another api key
+        return res
+
+
+    def get_indices(self):
+        r = requests.get('https://financialmodelingprep.com/api/v3/majors-indexes')
+        res = r.json()
+        return res['majorIndexesList']
 
  # ======================================================= # 
  #            IEX API Calls                                #

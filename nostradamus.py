@@ -9,6 +9,7 @@ from database.helpers import *
 # check date on fundmental (fin model prep api) some are wicked out of date, maybe hit another source?
 
 
+
 index = 1
 end_id = 1
 end_of_list = False

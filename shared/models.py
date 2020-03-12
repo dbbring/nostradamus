@@ -23,35 +23,89 @@ class Ticker(object):
 #                 Sectors Table                           #
 # ======================================================= #
 
-# All Values are already percentages! No need to * 100 to get a true percent value.
+# All Values are already percentages! No need to * 100 to get a true percent value. Except for the VIX CLOSE.
 # These sectors are based on the S and P sectors.
+# make list of sub cats and direct to top level cat
+# hit fin model prep for all indicies and calc percent change still need vix and futures
 
 class Sectors(Base_Model):
 
   def __init__(self):
-    Base_Model.__init__(self)
-    self.schema = {
-      'sector_id': None,
-      'date': None,
-      's_p': 999999.99,
-      'real_estate': 999999.99,
-      'consumer_staples': 999999.99,
-      'health_care': 999999.99,
-      'utilities': 999999.99,
-      'materials': 999999.99,
-      'industrials': 999999.99,
-      'financials': 999999.99,
-      'energy': 999999.99,
-      'communication_services': 999999.99,
-      'consumer_discretionary': 999999.99,
-      'information_technology': 999999.99
-    }
-    self.insert_sql = ('INSERT INTO Sectors (' + 
-      'date, s_p, real_estate, consumer_staples, health_care,' +
-      'utilities, materials, industrials, financials, energy,' +
-      'communication_services, consumer_discretionary,information_technology) ' +
-     ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
     return
+
+  default_float = 99999.99
+
+  insert_sql = ('INSERT INTO Sectors ('
+    'date, s_p, dji, nasdaq, russell_1000, russell_2000, vix, vix_close,'
+    'real_estate, consumer_staples, health_care, utilities, materials,'
+    'industrials, financials, energy,communication_services,'
+    'consumer_discretionary, information_technology) VALUES '
+    '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
+
+  schema = {
+    'sector_id': None,
+    'date': None,
+    's_p': default_float,
+    'dji': default_float,
+    'nasdaq': default_float,
+    'russell_1000': default_float,
+    'russell_2000': default_float,
+    'vix': default_float,
+    'vix_close': default_float,
+    'real_estate': default_float,
+    'consumer_staples': default_float,
+    'health_care': default_float,
+    'utilities': default_float,
+    'materials': default_float,
+    'industrials': default_float,
+    'financials': default_float,
+    'energy': default_float,
+    'communication_services': default_float,
+    'consumer_discretionary': default_float,
+    'information_technology': default_float
+  }
+
+  def get_sector(self, sector: str) -> str:
+    # returns the proper top level schema name for a sub
+    sanitizeSector = sector.lower()
+    sanitizeSector = sanitizeSector.replace(' ', '')
+    sanitizeSector = sanitizeSector.replace('-', '')
+    sanitizeSector = sanitizeSector.replace('_', '')
+    sanitizeSector = sanitizeSector.replace('&', '')
+
+    health_care = set(['healthcareequipmentandservices', 'healthcareequipmentservices', 'pharmaceuticals,biotechnologyandlifesciences', 'pharmaceuticals,biotechnology,lifesciences', 'pharmaceuticals', 'biotechnology', 'pharmaceuticals','lifesciences', 'pharmaceutical', 'healthcare'])
+    it = set(['technologyhardwareequipment', 'technology', 'hardware','semiconductorssemiconductorequipment', 'semiconductors','semiconductorequipment','informationtechnology', 'software', 'softwareservices'])
+    comm_serv = set(['communicationservices', 'communicationservice','telecommunicationservices', 'mediaentertainment','media', 'entertainment'])
+    comm_staples = set(['consumerstaples', 'consumerstaple','foodstaplesretailing', 'food','staples', 'householpersonalproducts', 'household', 'personalproducts', 'foodbeveragetobacco', 'foodbeverage', 'tobacco'])
+    comm_disc = set(['consumerdiscretionary', 'automobilescomponents', 'automobiles','consumerservices', 'consumerdurablesapparel', 'apparel', 'consumerdurables', 'retailing'])
+    indust = set(['industrials', 'industrial', 'commercialprofessional services','professionalservices', 'transportation', 'capitalgoods'])
+    financ = set(['financials', 'financial', 'insurance', 'banks', 'bank', 'banking', 'diversifiedfinancials'])
+
+
+    if sanitizeSector == 'realestate':
+      return 'real_estate'
+    elif sanitizeSector == 'utilities':
+      return 'utilities'
+    elif sanitizeSector == 'materials':
+      return 'materials'
+    elif sanitizeSector == 'energy':
+      return 'energy'
+    elif sanitizeSector in health_care:
+      return 'health_care'
+    elif sanitizeSector in it:
+      return 'information_technology'
+    elif sanitizeSector in comm_serv:
+      return 'communication_services'
+    elif sanitizeSector in comm_staples:
+      return 'consumer_staples'
+    elif sanitizeSector in comm_disc:
+      return 'consumer_discretionary'
+    elif sanitizeSector in indust:
+      return 'industrials'
+    elif sanitizeSector in financ:
+      return 'financials'
+
+    return sector
  
 # ======================================================= #
 #                Transaction Table                        #
