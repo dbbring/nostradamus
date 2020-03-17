@@ -41,7 +41,7 @@ class DB(db_schema):
 
     def save(self, model) -> None:
         table_name = type(model).__name__
-        data = list(model.schema.values())
+        data = list(model.data.values())
         
         if not data[0]:  # if our id is null, then exclude it
             del data[0]

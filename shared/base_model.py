@@ -1,6 +1,7 @@
 class Base_Model(object):
 
     default_float = 999999.99
+    default_int = -1
 
     def __init__(self):
         return

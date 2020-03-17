@@ -1,9 +1,4 @@
 from shared.base_model import Base_Model
-# Populate models?
-# or just models of each database????
-
-#  T = Transaction()
-# all_variables = vars(T)
 
 
 # ======================================================= #
@@ -12,9 +7,16 @@ from shared.base_model import Base_Model
 
 class Ticker(object):
 
-  def __init__(self):
+  def __init__(self, symbol):
     return
 
+  basic_info = Transaction()
+  intraday = [Price_Detail()]
+  eod = [Price_EOD()]
+  weekly = [Price_Weekly()]
+  tech_anaylsis = [Technical_Indicators()]
+  fund_anaylsis = Fundamental_Indicators()
+  chart_anaylsis = [Chart_Indicators()]
 
 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -33,7 +35,7 @@ class Sectors(Base_Model):
   def __init__(self):
     return
 
-  default_float = 99999.99
+  default_float = Base_Model.default_float
 
   insert_sql = ('INSERT INTO Sectors ('
     'date, s_p, dji, nasdaq, russell_1000, russell_2000, vix, vix_close,'
@@ -42,7 +44,7 @@ class Sectors(Base_Model):
     'consumer_discretionary, information_technology) VALUES '
     '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
 
-  schema = {
+  data = {
     'sector_id': None,
     'date': None,
     's_p': default_float,
@@ -66,7 +68,7 @@ class Sectors(Base_Model):
   }
 
   def get_sector(self, sector: str) -> str:
-    # returns the proper top level schema name for a sub
+    # returns the proper top level data name for a sub
     sanitizeSector = sector.lower()
     sanitizeSector = sanitizeSector.replace(' ', '')
     sanitizeSector = sanitizeSector.replace('-', '')
@@ -114,14 +116,19 @@ class Sectors(Base_Model):
 class Transaction(Base_Model):
 
   def __init__(self):
-    Base_Model.__init__(self)
-    self.transaction_id = None
-    self.date = None
-    self.ticker = ''
-    self.sector_change = 0
-    self.percent_change = 999999.99
     return
 
+
+  default_float = Base_Model.default_float
+  insert_sql = ''
+
+  data = {
+    'transaction_id': None,
+    'date': None,
+    'ticker': None,
+    'sector_change': 0,
+    'percent_change': default_float
+  }
 
 
 # ======================================================= #
@@ -131,11 +138,18 @@ class Transaction(Base_Model):
 class PEOD_Transact_Bridge(Base_Model):
 
   def __init__(self):
-    Base_Model.__init__(self)
-    self.row_id = None
-    self.transaction_id = None
-    self.eod_id = None
-    return
+      return
+
+
+  default_float = Base_Model.default_float
+  insert_sql = ''
+
+  data = {
+    'row_id': None,
+    'tranasction_id': None,
+    'eod_id': None
+  }
+
 
 # ======================================================= #
 #                Price End of Day Table                   #
@@ -144,20 +158,27 @@ class PEOD_Transact_Bridge(Base_Model):
 class Price_EOD(Base_Model):
 
   def __init__(self):
-    Base_Model.__init__(self)
-    self.eod_id = None
-    self.is_tracking_period = True
-    self.open = -1
-    self.high = -1
-    self.low = -1
-    self.close = -1
-    self.volume = -1
-    self.avg_volume = -1
-    self.percent_change = 999999.99
-    self.date = None
-    return
-    
+      return
 
+
+  default_float = Base_Model.default_float
+  default_int = Base_Model.default_int
+  insert_sql = ''
+
+  data = {
+    'eod_id': None,
+    'is_tracking_period': None,
+    'date': None,
+    'open': default_int,
+    'high': default_int,
+    'low': default_int,
+    'close': default_int,
+    'volume': default_float,
+    'avg_volume': default_float,
+    'percent_change': default_float
+  }
+
+    
 # ======================================================= #
 #    Price Weekly - Transaction Bridge Table          #
 # ======================================================= #
@@ -165,11 +186,17 @@ class Price_EOD(Base_Model):
 class PW_Transact_Bridge(Base_Model):
 
   def __init__(self):
-    Base_Model.__init__(self)
-    self.row_id = None
-    self.transaction_id = None
-    self.pw_id = None
-    return
+      return
+
+
+  default_float = Base_Model.default_float
+  insert_sql = ''
+
+  data = {
+    'row_id': None,
+    'transaction_id': None,
+    'pw_id': None
+  }
 
 
 # ======================================================= #
@@ -179,17 +206,24 @@ class PW_Transact_Bridge(Base_Model):
 class Price_Weekly(Base_Model):
 
   def __init__(self):
-    Base_Model.__init__(self)
-    self.weekly_id = None
-    self.open = -1
-    self.high = -1
-    self.low = -1
-    self.close = -1
-    self.volume = -1
-    self.avg_volume = -1
-    self.percent_change = 999999.99
-    self.date = None
-    return
+      return
+
+
+  default_float = Base_Model.default_float
+  default_int = Base_Model.default_int
+  insert_sql = ''
+
+  data = {
+    'weekly_id': None,
+    'open': default_int,
+    'high': default_int,
+    'low': default_int,
+    'close': default_int,
+    'volume': default_int,
+    'avg_volume': default_int,
+    'percent_change': default_float,
+    'date': None
+  }
         
 
 # ======================================================= #
@@ -199,11 +233,18 @@ class Price_Weekly(Base_Model):
 class PEOD_PD_Bridge(Base_Model):
 
   def __init__(self):
-    Base_Model.__init__(self)
-    self.row_id = None
-    self.eod_id = None
-    self.price_detail_id = None
     return
+
+
+  default_float = Base_Model.default_float
+  default_int = Base_Model.default_int
+  insert_sql = ''
+
+  data = {
+    'row_id': None,
+    'eod_id': None,
+    'price_detail_id': None
+  }
 
 
 # ======================================================= #
@@ -211,19 +252,26 @@ class PEOD_PD_Bridge(Base_Model):
 # ======================================================= #
 
 class Price_Detail(Base_Model):
-
+  
   def __init__(self):
-    Base_Model.__init__(self)
-    self.price_detail_id = None
-    self.open = -1
-    self.high = -1
-    self.low = -1
-    self.close = -1
-    self.volume = -1
-    self.percent_change = 999999.99
-    self.date = None
-    self.time = ''
     return
+
+
+  default_float = Base_Model.default_float
+  default_int = Base_Model.default_int
+  insert_sql = ''
+
+  data = {
+    'price_detail_id': None,
+    'open': default_float,
+    'high': default_float,
+    'low': default_float,
+    'close': default_float,
+    'volume': default_float,
+    'percent_change': default_float,
+    'date': None,
+    'time': '',
+  }
 
 
 # ======================================================= #
@@ -231,52 +279,59 @@ class Price_Detail(Base_Model):
 # ======================================================= #
 
 class Technical_Indicators(Base_Model):
-
+    
   def __init__(self):
-    Base_Model.__init__(self)
-    self.eod_id = None
-    self.atr = 999999.99
-    self.boll_bands = 999999.99
-    self.sma = 999999.99
-    self.ema = 999999.99
-    self.average_directional_movement = 999999.99
-    self.chaikin_osc = 999999.99
-    self.chaikin_a_d_line = 999999.99
-    self.beta = 999999.99
-    self.balance_of_power = 999999.99
-    self.commodity_channel_index = 999999.99
-    self.chande_momentum_oscillator = 999999.99
-    self.pearsons_coefficient = 999999.99
-    self.double_ema = 999999.99
-    self.directional_movement_index = 999999.99
-    self.kaufman_adaptive_ma = 999999.99
-    self.linear_reg = 999999.99
-    self.linear_reg_angle = 999999.99
-    self.linear_reg_intercept = 999999.99
-    self.linear_reg_slope = 999999.99
-    self.macd_conv_diver = 999999.99
-    self.mesa_adaptive_ma = 999999.99
-    self.money_flow_index = 999999.99
-    self.momentum  = 999999.99
-    self.normalized_atr = 999999.99
-    self.obv = 999999.99
-    self.percent_price_osc = 999999.99
-    self.rsi = 999999.99
-    self.parabolic_sar = 999999.99
-    self.parabolic_sar_ext = 999999.99
-    self.std_deviation = 999999.99
-    self.stochastic = 999999.99
-    self.stochastic_fast = 999999.99
-    self.stochastic_rsi = 999999.99
-    self.triple_ema = 999999.99
-    self.true_range = 999999.99
-    self.triangluar_ma = 999999.99
-    self.ultimate_osc = 999999.99
-    self.williams_percent_r = 999999.99
-    self.weighted_ma = 999999.99
-    self.resistance_point = 999999.99
-    self.support_point = 999999.99
     return
+
+
+  default_float = Base_Model.default_float
+  default_int = Base_Model.default_int
+  insert_sql = ''
+
+  data = {
+    'eod_id': None,
+    'atr': default_float,
+    'boll_bands': default_float,
+    'sma': default_float,
+    'ema': default_float,
+    'average_directional_movement': default_float,
+    'chaikin_osc': default_float,
+    'chaikin_a_d_line': default_float,
+    'beta': default_float,
+    'balance_of_power': default_float,
+    'commodity_channel_index': default_float,
+    'chande_momentum_oscillator': default_float,
+    'pearsons_coefficient': default_float,
+    'double_ema': default_float,
+    'directional_movement_index': default_float,
+    'kaufman_adaptive_ma': default_float,
+    'linear_reg': default_float,
+    'linear_reg_angle': default_float,
+    'linear_reg_intercept': default_float,
+    'linear_reg_slope': default_float,
+    'macd_conv_diver': default_float,
+    'mesa_adaptive_ma': default_float,
+    'money_flow_index': default_float,
+    'momentum' : default_float,
+    'normalized_atr': default_float,
+    'obv': default_float,
+    'percent_price_osc': default_float,
+    'rsi': default_float,
+    'parabolic_sar': default_float,
+    'parabolic_sar_ext': default_float,
+    'std_deviation': default_float,
+    'stochastic': default_float,
+    'stochastic_fast': default_float,
+    'stochastic_rsi': default_float,
+    'triple_ema': default_float,
+    'true_range': default_float,
+    'triangluar_ma': default_float,
+    'ultimate_osc': default_float,
+    'williams_percent_r': default_float,
+    'weighted_ma': default_float,
+    'resistance_point': default_float,
+    'support_point': default_float,
+  }
 
 
 # ======================================================= #
@@ -284,79 +339,88 @@ class Technical_Indicators(Base_Model):
 # ======================================================= #
 
 class Fundamental_Indicators(Base_Model):
-
+      
   def __init__(self):
-    Base_Model.__init__(self)
-    self.transaction_id = None
-    # date of quarter when this data is taken
-    self.fundemental_date = None
-    # profile
-    self.beta = 999999.99
-    self.company_name = ''
-    # income statement
-    self.revenue = 999999.99
-    self.revenue_growth = 999999.99
-    self.gross_profit = 999999.99
-    self.eps = 999999.99
-    self.eps_diluted = 999999.99
-    self.divided_per_share = 999999.99
-    self.ebitda_margin = 999999.99
-    self.profit_margin = 999999.99
-    self.ebitda = 999999.99
-    self.net_profit_margin = 999999.99
-    self.free_cash_flow_margin = 999999.99
-    # Balance sheet
-    self.cash_and_equivalents = 999999.99
-    self.short_term_debt = 999999.99
-    self.total_current_liabilites = 999999.99
-    self.total_debt = 999999.99
-    self.total_shareholder_equity = 999999.99
-    self.tax_assets = 999999.99
-    # cash-flow
-    self.stock_based_compensationg = 999999.99
-    self.operating_cash_flow = 999999.99
-    self.capital_expenditure  = 999999.99
-    self.free_cash_flow = 999999.99
-    # finicial ratios
-    self.price_book_value_ratio  = 999999.99
-    self.price_to_book_ratio  = 999999.99
-    self.price_to_sales_ratio = 999999.99
-    self.price_earnings_ratio  = 999999.99
-    self.price_to_free_cash_flow_ratio = 999999.99
-    self.price_to_cash_flow_ratio = 999999.99
-    self.earnings_to_growth = 999999.99
-    self.price_sales_ratio = 999999.99
-    self.price_fair_value = 999999.99
-    self.gross_profit_margin = 999999.99
-    self.return_on_assets = 999999.99
-    self.liquidity_current_ratio = 999999.99
-    self.debt_ratio = 999999.99
-    self.debt_equity_ratio = 999999.99
-    self.operating_cash_flows_per_share = 999999.99
-    self.free_cash_flow_per_share = 999999.99
-    # enterprise value
-    self.shares_outstanding = 999999.99
-    self.market_cap = 999999.99
-    self.enterprise_value = 999999.99
-    self.revenue_per_share = 999999.99
-    self.cash_per_share = 999999.99
-    self.book_value_per_share = 999999.99
-    self.intrest_debt_per_share = 999999.99
-    self.pe_ratio = 999999.99
-    self.ebitda_enterprise_value = 999999.99
-    self.debt_to_equity = 999999.99
-    self.graham_number = 999999.99
-    self.graham_net_net = 999999.99
-    self.working_capital = 999999.99
-    self.capex_per_share = 999999.99
-    # growth
-    self.gross_profit_growth = 999999.99
-    self.operating_income_growth = 999999.99
-    self.net_income_growth = 999999.99
-    self.eps_growth = 999999.99
-    # dcf
-    self.discounted_cash_flow = 999999.99
     return
+
+
+  default_float = Base_Model.default_float
+  default_int = Base_Model.default_int
+  insert_sql = ''
+
+  data = {
+    'transaction_id': None,
+    # date of quarter when this data is taken
+    'fundemental_date': None,
+    # profile
+    'beta': default_float,
+    'company_name': '',
+    # income statement
+    'revenue': default_float,
+    'revenue_growth': default_float,
+    'gross_profit': default_float,
+    'eps': default_float,
+    'eps_diluted': default_float,
+    'divided_per_share': default_float,
+    'ebitda_margin': default_float,
+    'profit_margin': default_float,
+    'ebitda': default_float,
+    'net_profit_margin': default_float,
+    'free_cash_flow_margin': default_float,
+    # Balance sheet
+    'cash_and_equivalents': default_float,
+    'short_term_debt': default_float,
+    'total_current_liabilites': default_float,
+    'total_debt': default_float,
+    'total_shareholder_equity': default_float,
+    'tax_assets': default_float,
+    # cash-flow
+    'stock_based_compensation': default_float,
+    'operating_cash_flow': default_float,
+    'capital_expenditure' : default_float,
+    'free_cash_flow': default_float,
+    # finicial ratios
+    'price_book_value_ratio' : default_float,
+    'price_to_book_ratio' : default_float,
+    'price_to_sales_ratio': default_float,
+    'price_earnings_ratio' : default_float,
+    'price_to_free_cash_flow_ratio': default_float,
+    'price_to_cash_flow_ratio': default_float,
+    'earnings_to_growth': default_float,
+    'price_sales_ratio': default_float,
+    'price_fair_value': default_float,
+    'gross_profit_margin': default_float,
+    'return_on_assets': default_float,
+    'liquidity_current_ratio': default_float,
+    'debt_ratio': default_float,
+    'debt_equity_ratio': default_float,
+    'operating_cash_flows_per_share': default_float,
+    'free_cash_flow_per_share': default_float,
+    # enterprise value
+    'shares_outstanding': default_float,
+    'market_cap': default_float,
+    'enterprise_value': default_float,
+    'revenue_per_share': default_float,
+    'cash_per_share': default_float,
+    'book_value_per_share': default_float,
+    'intrest_debt_per_share': default_float,
+    'pe_ratio': default_float,
+    'ebitda_enterprise_value': default_float,
+    'debt_to_equity': default_float,
+    'graham_number': default_float,
+    'graham_net_net': default_float,
+    'working_capital': default_float,
+    'capex_per_share': default_float,
+    # growth
+    'gross_profit_growth': default_float,
+    'operating_income_growth': default_float,
+    'net_income_growth': default_float,
+    'eps_growth': default_float,
+    # dcf
+    'discounted_cash_flow': default_float,
+    # Other One off data points
+    'sector': ''
+  }
 
 
 # ======================================================= #
@@ -366,64 +430,71 @@ class Fundamental_Indicators(Base_Model):
 # returns float to say -100 is bearish 100 is bullish
 
 class Chart_Indicators(Base_Model):
-
+        
   def __init__(self):
-    Base_Model.__init__(self)
-    self.eod_id = None
-    self.two_crows = 999999.99
-    self.three_black_crows = 999999.99
-    self.three_inside_up_down = 999999.99
-    self.three_outside_up_down = 999999.99
-    self.three_line_strike = 999999.99
-    self.three_stars_south = 999999.99
-    self.three_adv_soliders = 999999.99
-    self.abandoned_baby = 999999.99
-    self.advance_block = 999999.99
-    self.belt_hold = 999999.99
-    self.breakaway = 999999.99
-    self.marubozu_closing = 999999.99
-    self.concealing_baby_swallow = 999999.99
-    self.counterattack = 999999.99
-    self.dark_cloud_cover = 999999.99
-    self.doji = 999999.99
-    self.doji_star = 999999.99
-    self.doji_dragonfly = 999999.99
-    self.engulfing_pattern = 999999.99
-    self.gravestone_doji = 999999.99
-    self.hammer = 999999.99
-    self.hanging_man = 999999.99
-    self.harami_pattern = 999999.99
-    self.harami_cross_pattern = 999999.99
-    self.high_wave_candle = 999999.99
-    self.hikkake_pattern = 999999.99
-    self.hikkake_mod_pattern = 999999.99
-    self.homing_pigeon = 999999.99
-    self.identical_three_crows = 999999.99
-    self.in_neck_pattern = 999999.99
-    self.inverted_hammer = 999999.99
-    self.kicking = 999999.99
-    self.ladder_bottom = 999999.99
-    self.doji_long_leg = 999999.99
-    self.long_line_candle = 999999.99
-    self.marubozu = 999999.99
-    self.matching_low = 999999.99
-    self.mat_hold = 999999.99
-    self.doji_morning_star = 999999.99
-    self.morning_star = 999999.99
-    self.on_neck_pattern = 999999.99
-    self.piercing_pattern = 999999.99
-    self.rickshaw_man = 999999.99
-    self.rise_fall_three_methods = 999999.99
-    self.seperating_lines = 999999.99
-    self.shooting_star = 999999.99
-    self.short_line_candle = 999999.99
-    self.spinning_top = 999999.99
-    self.stalled_pattern = 999999.99
-    self.stick_sandwhich = 999999.99
-    self.doji_tasuki = 999999.99
-    self.tasuki_gap = 999999.99
-    self.thrusting_pattern = 999999.99
-    self.tristar_pattern = 999999.99
-    self.three_unique_river = 999999.99
-    self.three_upside_gap_river = 999999.99
     return
+
+
+  default_float = Base_Model.default_float
+  default_int = Base_Model.default_int
+  insert_sql = ''
+
+  data = {
+    'eod_id': None,
+    'two_crows': default_float,
+    'three_black_crows': default_float,
+    'three_inside_up_down': default_float,
+    'three_outside_up_down': default_float,
+    'three_line_strike': default_float,
+    'three_stars_south': default_float,
+    'three_adv_soliders': default_float,
+    'abandoned_baby': default_float,
+    'advance_block': default_float,
+    'belt_hold': default_float,
+    'breakaway': default_float,
+    'marubozu_closing': default_float,
+    'concealing_baby_swallow': default_float,
+    'counterattack': default_float,
+    'dark_cloud_cover': default_float,
+    'doji': default_float,
+    'doji_star': default_float,
+    'doji_dragonfly': default_float,
+    'engulfing_pattern': default_float,
+    'gravestone_doji': default_float,
+    'hammer': default_float,
+    'hanging_man': default_float,
+    'harami_pattern': default_float,
+    'harami_cross_pattern': default_float,
+    'high_wave_candle': default_float,
+    'hikkake_pattern': default_float,
+    'hikkake_mod_pattern': default_float,
+    'homing_pigeon': default_float,
+    'identical_three_crows': default_float,
+    'in_neck_pattern': default_float,
+    'inverted_hammer': default_float,
+    'kicking': default_float,
+    'ladder_bottom': default_float,
+    'doji_long_leg': default_float,
+    'long_line_candle': default_float,
+    'marubozu': default_float,
+    'matching_low': default_float,
+    'mat_hold': default_float,
+    'doji_morning_star': default_float,
+    'morning_star': default_float,
+    'on_neck_pattern': default_float,
+    'piercing_pattern': default_float,
+    'rickshaw_man': default_float,
+    'rise_fall_three_methods': default_float,
+    'seperating_lines': default_float,
+    'shooting_star': default_float,
+    'short_line_candle': default_float,
+    'spinning_top': default_float,
+    'stalled_pattern': default_float,
+    'stick_sandwhich': default_float,
+    'doji_tasuki': default_float,
+    'tasuki_gap': default_float,
+    'thrusting_pattern': default_float,
+    'tristar_pattern': default_float,
+    'three_unique_river': default_float,
+    'three_upside_gap_river': default_float  
+  }

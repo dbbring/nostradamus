@@ -6,11 +6,12 @@ import requests
  #            AlphaVantage API Calls                       #
  # ======================================================= #
 
+# We can add more API keys to the array and cycle them if we start hitting out limit. 
+# But they still block via IP. We will have use liquidVPN and enable the IP 
+# modulation if we want to use mulitple API tokens. API returns a note if you 
+# exceed the limit.
 
 class AlphaVantage(util.API_Request):
-
-    # keep track of api keys and cycle through them
-    # what happens if ticker isnt found
 
     def __init__(self, ticker):
         self.base = super()
@@ -26,11 +27,12 @@ class AlphaVantage(util.API_Request):
         return
 
 
-    def try_api_call(self, ticker: str):
+    def try_api_call(self, ticker: str) -> dict:
+        time.sleep(30)
         r = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=' + ticker + '&apikey=' + self.api_keys[self.api_key_counter])
         res = r.json()
-        # if api timed out error use another api key or
-        # api return "note" : "you excceded the limit"
+        if 'note' in res:
+            return {}
         return res['Time Series (Daily)']
         
 
@@ -44,13 +46,6 @@ class Fin_Mod_Prep(util.API_Request):
     def __init__(self):
         self.base = super()
         return
-
-
-    def try_api_call(self, ticker: str):
-        r = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=' + ticker + '&apikey=' + self.api_keys[self.api_key_counter])
-        res = r.json()
-        # if api timed out error use another api key
-        return res
 
 
     def get_indices(self):

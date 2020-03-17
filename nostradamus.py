@@ -1,12 +1,17 @@
 import sys
-from utils.scrapers import *
-from utils.api_requests import *
-from database.helpers import *
+
+from data_operations.utils.scrapers import *
+from data_operations.utils.api_requests import *
+from data_operations.database.helpers import *
+from shared.models import Ticker
 # ============== TODO =========================
-# Not thrilled about how we have to create a ton of new objects in FinViz
+
 # Figure out a way to move the date objects out of news
 # maybe we need to store off price from finvix and compare to api call to make sure we are getting the right ticker
 # check date on fundmental (fin model prep api) some are wicked out of date, maybe hit another source?
+
+# keep in mind this for the current day of gaining 10%. We need the previous days because the current means nothing to us.
+
 
 
 
@@ -15,7 +20,7 @@ end_id = 1
 end_of_list = False
 tickers = ['mcf']
 
-'''
+
 # Fetch all the tickers the meets our criteria
 while not end_of_list:
   FV = FinViz('../nostradamus_files/finviz-r=' + str(index) + '.html')
@@ -33,14 +38,10 @@ for ticker in tickers:
   if (FV.has_finviz_news()):
     tickers.remove(ticker)
   else:
+    TD = TDAmeritrade(ticker)
+    if not TD.has_td_news():
+      company = Ticker()
+      company.basic_info.data['ticker'] = ticker
     # do we create a ticker object that can hold all our data while we process?
     # proceed to check TD and if has news, then pop out otherwise lets go on and start
     # grabbing data
-
-    td = TDAmeritrade('mcf')
-
-av = AlphaVantage('mcf')
-'''
-
-db = DB()
-print(type(db).__name__)

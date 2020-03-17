@@ -3,6 +3,9 @@ from datetime import datetime, timedelta
 import requests
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
  
 # Date ranges to check for a news event. Today plus 3 days ago.
 def get_date_ranges() -> list:
@@ -58,6 +61,26 @@ def string_to_int_abbv(strToConvert: str) -> int:
             return int(float(int_only) * 1000)
         else:
             return 0
+
+def send_mail(message: str) -> None:
+    gmailUser = 'nostradamus.notifications@gmail.com'
+    gmailPassword = 'gatoradegreengrass'
+    recipient = 'dev.dbbring@gmail.com'
+    email_message=message
+
+    msg = MIMEMultipart()
+    msg['From'] = gmailUser
+    msg['To'] = recipient
+    msg['Subject'] = "-- | Nostradamus Update | --"
+    msg.attach(MIMEText(email_message))
+
+    mailServer = smtplib.SMTP('smtp.gmail.com', 587)
+    mailServer.ehlo()
+    mailServer.starttls()
+    mailServer.ehlo()
+    mailServer.login(gmailUser, gmailPassword)
+    mailServer.sendmail(gmailUser, recipient, msg.as_string())
+    mailServer.close()
 
 
  # ======================================================= # 

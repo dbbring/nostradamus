@@ -89,10 +89,13 @@ class FinViz(util.Scaper):
 
 class TDAmeritrade(util.Scaper):
 
-    def __init__(self, ticker: str):
+    def __init__(self, ticker: str, index=False):
         self.base = super()
-        # self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/summary?fromPage=overview&display=&fromSearch=true&symbol=' + ticker)
-        self.soup = self.base.get_data('../nostradamus_files/td-' + ticker + '.html')
+        if (index):
+            self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/charts?symbol=' + ticker)
+        else:
+            # self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/summary?fromPage=overview&display=&fromSearch=true&symbol=' + ticker) 
+            self.soup = self.base.get_data('../nostradamus_files/td-' + ticker + '.html')
         return
 
 
@@ -109,7 +112,6 @@ class TDAmeritrade(util.Scaper):
 
 
     def get_sector(self) -> str:
-        # keep in mind this for the current day of gaining 10%. We need the previous days because the current means nothing to us.
         sector = self.soup.find('div', class_='company-detail-information')
         sector = sector.get_text().split(':') 
         sector = unicodedata.normalize('NFKD', sector[0]).strip()       
@@ -125,16 +127,36 @@ class TDAmeritrade(util.Scaper):
     def get_tute_ownership(self) -> float:
         tutes = self.soup.find('a', text="% Held by Institutions")
         tutes = tutes.parent.parent.find_next_sibling('dd')
-        if util.isValidFloat(tutes.get_text()):
-            return float(tutes.get_text())
+        tutes = tutes.get_text()
+        if util.isValidFloat(tutes):
+            return float(tutes)
         return 0
 
 
     def get_short_intrest(self) -> float:
         shorties = self.soup.find('a', text="Short Interest")
         shorties = shorties.parent.parent.find_next_sibling('dd')
-        if util.isValidFloat(shorties.get_text()):
-            return float(shorties.get_text())
+        shorties = shorties.get_text()
+        if util.isValidFloat(shorties):
+            return float(shorties)
+        return 0
+
+    
+    def get_percent_change(self) -> float:
+        change = self.soup.find('span', class_='percent-change')
+        change = change.get_text()
+        change = change[2:(len(change) - 2)]      
+        if util.isValidFloat(change):
+            return float(change)
+        return 99999.99
+
+
+    def get_price(self) -> float:
+        price = self.soup.find('dt', text="Closing Price")
+        price = price.find_next_sibling('dd')
+        price = price.get_text().replace(',','')
+        if util.isValidFloat(price):
+            return float(price)
         return 0
 
 
