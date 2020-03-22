@@ -1,25 +1,6 @@
+from collections import OrderedDict
+
 from shared.base_model import Base_Model
-
-
-# ======================================================= #
-#                Main Ticker Object                       #
-# ======================================================= #
-
-class Ticker(object):
-
-  def __init__(self, symbol):
-    return
-
-  basic_info = Transaction()
-  intraday = [Price_Detail()]
-  eod = [Price_EOD()]
-  weekly = [Price_Weekly()]
-  tech_anaylsis = [Technical_Indicators()]
-  fund_anaylsis = Fundamental_Indicators()
-  chart_anaylsis = [Chart_Indicators()]
-
-
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # ======================================================= #
 #                 Sectors Table                           #
@@ -36,37 +17,30 @@ class Sectors(Base_Model):
     return
 
   default_float = Base_Model.default_float
+  data = OrderedDict()
 
-  insert_sql = ('INSERT INTO Sectors ('
-    'date, s_p, dji, nasdaq, russell_1000, russell_2000, vix, vix_close,'
-    'real_estate, consumer_staples, health_care, utilities, materials,'
-    'industrials, financials, energy,communication_services,'
-    'consumer_discretionary, information_technology) VALUES '
-    '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
+  data['sector_id'] = None
+  data['date'] = None
+  data['s_p'] = default_float
+  data['dji'] = default_float
+  data['nasdaq'] = default_float
+  data['russell_1000'] = default_float
+  data['russell_2000'] = default_float
+  data['vix'] = default_float
+  data['vix_close'] = default_float
+  data['real_estate'] = default_float
+  data['consumer_staples'] = default_float
+  data['health_care'] = default_float
+  data['utilities'] = default_float
+  data['materials'] = default_float
+  data['industrials'] = default_float
+  data['financials'] = default_float
+  data['energy'] = default_float
+  data['communication_services'] = default_float
+  data['consumer_discretionary'] = default_float
+  data['information_technology'] = default_float
 
-  data = {
-    'sector_id': None,
-    'date': None,
-    's_p': default_float,
-    'dji': default_float,
-    'nasdaq': default_float,
-    'russell_1000': default_float,
-    'russell_2000': default_float,
-    'vix': default_float,
-    'vix_close': default_float,
-    'real_estate': default_float,
-    'consumer_staples': default_float,
-    'health_care': default_float,
-    'utilities': default_float,
-    'materials': default_float,
-    'industrials': default_float,
-    'financials': default_float,
-    'energy': default_float,
-    'communication_services': default_float,
-    'consumer_discretionary': default_float,
-    'information_technology': default_float
-  }
-
+  # Class Level Function Just call it and get back what you want
   def get_sector(self, sector: str) -> str:
     # returns the proper top level data name for a sub
     sanitizeSector = sector.lower()
@@ -120,35 +94,12 @@ class Transaction(Base_Model):
 
 
   default_float = Base_Model.default_float
-  insert_sql = ''
+  data = OrderedDict()
 
-  data = {
-    'transaction_id': None,
-    'date': None,
-    'ticker': None,
-    'sector_change': 0,
-    'percent_change': default_float
-  }
-
-
-# ======================================================= #
-#    Price End of Day - Transaction Bridge Table          #
-# ======================================================= #
-
-class PEOD_Transact_Bridge(Base_Model):
-
-  def __init__(self):
-      return
-
-
-  default_float = Base_Model.default_float
-  insert_sql = ''
-
-  data = {
-    'row_id': None,
-    'tranasction_id': None,
-    'eod_id': None
-  }
+  data['transaction_id'] = None
+  data['date'] = None
+  data['ticker'] = None
+  data['percent_change'] = default_float
 
 
 # ======================================================= #
@@ -162,41 +113,19 @@ class Price_EOD(Base_Model):
 
 
   default_float = Base_Model.default_float
-  default_int = Base_Model.default_int
-  insert_sql = ''
+  data = OrderedDict()
 
-  data = {
-    'eod_id': None,
-    'is_tracking_period': None,
-    'date': None,
-    'open': default_int,
-    'high': default_int,
-    'low': default_int,
-    'close': default_int,
-    'volume': default_float,
-    'avg_volume': default_float,
-    'percent_change': default_float
-  }
-
-    
-# ======================================================= #
-#    Price Weekly - Transaction Bridge Table          #
-# ======================================================= #
-
-class PW_Transact_Bridge(Base_Model):
-
-  def __init__(self):
-      return
-
-
-  default_float = Base_Model.default_float
-  insert_sql = ''
-
-  data = {
-    'row_id': None,
-    'transaction_id': None,
-    'pw_id': None
-  }
+  data['eod_id'] = None
+  data['date'] = None
+  data['transaction_id'] = None
+  data['is_tracking_period'] = None
+  data['open'] = default_float
+  data['high'] = default_float
+  data['low'] = default_float
+  data['close'] = default_float
+  data['volume'] = default_float
+  data['avg_volume'] = default_float
+  data['percent_change'] = default_float
 
 
 # ======================================================= #
@@ -210,68 +139,19 @@ class Price_Weekly(Base_Model):
 
 
   default_float = Base_Model.default_float
-  default_int = Base_Model.default_int
-  insert_sql = ''
+  data = OrderedDict()
 
-  data = {
-    'weekly_id': None,
-    'open': default_int,
-    'high': default_int,
-    'low': default_int,
-    'close': default_int,
-    'volume': default_int,
-    'avg_volume': default_int,
-    'percent_change': default_float,
-    'date': None
-  }
-        
-
-# ======================================================= #
-#          Price EOD - Price Detail Bridge Table          #
-# ======================================================= #
-
-class PEOD_PD_Bridge(Base_Model):
-
-  def __init__(self):
-    return
-
-
-  default_float = Base_Model.default_float
-  default_int = Base_Model.default_int
-  insert_sql = ''
-
-  data = {
-    'row_id': None,
-    'eod_id': None,
-    'price_detail_id': None
-  }
-
-
-# ======================================================= #
-#                Price per Day (30Min) Table              #
-# ======================================================= #
-
-class Price_Detail(Base_Model):
-  
-  def __init__(self):
-    return
-
-
-  default_float = Base_Model.default_float
-  default_int = Base_Model.default_int
-  insert_sql = ''
-
-  data = {
-    'price_detail_id': None,
-    'open': default_float,
-    'high': default_float,
-    'low': default_float,
-    'close': default_float,
-    'volume': default_float,
-    'percent_change': default_float,
-    'date': None,
-    'time': '',
-  }
+  data['weekly_id'] = None
+  data['transaction_id'] = None
+  data['wk_start_date'] = None
+  data['wk_end_date'] = None
+  data['open'] = default_float
+  data['high'] = default_float
+  data['low'] = default_float
+  data['close'] = default_float
+  data['volume'] = default_float
+  data['avg_volume'] = default_float
+  data['percent_change'] = default_float
 
 
 # ======================================================= #
@@ -285,53 +165,49 @@ class Technical_Indicators(Base_Model):
 
 
   default_float = Base_Model.default_float
-  default_int = Base_Model.default_int
-  insert_sql = ''
+  data = OrderedDict()
 
-  data = {
-    'eod_id': None,
-    'atr': default_float,
-    'boll_bands': default_float,
-    'sma': default_float,
-    'ema': default_float,
-    'average_directional_movement': default_float,
-    'chaikin_osc': default_float,
-    'chaikin_a_d_line': default_float,
-    'beta': default_float,
-    'balance_of_power': default_float,
-    'commodity_channel_index': default_float,
-    'chande_momentum_oscillator': default_float,
-    'pearsons_coefficient': default_float,
-    'double_ema': default_float,
-    'directional_movement_index': default_float,
-    'kaufman_adaptive_ma': default_float,
-    'linear_reg': default_float,
-    'linear_reg_angle': default_float,
-    'linear_reg_intercept': default_float,
-    'linear_reg_slope': default_float,
-    'macd_conv_diver': default_float,
-    'mesa_adaptive_ma': default_float,
-    'money_flow_index': default_float,
-    'momentum' : default_float,
-    'normalized_atr': default_float,
-    'obv': default_float,
-    'percent_price_osc': default_float,
-    'rsi': default_float,
-    'parabolic_sar': default_float,
-    'parabolic_sar_ext': default_float,
-    'std_deviation': default_float,
-    'stochastic': default_float,
-    'stochastic_fast': default_float,
-    'stochastic_rsi': default_float,
-    'triple_ema': default_float,
-    'true_range': default_float,
-    'triangluar_ma': default_float,
-    'ultimate_osc': default_float,
-    'williams_percent_r': default_float,
-    'weighted_ma': default_float,
-    'resistance_point': default_float,
-    'support_point': default_float,
-  }
+  data['eod_id'] = None
+  data['atr'] = default_float
+  data['boll_bands'] = default_float
+  data['sma'] = default_float
+  data['ema'] = default_float
+  data['average_directional_movement'] = default_float
+  data['chaikin_osc'] = default_float
+  data['chaikin_a_d_line'] = default_float
+  data['balance_of_power'] = default_float
+  data['commodity_channel_index'] = default_float
+  data['chande_momentum_oscillator'] = default_float
+  data['pearsons_coefficient'] = default_float
+  data['double_ema'] = default_float
+  data['directional_movement_index'] = default_float
+  data['kaufman_adaptive_ma'] = default_float
+  data['linear_reg'] = default_float
+  data['linear_reg_angle'] = default_float
+  data['linear_reg_intercept'] = default_float
+  data['linear_reg_slope'] = default_float
+  data['macd_conv_diver'] = default_float
+  data['mesa_adaptive_ma'] = default_float
+  data['money_flow_index'] = default_float
+  data['momentum' ] = default_float
+  data['normalized_atr'] = default_float
+  data['obv'] = default_float
+  data['percent_price_osc'] = default_float
+  data['rsi'] = default_float
+  data['parabolic_sar'] = default_float
+  data['parabolic_sar_ext'] = default_float
+  data['std_deviation'] = default_float
+  data['stochastic'] = default_float
+  data['stochastic_fast'] = default_float
+  data['stochastic_rsi'] = default_float
+  data['triple_ema'] = default_float
+  data['true_range'] = default_float
+  data['triangluar_ma'] = default_float
+  data['ultimate_osc'] = default_float
+  data['williams_percent_r'] = default_float
+  data['weighted_ma'] = default_float
+  data['resistance_point'] = default_float
+  data['support_point'] = default_float
 
 
 # ======================================================= #
@@ -339,88 +215,140 @@ class Technical_Indicators(Base_Model):
 # ======================================================= #
 
 class Fundamental_Indicators(Base_Model):
+
+  # income statement
+  # Finicancals as reported or cash flow or both?
+  # Advanced stats
+  # Other one off pieces off info
+  # next earnings date? dont exclude if they are coming up
+  # maybe earnings data
       
   def __init__(self):
     return
 
 
   default_float = Base_Model.default_float
-  default_int = Base_Model.default_int
-  insert_sql = ''
+  data = OrderedDict()
 
-  data = {
-    'transaction_id': None,
-    # date of quarter when this data is taken
-    'fundemental_date': None,
-    # profile
-    'beta': default_float,
-    'company_name': '',
-    # income statement
-    'revenue': default_float,
-    'revenue_growth': default_float,
-    'gross_profit': default_float,
-    'eps': default_float,
-    'eps_diluted': default_float,
-    'divided_per_share': default_float,
-    'ebitda_margin': default_float,
-    'profit_margin': default_float,
-    'ebitda': default_float,
-    'net_profit_margin': default_float,
-    'free_cash_flow_margin': default_float,
-    # Balance sheet
-    'cash_and_equivalents': default_float,
-    'short_term_debt': default_float,
-    'total_current_liabilites': default_float,
-    'total_debt': default_float,
-    'total_shareholder_equity': default_float,
-    'tax_assets': default_float,
-    # cash-flow
-    'stock_based_compensation': default_float,
-    'operating_cash_flow': default_float,
-    'capital_expenditure' : default_float,
-    'free_cash_flow': default_float,
-    # finicial ratios
-    'price_book_value_ratio' : default_float,
-    'price_to_book_ratio' : default_float,
-    'price_to_sales_ratio': default_float,
-    'price_earnings_ratio' : default_float,
-    'price_to_free_cash_flow_ratio': default_float,
-    'price_to_cash_flow_ratio': default_float,
-    'earnings_to_growth': default_float,
-    'price_sales_ratio': default_float,
-    'price_fair_value': default_float,
-    'gross_profit_margin': default_float,
-    'return_on_assets': default_float,
-    'liquidity_current_ratio': default_float,
-    'debt_ratio': default_float,
-    'debt_equity_ratio': default_float,
-    'operating_cash_flows_per_share': default_float,
-    'free_cash_flow_per_share': default_float,
-    # enterprise value
-    'shares_outstanding': default_float,
-    'market_cap': default_float,
-    'enterprise_value': default_float,
-    'revenue_per_share': default_float,
-    'cash_per_share': default_float,
-    'book_value_per_share': default_float,
-    'intrest_debt_per_share': default_float,
-    'pe_ratio': default_float,
-    'ebitda_enterprise_value': default_float,
-    'debt_to_equity': default_float,
-    'graham_number': default_float,
-    'graham_net_net': default_float,
-    'working_capital': default_float,
-    'capex_per_share': default_float,
-    # growth
-    'gross_profit_growth': default_float,
-    'operating_income_growth': default_float,
-    'net_income_growth': default_float,
-    'eps_growth': default_float,
-    # dcf
-    'discounted_cash_flow': default_float,
-    # Other One off data points
-    'sector': ''
-  }
+  data['transaction_id'] = None
+  # Income Endpoint
+  data['total_revenue'] = default_float
+  data['cost_of_revenue'] = default_float
+  data['gross_profit'] = default_float
+  data['r_and_d'] = default_float
+  data['selling_gen_and_admin'] = default_float
+  data['operating_expense'] = default_float
+  data['operating_income'] = default_float
+  data['other_income_expense_net'] = default_float
+  data['ebit'] = default_float
+  data['intrest_income'] = default_float
+  data['pretax_income'] = default_float
+  data['income_tax'] = default_float
+  data['minority_intrest'] = default_float
+  data['net_income'] = default_float
+  data['net_income_basic'] = default_float
+  # Advanced Stats Endpoint
+  data['company_name'] = ''
+  data['yr_high'] = default_float
+  data['yr_low'] = default_float
+  data['yr_change'] = default_float
+  data['shares_outstanding'] = default_float
+  data['float'] = default_float
+  data['eps_ttm'] = default_float
+  data['dividend_yield'] = default_float
+  data['dividend_rate_ttm'] = default_float
+  data['employees'] = default_float
+  data['earnings_date'] = None
+  data['pe_ratio'] = default_float
+  data['beta'] = default_float
+  data['total_cash'] = default_float
+  data['current_debt'] = default_float
+  data['ebitda'] = default_float
+  data['revenue_per_share'] = default_float
+  data['revenue_per_employee'] = default_float
+  data['debt_to_equity'] = default_float
+  data['profit_margin'] = default_float
+  data['enterprise_value'] = default_float
+  data['enterprise_value_to_rev'] = default_float
+  data['price_to_sales'] = default_float
+  data['price_to_book'] = default_float
+  data['foward_pe_ratio'] = default_float
+  data['peg_ratio'] = default_float
+  data['pe_high'] = default_float
+  data['pe_low'] = default_float
+  # Cash Flow Endpoint
+  data['depreciation'] = default_float
+  data['changes_in_receviables'] = default_float
+  data['changes_in_inventories'] = default_float
+  data['cash_change'] = default_float
+  data['cash_flow'] = default_float
+  data['capital_expenditures'] = default_float
+  data['investments'] = default_float
+  data['total_investing_cash_flows'] = default_float
+  data['dividends_paid'] = default_float
+  data['net_borrowings'] = default_float
+  data['other_cash_flows'] = default_float
+  data['cash_flow_financing'] = default_float
+  # Balance Sheet endpoint
+  data['balance_sheet_date'] = None
+  data['current_cash'] = default_float
+  data['short_term_investments'] = default_float
+  data['receivables'] = default_float
+  data['inventory'] = default_float
+  data['other_current_assets'] = default_float
+  data['current_assets'] = default_float
+  data['long_term_investments'] = default_float
+  data['property_plant_equipment'] = default_float
+  data['goodwill'] = default_float
+  data['intangible_assets'] = default_float
+  data['other_assets'] = default_float
+  data['total_assets'] = default_float
+  data['accounts_payable'] = default_float
+  data['current_long_term_debt'] = default_float
+  data['other_current_liabilites'] = default_float
+  data['total_current_liabilites'] = default_float
+  data['long_term_debt'] = default_float
+  data['other_liabilites'] = default_float
+  data['minority_interest'] = default_float
+  data['total_liabilites'] = default_float
+  data['common_stock'] = default_float
+  data['retained_earnings'] = default_float
+  data['treasury_stock'] = default_float
+  data['capital_surplus'] = default_float
+  data['shareholder_equity'] = default_float
+  data['net_tangible_assets'] = default_float
+  # Financial Ratios Calc'd on the fly no endpoint
+  # https://www.oldschoolvalue.com/financials-accounting/balance-sheet-ratios/
+  data['quick_ratio'] = default_float
+  data['current_ratio'] = default_float
+  data['total_debt_equity_ratio'] = default_float
+  data['long_term_debt_equity'] = default_float
+  data['short_term_debt_equity'] = default_float
+  data['avg_age_of_inventory'] = default_float
+  data['intangibles_book_ratio'] = default_float
+  data['inventory_to_sales_ratio'] = default_float
+  data['long_term_debt_percent_invest_cap'] = default_float
+  data['short_term_debt_percent_invest_cap'] = default_float
+  data['long_term_debt_to_total_debt'] = default_float
+  data['short_term_debt_to_total_debt'] = default_float
+  data['total_liabilites_to_total_assets'] = default_float
+  data['working_capital'] = default_float
+  # Other One off data points with advanced stats
+  data['sector'] = ''
+  data['sector_change'] = default_float
+  data['avg_30_volume'] = default_float
+  data['mvg_avg_200'] = default_float
+  data['mvg_avg_50'] = default_float
+  data['max_change_percent'] = default_float
+  data['year_5_change_percent'] = default_float
+  data['year_2_change_percent'] = default_float
+  data['year_1_change_percent'] = default_float
+  data['ytd_change_percent'] = default_float
+  data['month_6_change_percent'] = default_float
+  data['month_3_change_percent'] = default_float
+  data['month_1_change_percent'] = default_float
+  data['day_30_change_percent'] = default_float
+  data['day_5_change_percent'] = default_float
 
 
 # ======================================================= #
@@ -436,65 +364,78 @@ class Chart_Indicators(Base_Model):
 
 
   default_float = Base_Model.default_float
-  default_int = Base_Model.default_int
-  insert_sql = ''
+  data = OrderedDict()
 
-  data = {
-    'eod_id': None,
-    'two_crows': default_float,
-    'three_black_crows': default_float,
-    'three_inside_up_down': default_float,
-    'three_outside_up_down': default_float,
-    'three_line_strike': default_float,
-    'three_stars_south': default_float,
-    'three_adv_soliders': default_float,
-    'abandoned_baby': default_float,
-    'advance_block': default_float,
-    'belt_hold': default_float,
-    'breakaway': default_float,
-    'marubozu_closing': default_float,
-    'concealing_baby_swallow': default_float,
-    'counterattack': default_float,
-    'dark_cloud_cover': default_float,
-    'doji': default_float,
-    'doji_star': default_float,
-    'doji_dragonfly': default_float,
-    'engulfing_pattern': default_float,
-    'gravestone_doji': default_float,
-    'hammer': default_float,
-    'hanging_man': default_float,
-    'harami_pattern': default_float,
-    'harami_cross_pattern': default_float,
-    'high_wave_candle': default_float,
-    'hikkake_pattern': default_float,
-    'hikkake_mod_pattern': default_float,
-    'homing_pigeon': default_float,
-    'identical_three_crows': default_float,
-    'in_neck_pattern': default_float,
-    'inverted_hammer': default_float,
-    'kicking': default_float,
-    'ladder_bottom': default_float,
-    'doji_long_leg': default_float,
-    'long_line_candle': default_float,
-    'marubozu': default_float,
-    'matching_low': default_float,
-    'mat_hold': default_float,
-    'doji_morning_star': default_float,
-    'morning_star': default_float,
-    'on_neck_pattern': default_float,
-    'piercing_pattern': default_float,
-    'rickshaw_man': default_float,
-    'rise_fall_three_methods': default_float,
-    'seperating_lines': default_float,
-    'shooting_star': default_float,
-    'short_line_candle': default_float,
-    'spinning_top': default_float,
-    'stalled_pattern': default_float,
-    'stick_sandwhich': default_float,
-    'doji_tasuki': default_float,
-    'tasuki_gap': default_float,
-    'thrusting_pattern': default_float,
-    'tristar_pattern': default_float,
-    'three_unique_river': default_float,
-    'three_upside_gap_river': default_float  
-  }
+  data['eod_id'] = None
+  data['two_crows'] = default_float
+  data['three_black_crows'] = default_float
+  data['three_inside_up_down'] = default_float
+  data['three_outside_up_down'] = default_float
+  data['three_line_strike'] = default_float
+  data['three_stars_south'] = default_float
+  data['three_adv_soliders'] = default_float
+  data['abandoned_baby'] = default_float
+  data['advance_block'] = default_float
+  data['belt_hold'] = default_float
+  data['breakaway'] = default_float
+  data['marubozu_closing'] = default_float
+  data['concealing_baby_swallow'] = default_float
+  data['counterattack'] = default_float
+  data['dark_cloud_cover'] = default_float
+  data['doji'] = default_float
+  data['doji_star'] = default_float
+  data['doji_dragonfly'] = default_float
+  data['engulfing_pattern'] = default_float
+  data['gravestone_doji'] = default_float
+  data['hammer'] = default_float
+  data['hanging_man'] = default_float
+  data['harami_pattern'] = default_float
+  data['harami_cross_pattern'] = default_float
+  data['high_wave_candle'] = default_float
+  data['hikkake_pattern'] = default_float
+  data['hikkake_mod_pattern'] = default_float
+  data['homing_pigeon'] = default_float
+  data['identical_three_crows'] = default_float
+  data['in_neck_pattern'] = default_float
+  data['inverted_hammer'] = default_float
+  data['kicking'] = default_float
+  data['ladder_bottom'] = default_float
+  data['doji_long_leg'] = default_float
+  data['long_line_candle'] = default_float
+  data['marubozu'] = default_float
+  data['matching_low'] = default_float
+  data['mat_hold'] = default_float
+  data['doji_morning_star'] = default_float
+  data['morning_star'] = default_float
+  data['on_neck_pattern'] = default_float
+  data['piercing_pattern'] = default_float
+  data['rickshaw_man'] = default_float
+  data['rise_fall_three_methods'] = default_float
+  data['seperating_lines'] = default_float
+  data['shooting_star'] = default_float
+  data['short_line_candle'] = default_float
+  data['spinning_top'] = default_float
+  data['stalled_pattern'] = default_float
+  data['stick_sandwhich'] = default_float
+  data['doji_tasuki'] = default_float
+  data['tasuki_gap'] = default_float
+  data['thrusting_pattern'] = default_float
+  data['tristar_pattern'] = default_float
+  data['three_unique_river'] = default_float
+  data['three_upside_gap_river'] = default_float  
+
+# ======================================================= #
+#                Main Ticker Object                       #
+# ======================================================= #
+
+class Ticker(object):
+
+  def __init__(self):
+    return
+
+  basic_info = Transaction()
+  eod = [Price_EOD()]
+  weekly = [Price_Weekly()]
+  tech_anaylsis = [Technical_Indicators()]
+  fund_anaylsis = Fundamental_Indicators()
+  chart_anaylsis = [Chart_Indicators()]

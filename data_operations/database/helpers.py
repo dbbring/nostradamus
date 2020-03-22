@@ -1,11 +1,14 @@
-from data_operations.database.sql import db_schema
+from data_operations.database.sql import DB_SCHEMA
 import mysql.connector
 from mysql.connector import errorcode
 
-class DB(db_schema):
+class DB(DB_SCHEMA):
     
     def __init__(self):
         self.base = super()
+        self.insert_sql = self.base.insert_statements()
+        self.update_sql = self.base.update_statements()
+        self.last_insert_id = -1
         try:
             self.cnx = mysql.connector.connect(user='toor', database='nostradamus')
             self.cursor = self.cnx.cursor()
@@ -25,6 +28,7 @@ class DB(db_schema):
         self.cnx.close()
         return
     
+
     def load_tables(self):
         base_tables = self.base.tables()
         for table_name in base_tables:
@@ -32,23 +36,22 @@ class DB(db_schema):
             try:
                 self.cursor.execute(table_description)
             except mysql.connector.Error as err:
-                if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-                    print("already exists.")
-                else:
-                    print(err.msg)
+                print(err.msg)
         return
 
 
     def save(self, model) -> None:
-        table_name = type(model).__name__
         data = list(model.data.values())
-        
         if not data[0]:  # if our id is null, then exclude it
             del data[0]
-            self.cursor.execute(model.insert_sql, data)
-            self.cnx.commit()
-            return
+        self.cursor.execute(self.insert_sql[type(model).__name__], data)
+        self.last_insert_id = self.cursor.lastrowid
+        self.cnx.commit()
+        return
 
-        # do updates here because we need the id
+    def update(self, model) -> None:
+        # use update statements here.
+        # figure out which key changed i guess
+        # update [ dict key ] values [ dict value ]
         return
 

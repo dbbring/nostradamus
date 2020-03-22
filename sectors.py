@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 from data_operations.utils.scrapers import Bloomberg, TDAmeritrade
 from data_operations.database.helpers import DB
 from shared.models import Sectors

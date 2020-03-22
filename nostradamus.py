@@ -1,4 +1,7 @@
+#! /usr/bin/env python
+
 import sys
+from datetime import date, datetime
 
 from data_operations.utils.scrapers import *
 from data_operations.utils.api_requests import *
@@ -42,6 +45,10 @@ for ticker in tickers:
     if not TD.has_td_news():
       company = Ticker()
       company.basic_info.data['ticker'] = ticker
-    # do we create a ticker object that can hold all our data while we process?
-    # proceed to check TD and if has news, then pop out otherwise lets go on and start
-    # grabbing data
+      company.basic_info.data['date'] = datetime.now().date()
+      company.basic_info.data['percent_change'] = TD.get_percent_change()
+
+
+
+# when saving, just call save on each model if its an array
+# send mail with entire ticker list
