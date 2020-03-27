@@ -11,9 +11,13 @@ from shared.models import Ticker
 
 # Figure out a way to move the date objects out of news
 # maybe we need to store off price from finvix and compare to api call to make sure we are getting the right ticker
-# check date on fundmental (fin model prep api) some are wicked out of date, maybe hit another source?
 
 # keep in mind this for the current day of gaining 10%. We need the previous days because the current means nothing to us.
+
+# also store off sub sector for future data anaysis but get top level sector to compare gains
+
+
+# use trendln package to get support and resistance points https://github.com/GregoryMorse/trendln
 
 
 
@@ -36,6 +40,8 @@ while not end_of_list:
   else:
     end_of_list = True
 
+
+
 for ticker in tickers:
   FV = FinViz('../nostradamus_files/finviz=' + ticker + '.html')
   if (FV.has_finviz_news()):
@@ -43,12 +49,15 @@ for ticker in tickers:
   else:
     TD = TDAmeritrade(ticker)
     if not TD.has_td_news():
+      # try catch here and just pass dont save information if exception
       company = Ticker()
       company.basic_info.data['ticker'] = ticker
       company.basic_info.data['date'] = datetime.now().date()
       company.basic_info.data['percent_change'] = TD.get_percent_change()
+      # get sector name and subname and shorties and tute ownership then proceed on
+
+      # Check IEX for News
+      # All green lights grab information from alpha vantage and start processing
 
 
-
-# when saving, just call save on each model if its an array
 # send mail with entire ticker list

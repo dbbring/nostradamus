@@ -14,31 +14,30 @@ from shared.base_model import Base_Model
 class Sectors(Base_Model):
 
   def __init__(self):
+    self.default_float = Base_Model.default_float
+    self.data = OrderedDict()
+
+    self.data['sector_id'] = None
+    self.data['date'] = None
+    self.data['s_p'] = self.default_float
+    self.data['dji'] = self.default_float
+    self.data['nasdaq'] = self.default_float
+    self.data['russell_1000'] = self.default_float
+    self.data['russell_2000'] = self.default_float
+    self.data['vix'] = self.default_float
+    self.data['vix_close'] = self.default_float
+    self.data['real_estate'] = self.default_float
+    self.data['consumer_staples'] = self.default_float
+    self.data['health_care'] = self.default_float
+    self.data['utilities'] = self.default_float
+    self.data['materials'] = self.default_float
+    self.data['industrials'] = self.default_float
+    self.data['financials'] = self.default_float
+    self.data['energy'] = self.default_float
+    self.data['communication_services'] = self.default_float
+    self.data['consumer_discretionary'] = self.default_float
+    self.data['information_technology'] = self.default_float
     return
-
-  default_float = Base_Model.default_float
-  data = OrderedDict()
-
-  data['sector_id'] = None
-  data['date'] = None
-  data['s_p'] = default_float
-  data['dji'] = default_float
-  data['nasdaq'] = default_float
-  data['russell_1000'] = default_float
-  data['russell_2000'] = default_float
-  data['vix'] = default_float
-  data['vix_close'] = default_float
-  data['real_estate'] = default_float
-  data['consumer_staples'] = default_float
-  data['health_care'] = default_float
-  data['utilities'] = default_float
-  data['materials'] = default_float
-  data['industrials'] = default_float
-  data['financials'] = default_float
-  data['energy'] = default_float
-  data['communication_services'] = default_float
-  data['consumer_discretionary'] = default_float
-  data['information_technology'] = default_float
 
   # Class Level Function Just call it and get back what you want
   def get_sector(self, sector: str) -> str:
@@ -90,16 +89,14 @@ class Sectors(Base_Model):
 class Transaction(Base_Model):
 
   def __init__(self):
+    self.default_float = Base_Model.default_float
+    self.data = OrderedDict()
+
+    self.data['transaction_id'] = None
+    self.data['date'] = None
+    self.data['ticker'] = None
+    self.data['percent_change'] = self.default_float
     return
-
-
-  default_float = Base_Model.default_float
-  data = OrderedDict()
-
-  data['transaction_id'] = None
-  data['date'] = None
-  data['ticker'] = None
-  data['percent_change'] = default_float
 
 
 # ======================================================= #
@@ -109,24 +106,21 @@ class Transaction(Base_Model):
 class Price_EOD(Base_Model):
 
   def __init__(self):
-      return
+    self.default_float = Base_Model.default_float
+    self.data = OrderedDict()
 
-
-  default_float = Base_Model.default_float
-  data = OrderedDict()
-
-  data['eod_id'] = None
-  data['date'] = None
-  data['transaction_id'] = None
-  data['is_tracking_period'] = None
-  data['open'] = default_float
-  data['high'] = default_float
-  data['low'] = default_float
-  data['close'] = default_float
-  data['volume'] = default_float
-  data['avg_volume'] = default_float
-  data['percent_change'] = default_float
-
+    self.data['eod_id'] = None
+    self.data['date'] = None
+    self.data['transaction_id'] = None
+    self.data['is_tracking_period'] = None
+    self.data['open'] = self.default_float
+    self.data['high'] = self.default_float
+    self.data['low'] = self.default_float
+    self.data['close'] = self.default_float
+    self.data['volume'] = self.default_float
+    self.data['avg_volume'] = self.default_float #50 day period
+    self.data['percent_change'] = self.default_float
+    return
 
 # ======================================================= #
 #                Price Weekly Table                       #
@@ -135,23 +129,21 @@ class Price_EOD(Base_Model):
 class Price_Weekly(Base_Model):
 
   def __init__(self):
-      return
+    self.default_float = Base_Model.default_float
+    self.data = OrderedDict()
 
-
-  default_float = Base_Model.default_float
-  data = OrderedDict()
-
-  data['weekly_id'] = None
-  data['transaction_id'] = None
-  data['wk_start_date'] = None
-  data['wk_end_date'] = None
-  data['open'] = default_float
-  data['high'] = default_float
-  data['low'] = default_float
-  data['close'] = default_float
-  data['volume'] = default_float
-  data['avg_volume'] = default_float
-  data['percent_change'] = default_float
+    self.data['weekly_id'] = None
+    self.data['transaction_id'] = None
+    self.data['wk_start_date'] = None
+    self.data['wk_end_date'] = None
+    self.data['open'] = self.default_float
+    self.data['high'] = self.default_float
+    self.data['low'] = self.default_float
+    self.data['close'] = self.default_float
+    self.data['volume'] = self.default_float
+    self.data['avg_volume'] = self.default_float
+    self.data['percent_change'] = self.default_float
+    return
 
 
 # ======================================================= #
@@ -161,53 +153,146 @@ class Price_Weekly(Base_Model):
 class Technical_Indicators(Base_Model):
     
   def __init__(self):
+    self.default_float = Base_Model.default_float
+    self.data = OrderedDict()
+
+    self.data['eod_id'] = None
+    self.data['atr_3_period'] = self.default_float # Measures volatility
+    self.data['atr_10_period'] = self.default_float
+    self.data['atr_15_period'] = self.default_float
+    self.data['atr_20_period'] = self.default_float
+    self.data['boll_bands_upper_3_period'] = self.default_float
+    self.data['boll_bands_middle_3_period'] = self.default_float
+    self.data['boll_bands_lower_3_period'] = self.default_float
+    self.data['boll_bands_upper_10_period'] = self.default_float
+    self.data['boll_bands_middle_10_period'] = self.default_float
+    self.data['boll_bands_lower_10_period'] = self.default_float
+    self.data['boll_bands_upper_15_period'] = self.default_float
+    self.data['boll_bands_middle_15_period'] = self.default_float
+    self.data['boll_bands_lower_15_period'] = self.default_float
+    self.data['boll_bands_upper_20_period'] = self.default_float
+    self.data['boll_bands_middle_20_period'] = self.default_float
+    self.data['boll_bands_lower_20_period'] = self.default_float
+    self.data['sma_3_period'] = self.default_float
+    self.data['sma_10_period'] = self.default_float
+    self.data['sma_15_period'] = self.default_float
+    self.data['sma_20_period'] = self.default_float
+    self.data['ema_3_period'] = self.default_float
+    self.data['ema_10_period'] = self.default_float
+    self.data['ema_15_period'] = self.default_float
+    self.data['ema_20_period'] = self.default_float
+    self.data['average_directional_movement_3_period'] = self.default_float
+    self.data['average_directional_movement_10_period'] = self.default_float
+    self.data['average_directional_movement_15_period'] = self.default_float
+    self.data['average_directional_movement_20_period'] = self.default_float
+    self.data['chaikin_osc_fast_3_slow_10'] = self.default_float
+    self.data['chaikin_osc_fast_6_slow_18'] = self.default_float
+    self.data['chaikin_osc_fast_10_slow_20'] = self.default_float
+    self.data['chaikin_a_d_line'] = self.default_float
+    self.data['balance_of_power'] = self.default_float
+    self.data['commodity_channel_index_3_period'] = self.default_float
+    self.data['commodity_channel_index_10_period'] = self.default_float
+    self.data['commodity_channel_index_15_period'] = self.default_float
+    self.data['commodity_channel_index_20_period'] = self.default_float
+    self.data['chande_momentum_oscillator_3_period'] = self.default_float
+    self.data['chande_momentum_oscillator_10_period'] = self.default_float
+    self.data['chande_momentum_oscillator_15_period'] = self.default_float
+    self.data['chande_momentum_oscillator_20_period'] = self.default_float
+    self.data['pearsons_coefficient_5_period'] = self.default_float
+    self.data['pearsons_coefficient_15_period'] = self.default_float
+    self.data['pearsons_coefficient_30_period'] = self.default_float
+    self.data['double_ema_3_period'] = self.default_float
+    self.data['double_ema_10_period'] = self.default_float
+    self.data['double_ema_15_period'] = self.default_float
+    self.data['double_ema_20_period'] = self.default_float
+    self.data['directional_movement_index_3_period'] = self.default_float
+    self.data['directional_movement_index_10_period'] = self.default_float
+    self.data['directional_movement_index_15_period'] = self.default_float
+    self.data['directional_movement_index_20_period'] = self.default_float
+    self.data['kaufman_adaptive_ma_5_period'] = self.default_float
+    self.data['kaufman_adaptive_ma_15_period'] = self.default_float
+    self.data['kaufman_adaptive_ma_30_period'] = self.default_float
+    self.data['linear_reg_3_period'] = self.default_float
+    self.data['linear_reg_10_period'] = self.default_float
+    self.data['linear_reg_15_period'] = self.default_float
+    self.data['linear_reg_20_period'] = self.default_float
+    self.data['linear_reg_angle_3_period'] = self.default_float
+    self.data['linear_reg_angle_10_period'] = self.default_float
+    self.data['linear_reg_angle_15_period'] = self.default_float
+    self.data['linear_reg_angle_20_period'] = self.default_float
+    self.data['linear_reg_intercept_3_period'] = self.default_float
+    self.data['linear_reg_intercept_10_period'] = self.default_float
+    self.data['linear_reg_intercept_15_period'] = self.default_float
+    self.data['linear_reg_intercept_20_period'] = self.default_float
+    self.data['linear_reg_slope_3_period'] = self.default_float
+    self.data['linear_reg_slope_10_period'] = self.default_float
+    self.data['linear_reg_slope_15_period'] = self.default_float
+    self.data['linear_reg_slope_20_period'] = self.default_float
+    self.data['macd_fast_12_slow_26_sig_9'] = self.default_float
+    self.data['macd_signal_fast_12_slow_26_sig_9'] = self.default_float
+    self.data['macd_hist_fast_12_slow_26_sig_9'] = self.default_float
+    self.data['macd_fast_6_slow_13_sig_5'] = self.default_float
+    self.data['macd_signal_fast_6_slow_13_sig_5'] = self.default_float
+    self.data['macd_hist_fast_6_slow_13_sig_5'] = self.default_float
+    self.data['macd_fast_18_slow_39_sig_14'] = self.default_float
+    self.data['macd_signal_fast_18_slow_39_sig_14'] = self.default_float
+    self.data['macd_hist_fast_18_slow_39_sig_14'] = self.default_float
+    self.data['mesa_adaptive_ma_mama'] = self.default_float
+    self.data['mesa_adaptive_ma_fama'] = self.default_float
+    self.data['money_flow_index_3_period'] = self.default_float
+    self.data['money_flow_index_10_period'] = self.default_float
+    self.data['money_flow_index_15_period'] = self.default_float
+    self.data['money_flow_index_20_period'] = self.default_float
+    self.data['momentum_3_period'] = self.default_float
+    self.data['momentum_10_period'] = self.default_float
+    self.data['momentum_15_period'] = self.default_float
+    self.data['momentum_20_period'] = self.default_float
+    self.data['normalized_atr_3_period'] = self.default_float
+    self.data['normalized_atr_10_period'] = self.default_float
+    self.data['normalized_atr_15_period'] = self.default_float
+    self.data['normalized_atr_20_period'] = self.default_float
+    self.data['obv'] = self.default_float
+    self.data['percent_price_osc_fast_6_slow_13'] = self.default_float
+    self.data['percent_price_osc_fast_12_slow_26'] = self.default_float
+    self.data['percent_price_osc_fast_18_slow_38'] = self.default_float
+    self.data['rsi_3_period'] = self.default_float
+    self.data['rsi_10_period'] = self.default_float
+    self.data['rsi_15_period'] = self.default_float
+    self.data['rsi_20_period'] = self.default_float
+    self.data['parabolic_sar'] = self.default_float
+    self.data['parabolic_sar_ext'] = self.default_float
+    self.data['std_deviation_3_period'] = self.default_float
+    self.data['std_deviation_10_period'] = self.default_float
+    self.data['std_deviation_15_period'] = self.default_float
+    self.data['std_deviation_20_period'] = self.default_float
+    self.data['std_deviation_dbl_3_period'] = self.default_float
+    self.data['std_deviation_dbl_10_period'] = self.default_float
+    self.data['std_deviation_dbl_15_period'] = self.default_float
+    self.data['std_deviation_dbl_20_period'] = self.default_float
+    self.data['stochastic_fast_5_slow_k_3_slow_d_3'] = self.default_float
+    self.data['stochastic_fast_20_slow_k_7_slow_d_7'] = self.default_float
+    self.data['stochastic_fast_20_slow_k_14_slow_d_14'] = self.default_float
+    self.data['triple_ema_3_period'] = self.default_float
+    self.data['triple_ema_10_period'] = self.default_float
+    self.data['triple_ema_15_period'] = self.default_float
+    self.data['triple_ema_20_period'] = self.default_float
+    self.data['true_range'] = self.default_float
+    self.data['triangluar_ma_15_period'] = self.default_float
+    self.data['triangluar_ma_30_period'] = self.default_float
+    self.data['ultimate_osc_3_period'] = self.default_float
+    self.data['ultimate_osc_7_period'] = self.default_float
+    self.data['ultimate_osc_10_period'] = self.default_float
+    self.data['williams_percent_r_3_period'] = self.default_float
+    self.data['williams_percent_r_10_period'] = self.default_float
+    self.data['williams_percent_r_15_period'] = self.default_float
+    self.data['williams_percent_r_20_period'] = self.default_float
+    self.data['weighted_ma_3_period'] = self.default_float
+    self.data['weighted_ma_10_period'] = self.default_float
+    self.data['weighted_ma_15_period'] = self.default_float
+    self.data['weighted_ma_20_period'] = self.default_float
+    self.data['resistance_point'] = self.default_float
+    self.data['support_point'] = self.default_float
     return
-
-
-  default_float = Base_Model.default_float
-  data = OrderedDict()
-
-  data['eod_id'] = None
-  data['atr'] = default_float
-  data['boll_bands'] = default_float
-  data['sma'] = default_float
-  data['ema'] = default_float
-  data['average_directional_movement'] = default_float
-  data['chaikin_osc'] = default_float
-  data['chaikin_a_d_line'] = default_float
-  data['balance_of_power'] = default_float
-  data['commodity_channel_index'] = default_float
-  data['chande_momentum_oscillator'] = default_float
-  data['pearsons_coefficient'] = default_float
-  data['double_ema'] = default_float
-  data['directional_movement_index'] = default_float
-  data['kaufman_adaptive_ma'] = default_float
-  data['linear_reg'] = default_float
-  data['linear_reg_angle'] = default_float
-  data['linear_reg_intercept'] = default_float
-  data['linear_reg_slope'] = default_float
-  data['macd_conv_diver'] = default_float
-  data['mesa_adaptive_ma'] = default_float
-  data['money_flow_index'] = default_float
-  data['momentum' ] = default_float
-  data['normalized_atr'] = default_float
-  data['obv'] = default_float
-  data['percent_price_osc'] = default_float
-  data['rsi'] = default_float
-  data['parabolic_sar'] = default_float
-  data['parabolic_sar_ext'] = default_float
-  data['std_deviation'] = default_float
-  data['stochastic'] = default_float
-  data['stochastic_fast'] = default_float
-  data['stochastic_rsi'] = default_float
-  data['triple_ema'] = default_float
-  data['true_range'] = default_float
-  data['triangluar_ma'] = default_float
-  data['ultimate_osc'] = default_float
-  data['williams_percent_r'] = default_float
-  data['weighted_ma'] = default_float
-  data['resistance_point'] = default_float
-  data['support_point'] = default_float
 
 
 # ======================================================= #
@@ -224,131 +309,132 @@ class Fundamental_Indicators(Base_Model):
   # maybe earnings data
       
   def __init__(self):
+    self.default_float = Base_Model.default_float
+    self.data = OrderedDict()
+
+    self.data['transaction_id'] = None
+    # Income Endpoint
+    self.data['total_revenue'] = self.default_float
+    self.data['cost_of_revenue'] = self.default_float
+    self.data['gross_profit'] = self.default_float
+    self.data['r_and_d'] = self.default_float
+    self.data['selling_gen_and_admin'] = self.default_float
+    self.data['operating_expense'] = self.default_float
+    self.data['operating_income'] = self.default_float
+    self.data['other_income_expense_net'] = self.default_float
+    self.data['ebit'] = self.default_float
+    self.data['intrest_income'] = self.default_float
+    self.data['pretax_income'] = self.default_float
+    self.data['income_tax'] = self.default_float
+    self.data['minority_intrest'] = self.default_float
+    self.data['net_income'] = self.default_float
+    self.data['net_income_basic'] = self.default_float
+    # Advanced Stats Endpoint
+    self.data['company_name'] = ''
+    self.data['yr_high'] = self.default_float
+    self.data['yr_low'] = self.default_float
+    self.data['yr_change'] = self.default_float
+    self.data['shares_outstanding'] = self.default_float
+    self.data['float'] = self.default_float
+    self.data['eps_ttm'] = self.default_float
+    self.data['dividend_yield'] = self.default_float
+    self.data['dividend_rate_ttm'] = self.default_float
+    self.data['employees'] = self.default_float
+    self.data['earnings_date'] = None
+    self.data['pe_ratio'] = self.default_float
+    self.data['beta'] = self.default_float
+    self.data['total_cash'] = self.default_float
+    self.data['current_debt'] = self.default_float
+    self.data['ebitda'] = self.default_float
+    self.data['revenue_per_share'] = self.default_float
+    self.data['revenue_per_employee'] = self.default_float
+    self.data['debt_to_equity'] = self.default_float
+    self.data['profit_margin'] = self.default_float
+    self.data['enterprise_value'] = self.default_float
+    self.data['enterprise_value_to_rev'] = self.default_float
+    self.data['price_to_sales'] = self.default_float
+    self.data['price_to_book'] = self.default_float
+    self.data['foward_pe_ratio'] = self.default_float
+    self.data['peg_ratio'] = self.default_float
+    self.data['pe_high'] = self.default_float
+    self.data['pe_low'] = self.default_float
+    # Cash Flow Endpoint
+    self.data['depreciation'] = self.default_float
+    self.data['changes_in_receviables'] = self.default_float
+    self.data['changes_in_inventories'] = self.default_float
+    self.data['cash_change'] = self.default_float
+    self.data['cash_flow'] = self.default_float
+    self.data['capital_expenditures'] = self.default_float
+    self.data['investments'] = self.default_float
+    self.data['total_investing_cash_flows'] = self.default_float
+    self.data['dividends_paid'] = self.default_float
+    self.data['net_borrowings'] = self.default_float
+    self.data['other_cash_flows'] = self.default_float
+    self.data['cash_flow_financing'] = self.default_float
+    # Balance Sheet endpoint
+    self.data['balance_sheet_date'] = None
+    self.data['current_cash'] = self.default_float
+    self.data['short_term_investments'] = self.default_float
+    self.data['receivables'] = self.default_float
+    self.data['inventory'] = self.default_float
+    self.data['other_current_assets'] = self.default_float
+    self.data['current_assets'] = self.default_float
+    self.data['long_term_investments'] = self.default_float
+    self.data['property_plant_equipment'] = self.default_float
+    self.data['goodwill'] = self.default_float
+    self.data['intangible_assets'] = self.default_float
+    self.data['other_assets'] = self.default_float
+    self.data['total_assets'] = self.default_float
+    self.data['accounts_payable'] = self.default_float
+    self.data['current_long_term_debt'] = self.default_float
+    self.data['other_current_liabilites'] = self.default_float
+    self.data['total_current_liabilites'] = self.default_float
+    self.data['long_term_debt'] = self.default_float
+    self.data['other_liabilites'] = self.default_float
+    self.data['minority_interest'] = self.default_float
+    self.data['total_liabilites'] = self.default_float
+    self.data['common_stock'] = self.default_float
+    self.data['retained_earnings'] = self.default_float
+    self.data['treasury_stock'] = self.default_float
+    self.data['capital_surplus'] = self.default_float
+    self.data['shareholder_equity'] = self.default_float
+    self.data['net_tangible_assets'] = self.default_float
+    # Financial Ratios Calc'd on the fly no endpoint
+    # https://www.oldschoolvalue.com/financials-accounting/balance-sheet-ratios/
+    self.data['quick_ratio'] = self.default_float
+    self.data['current_ratio'] = self.default_float
+    self.data['total_debt_equity_ratio'] = self.default_float
+    self.data['long_term_debt_equity'] = self.default_float
+    self.data['short_term_debt_equity'] = self.default_float
+    self.data['avg_age_of_inventory'] = self.default_float
+    self.data['intangibles_book_ratio'] = self.default_float
+    self.data['inventory_to_sales_ratio'] = self.default_float
+    self.data['long_term_debt_percent_invest_cap'] = self.default_float
+    self.data['short_term_debt_percent_invest_cap'] = self.default_float
+    self.data['long_term_debt_to_total_debt'] = self.default_float
+    self.data['short_term_debt_to_total_debt'] = self.default_float
+    self.data['total_liabilites_to_total_assets'] = self.default_float
+    self.data['working_capital'] = self.default_float
+    # Other One off self.data points with advanced stats
+    self.data['sector'] = ''
+    self.data['sub_sector'] = ''
+    self.data['sector_change'] = self.default_float
+    self.data['institutional_ownership'] = self.default_float # already a percent dont convert
+    self.data['short_interest_percent'] = self.default_float # already a percent dont convert
+    self.data['avg_30_volume'] = self.default_float
+    self.data['mvg_avg_200'] = self.default_float
+    self.data['mvg_avg_50'] = self.default_float
+    self.data['max_change_percent'] = self.default_float
+    self.data['year_5_change_percent'] = self.default_float
+    self.data['year_2_change_percent'] = self.default_float
+    self.data['year_1_change_percent'] = self.default_float
+    self.data['ytd_change_percent'] = self.default_float
+    self.data['month_6_change_percent'] = self.default_float
+    self.data['month_3_change_percent'] = self.default_float
+    self.data['month_1_change_percent'] = self.default_float
+    self.data['day_30_change_percent'] = self.default_float
+    self.data['day_5_change_percent'] = self.default_float
     return
-
-
-  default_float = Base_Model.default_float
-  data = OrderedDict()
-
-  data['transaction_id'] = None
-  # Income Endpoint
-  data['total_revenue'] = default_float
-  data['cost_of_revenue'] = default_float
-  data['gross_profit'] = default_float
-  data['r_and_d'] = default_float
-  data['selling_gen_and_admin'] = default_float
-  data['operating_expense'] = default_float
-  data['operating_income'] = default_float
-  data['other_income_expense_net'] = default_float
-  data['ebit'] = default_float
-  data['intrest_income'] = default_float
-  data['pretax_income'] = default_float
-  data['income_tax'] = default_float
-  data['minority_intrest'] = default_float
-  data['net_income'] = default_float
-  data['net_income_basic'] = default_float
-  # Advanced Stats Endpoint
-  data['company_name'] = ''
-  data['yr_high'] = default_float
-  data['yr_low'] = default_float
-  data['yr_change'] = default_float
-  data['shares_outstanding'] = default_float
-  data['float'] = default_float
-  data['eps_ttm'] = default_float
-  data['dividend_yield'] = default_float
-  data['dividend_rate_ttm'] = default_float
-  data['employees'] = default_float
-  data['earnings_date'] = None
-  data['pe_ratio'] = default_float
-  data['beta'] = default_float
-  data['total_cash'] = default_float
-  data['current_debt'] = default_float
-  data['ebitda'] = default_float
-  data['revenue_per_share'] = default_float
-  data['revenue_per_employee'] = default_float
-  data['debt_to_equity'] = default_float
-  data['profit_margin'] = default_float
-  data['enterprise_value'] = default_float
-  data['enterprise_value_to_rev'] = default_float
-  data['price_to_sales'] = default_float
-  data['price_to_book'] = default_float
-  data['foward_pe_ratio'] = default_float
-  data['peg_ratio'] = default_float
-  data['pe_high'] = default_float
-  data['pe_low'] = default_float
-  # Cash Flow Endpoint
-  data['depreciation'] = default_float
-  data['changes_in_receviables'] = default_float
-  data['changes_in_inventories'] = default_float
-  data['cash_change'] = default_float
-  data['cash_flow'] = default_float
-  data['capital_expenditures'] = default_float
-  data['investments'] = default_float
-  data['total_investing_cash_flows'] = default_float
-  data['dividends_paid'] = default_float
-  data['net_borrowings'] = default_float
-  data['other_cash_flows'] = default_float
-  data['cash_flow_financing'] = default_float
-  # Balance Sheet endpoint
-  data['balance_sheet_date'] = None
-  data['current_cash'] = default_float
-  data['short_term_investments'] = default_float
-  data['receivables'] = default_float
-  data['inventory'] = default_float
-  data['other_current_assets'] = default_float
-  data['current_assets'] = default_float
-  data['long_term_investments'] = default_float
-  data['property_plant_equipment'] = default_float
-  data['goodwill'] = default_float
-  data['intangible_assets'] = default_float
-  data['other_assets'] = default_float
-  data['total_assets'] = default_float
-  data['accounts_payable'] = default_float
-  data['current_long_term_debt'] = default_float
-  data['other_current_liabilites'] = default_float
-  data['total_current_liabilites'] = default_float
-  data['long_term_debt'] = default_float
-  data['other_liabilites'] = default_float
-  data['minority_interest'] = default_float
-  data['total_liabilites'] = default_float
-  data['common_stock'] = default_float
-  data['retained_earnings'] = default_float
-  data['treasury_stock'] = default_float
-  data['capital_surplus'] = default_float
-  data['shareholder_equity'] = default_float
-  data['net_tangible_assets'] = default_float
-  # Financial Ratios Calc'd on the fly no endpoint
-  # https://www.oldschoolvalue.com/financials-accounting/balance-sheet-ratios/
-  data['quick_ratio'] = default_float
-  data['current_ratio'] = default_float
-  data['total_debt_equity_ratio'] = default_float
-  data['long_term_debt_equity'] = default_float
-  data['short_term_debt_equity'] = default_float
-  data['avg_age_of_inventory'] = default_float
-  data['intangibles_book_ratio'] = default_float
-  data['inventory_to_sales_ratio'] = default_float
-  data['long_term_debt_percent_invest_cap'] = default_float
-  data['short_term_debt_percent_invest_cap'] = default_float
-  data['long_term_debt_to_total_debt'] = default_float
-  data['short_term_debt_to_total_debt'] = default_float
-  data['total_liabilites_to_total_assets'] = default_float
-  data['working_capital'] = default_float
-  # Other One off data points with advanced stats
-  data['sector'] = ''
-  data['sector_change'] = default_float
-  data['avg_30_volume'] = default_float
-  data['mvg_avg_200'] = default_float
-  data['mvg_avg_50'] = default_float
-  data['max_change_percent'] = default_float
-  data['year_5_change_percent'] = default_float
-  data['year_2_change_percent'] = default_float
-  data['year_1_change_percent'] = default_float
-  data['ytd_change_percent'] = default_float
-  data['month_6_change_percent'] = default_float
-  data['month_3_change_percent'] = default_float
-  data['month_1_change_percent'] = default_float
-  data['day_30_change_percent'] = default_float
-  data['day_5_change_percent'] = default_float
 
 
 # ======================================================= #
@@ -360,69 +446,67 @@ class Fundamental_Indicators(Base_Model):
 class Chart_Indicators(Base_Model):
         
   def __init__(self):
+    self.default_int = Base_Model.default_int
+    self.data = OrderedDict()
+
+    self.data['eod_id'] = None
+    self.data['two_crows'] = self.default_int
+    self.data['three_black_crows'] = self.default_int
+    self.data['three_inside_up_down'] = self.default_int
+    self.data['three_outside_up_down'] = self.default_int
+    self.data['three_line_strike'] = self.default_int
+    self.data['three_stars_south'] = self.default_int
+    self.data['three_adv_soliders'] = self.default_int
+    self.data['abandoned_baby'] = self.default_int
+    self.data['advance_block'] = self.default_int
+    self.data['belt_hold'] = self.default_int
+    self.data['breakaway'] = self.default_int
+    self.data['marubozu_closing'] = self.default_int
+    self.data['concealing_baby_swallow'] = self.default_int
+    self.data['counterattack'] = self.default_int
+    self.data['dark_cloud_cover'] = self.default_int
+    self.data['doji'] = self.default_int
+    self.data['doji_star'] = self.default_int
+    self.data['doji_dragonfly'] = self.default_int
+    self.data['engulfing_pattern'] = self.default_int
+    self.data['gravestone_doji'] = self.default_int
+    self.data['hammer'] = self.default_int
+    self.data['hanging_man'] = self.default_int
+    self.data['harami_pattern'] = self.default_int
+    self.data['harami_cross_pattern'] = self.default_int
+    self.data['high_wave_candle'] = self.default_int
+    self.data['hikkake_pattern'] = self.default_int
+    self.data['hikkake_mod_pattern'] = self.default_int
+    self.data['homing_pigeon'] = self.default_int
+    self.data['identical_three_crows'] = self.default_int
+    self.data['in_neck_pattern'] = self.default_int
+    self.data['inverted_hammer'] = self.default_int
+    self.data['kicking'] = self.default_int
+    self.data['ladder_bottom'] = self.default_int
+    self.data['doji_long_leg'] = self.default_int
+    self.data['long_line_candle'] = self.default_int
+    self.data['marubozu'] = self.default_int
+    self.data['matching_low'] = self.default_int
+    self.data['mat_hold'] = self.default_int
+    self.data['doji_morning_star'] = self.default_int
+    self.data['morning_star'] = self.default_int
+    self.data['on_neck_pattern'] = self.default_int
+    self.data['piercing_pattern'] = self.default_int
+    self.data['rickshaw_man'] = self.default_int
+    self.data['rise_fall_three_methods'] = self.default_int
+    self.data['seperating_lines'] = self.default_int
+    self.data['shooting_star'] = self.default_int
+    self.data['short_line_candle'] = self.default_int
+    self.data['spinning_top'] = self.default_int
+    self.data['stalled_pattern'] = self.default_int
+    self.data['stick_sandwhich'] = self.default_int
+    self.data['doji_tasuki'] = self.default_int
+    self.data['tasuki_gap'] = self.default_int
+    self.data['thrusting_pattern'] = self.default_int
+    self.data['tristar_pattern'] = self.default_int
+    self.data['three_unique_river'] = self.default_int
+    self.data['three_upside_gap_river'] = self.default_int  
     return
-
-
-  default_float = Base_Model.default_float
-  data = OrderedDict()
-
-  data['eod_id'] = None
-  data['two_crows'] = default_float
-  data['three_black_crows'] = default_float
-  data['three_inside_up_down'] = default_float
-  data['three_outside_up_down'] = default_float
-  data['three_line_strike'] = default_float
-  data['three_stars_south'] = default_float
-  data['three_adv_soliders'] = default_float
-  data['abandoned_baby'] = default_float
-  data['advance_block'] = default_float
-  data['belt_hold'] = default_float
-  data['breakaway'] = default_float
-  data['marubozu_closing'] = default_float
-  data['concealing_baby_swallow'] = default_float
-  data['counterattack'] = default_float
-  data['dark_cloud_cover'] = default_float
-  data['doji'] = default_float
-  data['doji_star'] = default_float
-  data['doji_dragonfly'] = default_float
-  data['engulfing_pattern'] = default_float
-  data['gravestone_doji'] = default_float
-  data['hammer'] = default_float
-  data['hanging_man'] = default_float
-  data['harami_pattern'] = default_float
-  data['harami_cross_pattern'] = default_float
-  data['high_wave_candle'] = default_float
-  data['hikkake_pattern'] = default_float
-  data['hikkake_mod_pattern'] = default_float
-  data['homing_pigeon'] = default_float
-  data['identical_three_crows'] = default_float
-  data['in_neck_pattern'] = default_float
-  data['inverted_hammer'] = default_float
-  data['kicking'] = default_float
-  data['ladder_bottom'] = default_float
-  data['doji_long_leg'] = default_float
-  data['long_line_candle'] = default_float
-  data['marubozu'] = default_float
-  data['matching_low'] = default_float
-  data['mat_hold'] = default_float
-  data['doji_morning_star'] = default_float
-  data['morning_star'] = default_float
-  data['on_neck_pattern'] = default_float
-  data['piercing_pattern'] = default_float
-  data['rickshaw_man'] = default_float
-  data['rise_fall_three_methods'] = default_float
-  data['seperating_lines'] = default_float
-  data['shooting_star'] = default_float
-  data['short_line_candle'] = default_float
-  data['spinning_top'] = default_float
-  data['stalled_pattern'] = default_float
-  data['stick_sandwhich'] = default_float
-  data['doji_tasuki'] = default_float
-  data['tasuki_gap'] = default_float
-  data['thrusting_pattern'] = default_float
-  data['tristar_pattern'] = default_float
-  data['three_unique_river'] = default_float
-  data['three_upside_gap_river'] = default_float  
 
 # ======================================================= #
 #                Main Ticker Object                       #
@@ -431,11 +515,11 @@ class Chart_Indicators(Base_Model):
 class Ticker(object):
 
   def __init__(self):
+    # DB SAVE USES THE FIELD NAME! MAKE SURE TO ACCOUNT FOR IT!
+    self.basic_info = Transaction()
+    self.fund_anaylsis = None # Fundamental_Indicators()
+    self.eod = [] # [Price_EOD(), Price_EOD()]
+    self.weekly = [] # [Price_Weekly(), Price_Weekly()]
+    self.tech_anaylsis = [] # [Technical_Indicators(), Technical_Indicators()]
+    self.chart_anaylsis =[] # [Chart_Indicators(), Chart_Indicators()]
     return
-
-  basic_info = Transaction()
-  eod = [Price_EOD()]
-  weekly = [Price_Weekly()]
-  tech_anaylsis = [Technical_Indicators()]
-  fund_anaylsis = Fundamental_Indicators()
-  chart_anaylsis = [Chart_Indicators()]

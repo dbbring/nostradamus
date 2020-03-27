@@ -1,35 +1,44 @@
 #! /usr/bin/env python
 from data_operations.database.helpers import DB
-from shared.models import Ticker
+from data_operations.utils.api_requests import AlphaVantage, IEX
+from shared.models import Price_EOD, Technical_Indicators, Chart_Indicators, Ticker, Price_Weekly
+
 from datetime import datetime, date
+import numpy as np
+import talib
+from copy import deepcopy
+
 
 db = DB()
 tick = Ticker()
 
 tick.basic_info.data['date'] = datetime.now().date()
-tick.basic_info.data['ticker'] = 'MSFT'
-db.save(tick.basic_info)
-transaction_id = db.last_insert_id
+tick.basic_info.data['ticker'] = 'MCF'
 
-tick.fund_anaylsis.data['transaction_id'] = transaction_id
-tick.fund_anaylsis.data['earnings_date'] = datetime.now().date()
-tick.fund_anaylsis.data['balance_sheet_date'] = datetime.now().date()
-db.save(tick.fund_anaylsis)
+fa = IEX('mcf')
+fa_data = fa.make_fund_indic_model()
+tick.fund_anaylsis = fa_data
 
-tick.eod[0].data['date'] = datetime.now().date()
-tick.eod[0].data['is_tracking_period'] = True
+# stop each array after x number of days we dont need the whole thing
+symbol = AlphaVantage('MCF')
+symbol_wk = AlphaVantage('MCF', False)
+inputs = symbol.get_inputs()
+wk_inputs = symbol_wk.get_inputs()
+start = len(inputs['date']) - 1
+end = start - 5
+test =[]
+for index in range(start, end, -1):
+  wk_data = symbol_wk.make_price_wk_model(wk_inputs, index)
+  tick.weekly.append(wk_data)
 
-for index, eod_data in enumerate(tick.eod):
-  eod_data.data['transaction_id'] = transaction_id
-  db.save(eod_data)
-  eod_id = db.last_insert_id
-  tick.tech_anaylsis[index].data['eod_id'] = eod_id
-  tick.chart_anaylsis[index].data['eod_id'] = eod_id
-  db.save(tick.chart_anaylsis[index])
-  db.save(tick.tech_anaylsis[index])
+  eod_data = symbol.make_price_eod_model(inputs, index)
+  tick.eod.append(eod_data)
 
-tick.weekly[0].data['wk_start_date'] = datetime.now().date()
-tick.weekly[0].data['wk_end_date'] = datetime.now().date()
-for week in tick.weekly:
-  week.data['transaction_id'] = transaction_id
-  db.save(week)
+  tech_data = symbol.make_tech_indic_model(inputs, index)
+  tick.tech_anaylsis.append(tech_data)
+
+  chart_data = symbol.make_chart_idic_model(inputs, index)
+  tick.chart_anaylsis.append(chart_data)
+
+# if whatever reason we fail, dont bother saving
+db.save_ticker_model(tick)

@@ -1,6 +1,7 @@
 from data_operations.database.sql import DB_SCHEMA
 import mysql.connector
 from mysql.connector import errorcode
+from shared.models import Ticker
 
 class DB(DB_SCHEMA):
     
@@ -49,9 +50,53 @@ class DB(DB_SCHEMA):
         self.cnx.commit()
         return
 
+
+    def save_ticker_model(self, ticker_model: Ticker) -> None:
+        self.save(ticker_model.basic_info)
+        trans_id = self.last_insert_id
+
+        
+        ticker_model.fund_anaylsis.data['transaction_id'] = trans_id
+        self.save(ticker_model.fund_anaylsis)
+
+        for item in ticker_model.weekly:
+            item.data['transaction_id'] = trans_id
+            self.save(item)
+
+        for index, item in enumerate(ticker_model.eod):
+            item.data['transaction_id'] = trans_id
+            self.save(item)
+            eod_id = self.last_insert_id
+
+            ta = ticker_model.tech_anaylsis[index]
+            ta.data['eod_id'] = eod_id
+            self.save(ta)
+
+            ca = ticker_model.chart_anaylsis[index]
+            ca.data['eod_id'] = eod_id
+            self.save(ca)
+
+        return
+
+
+    def update_ticker_model(self, ticker_model: Ticker) -> None:
+        models = vars(ticker_model).keys()
+        for model in models:
+            item = getattr(ticker_model, model)
+            if type(item) is not list:
+                self.update(model)
+            else:
+                for nest_model in model:
+                    self.update(nest_model)
+
+        return
+
+
     def update(self, model) -> None:
-        # use update statements here.
-        # figure out which key changed i guess
-        # update [ dict key ] values [ dict value ]
+        data = list(model.data.values())
+        if not data[0]:  # if our id is null, then exclude it
+            del data[0]
+        self.cursor.execute(self.update_sql[type(model).__name__], data)
+        self.cnx.commit()
         return
 
