@@ -1,7 +1,9 @@
 from data_operations.database.sql import DB_SCHEMA
+from shared.models import Ticker
+
+from datetime import datetime, timedelta
 import mysql.connector
 from mysql.connector import errorcode
-from shared.models import Ticker
 
 class DB(DB_SCHEMA):
     
@@ -26,6 +28,7 @@ class DB(DB_SCHEMA):
 
     
     def __del__(self):
+        # self.cursor.close()
         self.cnx.close()
         return
     
@@ -99,4 +102,18 @@ class DB(DB_SCHEMA):
         self.cursor.execute(self.update_sql[type(model).__name__], data)
         self.cnx.commit()
         return
+
+ # @returns a list of tuples with id and ticker
+    def select_tracking_tickers(self) -> list:
+        tickers = []
+        # get last 5 days, which is actually 7 days from any point in the week
+        lookback_date = datetime.today() - timedelta(days=7)
+        lookback_date = lookback_date.strftime("%Y-%m-%d")
+        sql = "SELECT transaction_id, ticker FROM Transaction WHERE date = '" + lookback_date + "';"
+        self.cursor.execute(sql)
+
+        for ticker in self.cursor:
+            tickers.append(ticker)
+
+        return tickers
 

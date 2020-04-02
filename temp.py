@@ -1,12 +1,9 @@
 #! /usr/bin/env python
 from data_operations.database.helpers import DB
 from data_operations.utils.api_requests import AlphaVantage, IEX
-from shared.models import Price_EOD, Technical_Indicators, Chart_Indicators, Ticker, Price_Weekly
+from shared.models import Price_EOD, Ticker
 
 from datetime import datetime, date
-import numpy as np
-import talib
-from copy import deepcopy
 
 
 db = DB()
@@ -17,13 +14,17 @@ tick.basic_info.data['ticker'] = 'MCF'
 
 fa = IEX('mcf')
 fa_data = fa.make_fund_indic_model()
+# Need TD here to add values for shorites and w.e
 tick.fund_anaylsis = fa_data
 
 # stop each array after x number of days we dont need the whole thing
-symbol = AlphaVantage('MCF')
-symbol_wk = AlphaVantage('MCF', False)
+sp = AlphaVantage('.ixc')
+sp_inputs = sp.get_inputs()
+symbol = AlphaVantage('mcf')
+symbol_wk = AlphaVantage('mcf', False)
 inputs = symbol.get_inputs()
 wk_inputs = symbol_wk.get_inputs()
+inputs['s_p'] = sp_inputs['close']
 start = len(inputs['date']) - 1
 end = start - 5
 test =[]

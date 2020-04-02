@@ -111,11 +111,21 @@ class TDAmeritrade(util.Scaper):
         return False
 
 
-    def get_sector(self) -> str:
+    def get_sector(self) -> dict:
+        sectors = {}
         sector = self.soup.find('div', class_='company-detail-information')
         sector = sector.get_text().split(':') 
-        sector = unicodedata.normalize('NFKD', sector[0]).strip()       
-        return sector.lower()
+        tl_sector = unicodedata.normalize('NFKD', sector[0]).strip()
+        if len(sector) <= 1:
+            sectors['top-level'] = tl_sector.lower()
+            sectors['second-level'] = None
+            return
+
+        sl_sector = sector[1].split('|')
+        sl_sector = unicodedata.normalize('NFKD', sl_sector[0]).strip()
+        sectors['top-level'] = tl_sector.lower()
+        sectors['second-level'] = sl_sector.lower()
+        return sectors
 
     
     def get_shares_outstanding(self) -> int:

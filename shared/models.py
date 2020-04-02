@@ -198,9 +198,15 @@ class Technical_Indicators(Base_Model):
     self.data['chande_momentum_oscillator_10_period'] = self.default_float
     self.data['chande_momentum_oscillator_15_period'] = self.default_float
     self.data['chande_momentum_oscillator_20_period'] = self.default_float
-    self.data['pearsons_coefficient_5_period'] = self.default_float
-    self.data['pearsons_coefficient_15_period'] = self.default_float
-    self.data['pearsons_coefficient_30_period'] = self.default_float
+    self.data['pearsons_coeff_close_vol_5_period'] = self.default_float 
+    self.data['pearsons_coeff_close_vol_15_period'] = self.default_float
+    self.data['pearsons_coeff_close_vol_30_period'] = self.default_float
+    self.data['pearsons_coeff_close_avg_vol_5_period'] = self.default_float 
+    self.data['pearsons_coeff_close_avg_vol_15_period'] = self.default_float
+    self.data['pearsons_coeff_close_avg_vol_30_period'] = self.default_float
+    self.data['pearsons_coeff_close_sp_5_period'] = self.default_float 
+    self.data['pearsons_coeff_close_sp_15_period'] = self.default_float
+    self.data['pearsons_coeff_close_sp_30_period'] = self.default_float
     self.data['double_ema_3_period'] = self.default_float
     self.data['double_ema_10_period'] = self.default_float
     self.data['double_ema_15_period'] = self.default_float
@@ -269,19 +275,21 @@ class Technical_Indicators(Base_Model):
     self.data['std_deviation_dbl_10_period'] = self.default_float
     self.data['std_deviation_dbl_15_period'] = self.default_float
     self.data['std_deviation_dbl_20_period'] = self.default_float
-    self.data['stochastic_fast_5_slow_k_3_slow_d_3'] = self.default_float
-    self.data['stochastic_fast_20_slow_k_7_slow_d_7'] = self.default_float
-    self.data['stochastic_fast_20_slow_k_14_slow_d_14'] = self.default_float
+    self.data['stochastic_sk_fast_5_slow_k_3_slow_d_3'] = self.default_float
+    self.data['stochastic_sd_fast_5_slow_k_3_slow_d_3'] = self.default_float
+    self.data['stochastic_sk_fast_20_slow_k_7_slow_d_7'] = self.default_float
+    self.data['stochastic_sd_fast_20_slow_k_7_slow_d_7'] = self.default_float
+    self.data['stochastic_sk_fast_20_slow_k_14_slow_d_14'] = self.default_float
+    self.data['stochastic_sd_fast_20_slow_k_14_slow_d_14'] = self.default_float
     self.data['triple_ema_3_period'] = self.default_float
     self.data['triple_ema_10_period'] = self.default_float
     self.data['triple_ema_15_period'] = self.default_float
-    self.data['triple_ema_20_period'] = self.default_float
     self.data['true_range'] = self.default_float
     self.data['triangluar_ma_15_period'] = self.default_float
     self.data['triangluar_ma_30_period'] = self.default_float
-    self.data['ultimate_osc_3_period'] = self.default_float
-    self.data['ultimate_osc_7_period'] = self.default_float
-    self.data['ultimate_osc_10_period'] = self.default_float
+    self.data['ultimate_osc_3_6_12_period'] = self.default_float
+    self.data['ultimate_osc_7_14_28_period'] = self.default_float
+    self.data['ultimate_osc_10_20_40_period'] = self.default_float
     self.data['williams_percent_r_3_period'] = self.default_float
     self.data['williams_percent_r_10_period'] = self.default_float
     self.data['williams_percent_r_15_period'] = self.default_float
@@ -290,8 +298,6 @@ class Technical_Indicators(Base_Model):
     self.data['weighted_ma_10_period'] = self.default_float
     self.data['weighted_ma_15_period'] = self.default_float
     self.data['weighted_ma_20_period'] = self.default_float
-    self.data['resistance_point'] = self.default_float
-    self.data['support_point'] = self.default_float
     return
 
 
@@ -406,7 +412,6 @@ class Fundamental_Indicators(Base_Model):
     self.data['total_debt_equity_ratio'] = self.default_float
     self.data['long_term_debt_equity'] = self.default_float
     self.data['short_term_debt_equity'] = self.default_float
-    self.data['avg_age_of_inventory'] = self.default_float
     self.data['intangibles_book_ratio'] = self.default_float
     self.data['inventory_to_sales_ratio'] = self.default_float
     self.data['long_term_debt_percent_invest_cap'] = self.default_float
@@ -418,7 +423,6 @@ class Fundamental_Indicators(Base_Model):
     # Other One off self.data points with advanced stats
     self.data['sector'] = ''
     self.data['sub_sector'] = ''
-    self.data['sector_change'] = self.default_float
     self.data['institutional_ownership'] = self.default_float # already a percent dont convert
     self.data['short_interest_percent'] = self.default_float # already a percent dont convert
     self.data['avg_30_volume'] = self.default_float
@@ -434,14 +438,17 @@ class Fundamental_Indicators(Base_Model):
     self.data['month_1_change_percent'] = self.default_float
     self.data['day_30_change_percent'] = self.default_float
     self.data['day_5_change_percent'] = self.default_float
+    self.data['resistance_point_avg'] = self.default_float
+    self.data['resistance_point'] = self.default_float
+    self.data['support_point_avg'] = self.default_float
+    self.data['support_point'] = self.default_float
+    self.data['book_value'] = self.default_float
     return
 
 
 # ======================================================= #
 #                Charting Table                           #
 # ======================================================= #
-
-# returns float to say -100 is bearish 100 is bullish
 
 class Chart_Indicators(Base_Model):
         
