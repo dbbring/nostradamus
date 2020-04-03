@@ -81,6 +81,7 @@ class Sectors(Base_Model):
       return 'financials'
 
     return sector
+
  
 # ======================================================= #
 #                Transaction Table                        #
@@ -121,6 +122,7 @@ class Price_EOD(Base_Model):
     self.data['avg_volume'] = self.default_float #50 day period
     self.data['percent_change'] = self.default_float
     return
+
 
 # ======================================================= #
 #                Price Weekly Table                       #
@@ -306,13 +308,6 @@ class Technical_Indicators(Base_Model):
 # ======================================================= #
 
 class Fundamental_Indicators(Base_Model):
-
-  # income statement
-  # Finicancals as reported or cash flow or both?
-  # Advanced stats
-  # Other one off pieces off info
-  # next earnings date? dont exclude if they are coming up
-  # maybe earnings data
       
   def __init__(self):
     self.default_float = Base_Model.default_float
@@ -514,6 +509,7 @@ class Chart_Indicators(Base_Model):
     self.data['three_unique_river'] = self.default_int
     self.data['three_upside_gap_river'] = self.default_int  
     return
+
 
 # ======================================================= #
 #                Main Ticker Object                       #

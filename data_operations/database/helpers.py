@@ -1,12 +1,23 @@
-from data_operations.database.sql import DB_SCHEMA
-from shared.models import Ticker
-
+#! /usr/bin/env python
+# ==================== Gen Imports ===========================
 from datetime import datetime, timedelta
 import mysql.connector
 from mysql.connector import errorcode
 
+# =================== Custom Imports ========================
+from data_operations.database.sql import DB_SCHEMA
+from shared.models import Ticker
+
+
+# ==============================================================
+#                   Database Connection Class
+# ==============================================================
+
 class DB(DB_SCHEMA):
     
+    # @params (None)
+    # @descrip - Connects to MySQL Instance and checks for database nostradamus, and loads up table in not present
+    # @returns None
     def __init__(self):
         self.base = super()
         self.insert_sql = self.base.insert_statements()
@@ -26,13 +37,19 @@ class DB(DB_SCHEMA):
         self.load_tables()
         return
 
-    
+
+    # @params (None)
+    # @descrip - Destructor, when we are done close up connections
+    # @returns None
     def __del__(self):
-        # self.cursor.close()
+        self.cursor.close()
         self.cnx.close()
         return
     
 
+    # @params (None)
+    # @descrip - Loads table from SQL file
+    # @returns None
     def load_tables(self):
         base_tables = self.base.tables()
         for table_name in base_tables:
@@ -44,6 +61,9 @@ class DB(DB_SCHEMA):
         return
 
 
+    # @params (model) a instance of a model
+    # @descrip - Save a singluar instance of model and set class level field to last inserted in
+    # @returns None
     def save(self, model) -> None:
         data = list(model.data.values())
         if not data[0]:  # if our id is null, then exclude it
@@ -54,6 +74,9 @@ class DB(DB_SCHEMA):
         return
 
 
+    # @params (ticker_model) a instance of the class model of ticker
+    # @descrip - Saves a ticker model which consists of models and array of models
+    # @returns None
     def save_ticker_model(self, ticker_model: Ticker) -> None:
         self.save(ticker_model.basic_info)
         trans_id = self.last_insert_id
@@ -82,6 +105,9 @@ class DB(DB_SCHEMA):
         return
 
 
+    # @params (Ticker_Model) a instance of the class ticker
+    # @descrip - Not using yet! IDK if it works..you have been warned...
+    # @returns None
     def update_ticker_model(self, ticker_model: Ticker) -> None:
         models = vars(ticker_model).keys()
         for model in models:
@@ -95,6 +121,9 @@ class DB(DB_SCHEMA):
         return
 
 
+    # @params (model) a instance of a model
+    # @descrip - Not using yet! IDK if it works..you have been warned...
+    # @returns None
     def update(self, model) -> None:
         data = list(model.data.values())
         if not data[0]:  # if our id is null, then exclude it
@@ -103,11 +132,15 @@ class DB(DB_SCHEMA):
         self.cnx.commit()
         return
 
- # @returns a list of tuples with id and ticker
+
+    # @params (None)
+    # @descrip - Query DB and return all tickers that need the price performance tracked for the last x days
+    # @returns list - a list of tuples with id and ticker
     def select_tracking_tickers(self) -> list:
         tickers = []
         # get last 5 days, which is actually 7 days from any point in the week
-        lookback_date = datetime.today() - timedelta(days=7)
+        #lookback_date = datetime.today() - timedelta(days=7)
+        lookback_date = datetime.now().date()
         lookback_date = lookback_date.strftime("%Y-%m-%d")
         sql = "SELECT transaction_id, ticker FROM Transaction WHERE date = '" + lookback_date + "';"
         self.cursor.execute(sql)
@@ -116,4 +149,3 @@ class DB(DB_SCHEMA):
             tickers.append(ticker)
 
         return tickers
-

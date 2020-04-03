@@ -1,7 +1,5 @@
-import data_operations.utils.helpers as util
-from shared.base_model import Base_Model
-from shared.models import Chart_Indicators, Price_EOD, Price_Weekly, Technical_Indicators, Fundamental_Indicators
-
+#! /usr/bin/env python
+# =================== Gen Imports ===========================
 import requests
 import time
 import json
@@ -11,17 +9,42 @@ import talib
 import os
 import trendln
 
+# ================ Custom Imports ===========================
+from shared.base_model import Base_Model
+from shared.models import Chart_Indicators, Price_EOD, Price_Weekly, Technical_Indicators, Fundamental_Indicators
 
- # ======================================================= # 
- #            AlphaVantage API Calls                       #
- # ======================================================= #
 
-class AlphaVantage(util.API_Request):
+# ============================================================ # 
+#                   Abstract Class                              #
+# ============================================================= #
 
+
+class API_Request(object):
+    
+    def __init__(self):
+        return
+
+    # Oversimplifed to abstract away a common use case.
+    def get_request(self, _url):
+        r = requests.get(url=_url)
+        return r.json()
+
+
+
+ # =========================================================== # 
+ #                 AlphaVantage API Calls                       #
+ # ============================================================ #
+
+class AlphaVantage(API_Request):
+
+    # @params (ticker, is daily) - ticker - what we are looking for, and either daily or weekly.
+    # @descrip - Init by making api call and populating our data dict.
+    # @returns dict - either empty dict for failure or data array dict
     def __init__(self, ticker: str, is_daily=True):
         self.base = super()
         self.ticker = ticker
-        self.total_lookback_days = 100 # farthest right now is 50 for avg volume to start our anaylasis
+        # One TA indicators needs to go this far back
+        self.total_lookback_days = 100 
         self.api_key = os.environ['AV_API_KEY']
         #self.data = self.try_api_call(is_daily)
         if (is_daily):
@@ -34,8 +57,10 @@ class AlphaVantage(util.API_Request):
         return
 
 
+    # @params (is_daily: bool) - Whether we should get daily or weekly data.
+    # @descrip - Try api call, if fails then return empty dict.
+    # @returns dict - either empty dict for failure or data array dict
     def try_api_call(self, is_daily=True) -> dict:
-        time.sleep(15)
         if (is_daily):
             r = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=' + self.ticker + '&apikey=' + self.api_key)
             res = r.json()
@@ -44,9 +69,14 @@ class AlphaVantage(util.API_Request):
             res = r.json()
         if 'note' in res:
             return {}
+        elif 'error' in res:
+            return {}
         return res['Time Series (Daily)'] if is_daily else res['Weekly Time Series']
 
 
+    # @params (None)
+    # @descrip - Blow up data array and seperate into individual arrays of OHLC and reverse because when we do our math, it is seqencal from the begining
+    # @returns (dict) - dict of nparray's (OHLC, Vol, Avg Vol)
     def get_inputs(self) -> dict:
         current_period = 0 # count today for calculations but dont save it
         date_data = []
@@ -84,6 +114,9 @@ class AlphaVantage(util.API_Request):
         return inputs
 
 
+    # @params (inputs, index, istracking) -inputs(dict of NP Arrays), index (which ohlc do we want to piece back toeghther), is tracking (really?)
+    # @descrip - Makes a Price_EOD model, and populates with our inputs data
+    # @returns (Price_EOD) - a Price_EOD model that is ready for saving
     def make_price_eod_model(self, inputs: dict, index: int, is_tracking=False) -> Price_EOD:
         # Class factory to generate each price eod's 
         eod_model = Price_EOD()
@@ -101,6 +134,9 @@ class AlphaVantage(util.API_Request):
         return eod_model
 
 
+    # @params (inputs, index) -inputs(dict of NP Arrays), index (which ohlc do we want to piece back toeghther)
+    # @descrip - Makes a Price_Weekly model, and populates with our inputs data
+    # @returns (Price_Weekly) - a Price_Weekly model that is ready for saving
     def make_price_wk_model(self, inputs: dict, index: int) -> Price_Weekly:
         # Class factory to generate each price weekly 
         wk_model = Price_Weekly()
@@ -118,6 +154,9 @@ class AlphaVantage(util.API_Request):
         return wk_model
 
 
+    # @params (inputs, index) -inputs(dict of NP Arrays), index (which ohlc do we want to piece back toeghther)
+    # @descrip - Uses TALIB to populate our Technical Model for each EOD
+    # @returns (Technical_Indicators - a Technical_Indicators model that is ready for saving
     def make_tech_indic_model(self, inputs: dict, index: int) -> Technical_Indicators:
         # Class factory to generate each price eod's techincal anaylisis
         ta = Technical_Indicators()
@@ -332,6 +371,9 @@ class AlphaVantage(util.API_Request):
         return ta
 
     
+    # @params (inputs, index) -inputs(dict of NP Arrays), index (which ohlc do we want to piece back toeghther)
+    # @descrip - Uses TALIB to populate our Chart Model for each EOD, either -100 for no, 0 for unsure, or 100 for yes.
+    # @returns (Chart_Indicators) - a Chart_Indicators model that is ready for saving
     def make_chart_idic_model(self, inputs: dict, index: int) -> Chart_Indicators:
         # Class factory to generate each price eod's chart anaylisis 
         ca = Chart_Indicators()
@@ -451,17 +493,35 @@ class AlphaVantage(util.API_Request):
         return ca
 
 
- # ======================================================= # 
- #            IEX API Calls                                #
- # ======================================================= #
+ # ============================================================# 
+ #                           IEX API Calls                     #
+ # ============================================================#
 
 
-class IEX(util.API_Request):
+class IEX(API_Request):
 
+    # @params (ticker) - ticker - what we are looking for
+    # @descrip - Init by making api call and populating our data dict from IEX endpoints.
+    # @returns dict - aka JSON response.
     def __init__(self, ticker: str):
         self.base = super()
         self.ticker = ticker
         self.api_key = os.environ['IEX_API_KEY']
+        '''
+        self.data = self.base.get_request('https://sandbox.iexapis.com/stable/stock/' + ticker + '/advanced-stats?token=Tpk_6b5abe0c3d8048fe82f669873de2665f')
+
+        bs = self.base.get_request('https://sandbox.iexapis.com/stable/stock/' + ticker + '/balance-sheet?token=Tpk_6b5abe0c3d8048fe82f669873de2665f')
+        bs = bs['balancesheet'][0]
+        self.data = {**bs, **self.data}
+
+        cs = self.base.get_request('https://sandbox.iexapis.com/stable/stock/' + ticker + '/cash-flow?token=Tpk_6b5abe0c3d8048fe82f669873de2665f')
+        cs = cs['cashflow'][0]
+        self.data = {**cs, **self.data}
+
+        inc = self.base.get_request('https://sandbox.iexapis.com/stable/stock/' + ticker + '/income?token=Tpk_6b5abe0c3d8048fe82f669873de2665f')
+        inc = inc['income'][0]
+        self.data = {**inc, **self.data}
+        '''
         with open('./' + ticker + '-advanced-stats.json') as f:
             self.data = json.load(f)
         with open('./' + ticker + '-balance-sheet.json') as f:
@@ -479,6 +539,9 @@ class IEX(util.API_Request):
         return
 
 
+    # @params (inputs) - inputs(dict of NP.Arrays)
+    # @descrip - Use IEX data to make one off model of Fundamental points
+    # @returns (Fundamental_Indicators) - a Fundamental model that is ready for saving
     def make_fund_indic_model(self, inputs: dict) -> Fundamental_Indicators:
         # Class factory to generate fundamentals
         fa = Fundamental_Indicators()
@@ -605,6 +668,9 @@ class IEX(util.API_Request):
         return fa
 
 
+    # @params (all) - required data points for calculations
+    # @descrip - Checks for None to perform the calculation
+    # @returns (dict) - Values are either None or the calcualted value
     def fill_ratios(self, current_assets: float, current_debt: float, inventory: float, total_current_liabilites: float, total_liabilites: float, shareholder_equity: float, long_term_debt: float, intangible_assets: float, total_revenue: float, current_cash: float, total_assets: float, book_value:float ) -> dict:
         data = {
             'quick_ratio': None,
@@ -658,6 +724,9 @@ class IEX(util.API_Request):
         return data
 
 
+    # @params (inputs) - dict of Np.Arrays
+    # @descrip - Finds low/highest point of close. Then iterates over each value and keeps count of all other values within a % range and returns value with most common data points.
+    # @returns (dict) - Values are either the initial value or the calcuated value.
     def get_support_resistance(self, inputs:dict) -> dict:
         sp_res = OrderedDict()
         min_indexes, max_indexes = trendln.get_extrema(inputs['close'])

@@ -1,10 +1,21 @@
+#! /usr/bin/env python
+
+# ===============================================================
+#           Schema of Nostradamus Database
+# ===============================================================
 
 class DB_SCHEMA(object):
 
+  # @params (None)
+  # @descrip - sets database name
+  # @returns None
   def __init__(self):
     self.DB_NAME = 'nostradamus'
     return
 
+  # @params (None)
+  # @descrip - The insert statements that corresponds to correct model (aka db table). So when the cursor called, it provides the data and the insert statement provides the SQL.
+  # @returns None
   def insert_statements(self):
     INSERT_SQL = {}
 
@@ -95,10 +106,18 @@ class DB_SCHEMA(object):
 
     return INSERT_SQL
 
+  
+  # @params (None)
+  # @descrip - The update statements that corresponds to correct model (aka db table). So when the cursor called, it provides the data and the insert statement provides the SQL. Not using yet. could just mirror the insert statement and update the whole row if we have all the values, which would be populated from the model.
+  # @returns None
   def update_statements(self):
     UPDATE_SQL = {}
     return UPDATE_SQL
 
+
+  # @params (None)
+  # @descrip - The create table statements for all the tables in nostradamus
+  # @returns None
   def tables(self):
     TABLES = {}
 
@@ -504,15 +523,3 @@ class DB_SCHEMA(object):
     ") ENGINE=InnoDB")            
 
     return TABLES
-    
-    
-    
-    '''
-    "  PRIMARY KEY (`emp_no`,`dept_no`), KEY `emp_no` (`emp_no`),"
-    "  KEY `dept_no` (`dept_no`),"
-    "  CONSTRAINT `dept_emp_ibfk_1` FOREIGN KEY (`emp_no`) "
-    "     REFERENCES `employees` (`emp_no`) ON DELETE CASCADE,"
-    "  CONSTRAINT `dept_emp_ibfk_2` FOREIGN KEY (`dept_no`) "
-    "     REFERENCES `departments` (`dept_no`) ON DELETE CASCADE"
-    ") ENGINE=InnoDB")
-    '''
