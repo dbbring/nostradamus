@@ -15,16 +15,16 @@ from shared.models import Ticker
 
 class DB(DB_SCHEMA):
     
-    # @params (None)
+    # @params (database_name) - Name of DB instance to be using
     # @descrip - Connects to MySQL Instance and checks for database nostradamus, and loads up table in not present
     # @returns None
-    def __init__(self):
+    def __init__(self, database_name:str):
         self.base = super()
         self.insert_sql = self.base.insert_statements()
         self.update_sql = self.base.update_statements()
         self.last_insert_id = -1
         try:
-            self.cnx = mysql.connector.connect(user='toor', database='nostradamus')
+            self.cnx = mysql.connector.connect(user='toor', database=database_name)
             self.cursor = self.cnx.cursor()
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -42,7 +42,6 @@ class DB(DB_SCHEMA):
     # @descrip - Destructor, when we are done close up connections
     # @returns None
     def __del__(self):
-        self.cursor.close()
         self.cnx.close()
         return
     
@@ -81,7 +80,6 @@ class DB(DB_SCHEMA):
         self.save(ticker_model.basic_info)
         trans_id = self.last_insert_id
 
-        
         ticker_model.fund_anaylsis.data['transaction_id'] = trans_id
         self.save(ticker_model.fund_anaylsis)
 
@@ -101,6 +99,18 @@ class DB(DB_SCHEMA):
             ca = ticker_model.chart_anaylsis[index]
             ca.data['eod_id'] = eod_id
             self.save(ca)
+        
+        for news_model in ticker_model.news:
+            news_model.data['transaction_id'] = trans_id
+            self.save(news_model)
+
+        for comp_sector_model in ticker_model.comp_sector:
+            comp_sector_model.data['transaction_id'] = trans_id
+            self.save(comp_sector_model)
+
+        for comp_geo_model in ticker_model.comp_geo:
+            comp_geo_model.data['transaction_id'] = trans_id
+            self.save(comp_geo_model)
 
         return
 
@@ -139,8 +149,7 @@ class DB(DB_SCHEMA):
     def select_tracking_tickers(self) -> list:
         tickers = []
         # get last 5 days, which is actually 7 days from any point in the week
-        #lookback_date = datetime.today() - timedelta(days=7)
-        lookback_date = datetime.now().date()
+        lookback_date = datetime.today() - timedelta(days=7)
         lookback_date = lookback_date.strftime("%Y-%m-%d")
         sql = "SELECT transaction_id, ticker FROM Transaction WHERE date = '" + lookback_date + "';"
         self.cursor.execute(sql)

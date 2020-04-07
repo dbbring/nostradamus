@@ -101,26 +101,40 @@ class Transaction(Base_Model):
 
 
 # ======================================================= #
-#                Price End of Day Table                   #
+#                Main Price Model                         #
 # ======================================================= #
 
-class Price_EOD(Base_Model):
+class Price(Base_Model):
 
   def __init__(self):
     self.default_float = Base_Model.default_float
     self.data = OrderedDict()
 
     self.data['eod_id'] = None
-    self.data['date'] = None
     self.data['transaction_id'] = None
-    self.data['is_tracking_period'] = None
+    self.data['date'] = None
     self.data['open'] = self.default_float
     self.data['high'] = self.default_float
     self.data['low'] = self.default_float
     self.data['close'] = self.default_float
     self.data['volume'] = self.default_float
-    self.data['avg_volume'] = self.default_float #50 day period
     self.data['percent_change'] = self.default_float
+    return
+
+
+# ======================================================= #
+#                Price End of Day Table                   #
+# ======================================================= #
+
+class Price_EOD(Price):
+
+  def __init__(self):
+    self.default_float = Base_Model.default_float
+    self.data = Price().data
+
+    
+    self.data['is_tracking_period'] = None
+    self.data['avg_volume'] = self.default_float #50 day period
     return
 
 
@@ -128,23 +142,62 @@ class Price_EOD(Base_Model):
 #                Price Weekly Table                       #
 # ======================================================= #
 
-class Price_Weekly(Base_Model):
+class Price_Weekly(Price):
 
   def __init__(self):
     self.default_float = Base_Model.default_float
-    self.data = OrderedDict()
+    self.data = Price().data
+    del self.data['eod_id']
 
     self.data['weekly_id'] = None
-    self.data['transaction_id'] = None
-    self.data['wk_start_date'] = None
     self.data['wk_end_date'] = None
-    self.data['open'] = self.default_float
-    self.data['high'] = self.default_float
-    self.data['low'] = self.default_float
-    self.data['close'] = self.default_float
-    self.data['volume'] = self.default_float
     self.data['avg_volume'] = self.default_float
-    self.data['percent_change'] = self.default_float
+    return
+
+
+# ======================================================= #
+#    Competitions Price Performance in the same Sector    #
+# ======================================================= #
+
+class Comp_Perfor_Sector(Price):
+
+  def __init__(self):
+    self.default_float = Base_Model.default_float
+    self.data = Price().data
+
+    self.data['ticker'] = None
+    return
+
+
+# ======================================================= #
+#            Business in the same Geographic Area         #
+# ======================================================= #
+
+class Comp_Perfor_Phys_Location(Price):
+
+  def __init__(self):
+    self.default_float = Base_Model.default_float
+    self.data = Price().data
+
+    self.data['ticker'] = None
+    return
+
+
+# ======================================================= #
+#                 News Event Table                        #
+# ======================================================= #
+
+class News_Event(Base_Model):
+
+  def __init__(self):
+    self.data = OrderedDict()
+
+    self.data['news_event_id'] = None
+    self.data['transaction_id'] = None
+    self.data['date_of_article'] = None
+    self.data['title_of_article'] = None
+    self.data['link'] = None
+    self.data['source'] = None
     return
 
 
@@ -438,6 +491,7 @@ class Fundamental_Indicators(Base_Model):
     self.data['support_point_avg'] = self.default_float
     self.data['support_point'] = self.default_float
     self.data['book_value'] = self.default_float
+    self.data['is_adr'] = None
     return
 
 
@@ -518,11 +572,16 @@ class Chart_Indicators(Base_Model):
 class Ticker(object):
 
   def __init__(self):
+
     # DB SAVE USES THE FIELD NAME! MAKE SURE TO ACCOUNT FOR IT!
+
     self.basic_info = Transaction()
     self.fund_anaylsis = None # Fundamental_Indicators()
     self.eod = [] # [Price_EOD(), Price_EOD()]
     self.weekly = [] # [Price_Weekly(), Price_Weekly()]
     self.tech_anaylsis = [] # [Technical_Indicators(), Technical_Indicators()]
     self.chart_anaylsis =[] # [Chart_Indicators(), Chart_Indicators()]
+    self.news = [] # [News_Event(), News_Event()]
+    self.comp_sector = [] # [Comp_Perfor_Sector(), Comp_Perfor_Sector()]
+    self.comp_geo = [] #[Comp_Perfor_Phys_Location(), Comp_Perfor_Phys_Location()]
     return

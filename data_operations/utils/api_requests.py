@@ -53,7 +53,15 @@ class AlphaVantage(API_Request):
         else:
             with open('./' + ticker + '_weekly.json') as f:
                 self.data = json.load(f)
+
         self.data = self.data['Time Series (Daily)'] if is_daily else self.data['Weekly Time Series']
+        '''
+        try:
+            self.data = self.data['Time Series (Daily)'] if is_daily else self.data['Weekly Time Series']
+        except KeyError:
+            # Let self.data be whatever it is
+            pass
+        '''
         return
 
 

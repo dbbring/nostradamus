@@ -1,6 +1,8 @@
 # Models
 With the exception of the Ticker Model, all models are mirror images of the database table they represent. The ticker model represents a top level model that holds all the other sub models.
 
+#### Almost every percent field is stored as a percent already, so dont convert with * 100.
+
 ## Ticker Model
 The ticker model is the top level model that holds all the sub models. Basically for keep one object that we can pass around and maniplute as needed. This way, if something goes wrong, with have the option to not save everything because we dont want incomplete data.
 
@@ -28,3 +30,6 @@ The Chart model includes all the daily charting anaylsis from the TALIB charting
 
 ## Sector Model
 The Sector model is completely segrated from the rest of the models. It merely holds information about each sector in the S and P, and its daily performance. It also contains daily information on the VIX as well as the Dow, and Nasdaq.
+
+## News Event Model
+The News event model holds a list of news articles that could be found from Finviz and TD Ameritrade. Although Nostradamus spefically kicks out tickers with a new article within the last 3 days, its helpful to know what previous articles were and how often the company releases news.

@@ -9,7 +9,7 @@ import requests
 
 # ===================== Custom Imports =======================
 import data_operations.utils.helpers as util
-
+from shared.models import News_Event
 
 # ============================================================ # 
 #                   Abstract Class                             #
@@ -44,7 +44,7 @@ class Scaper(object):
 
     # @params (row) - html TR, (column) - which column holds the data, (get_text) - return the html element, or the actual text
     # @descrip - for HTML tables, return the cell of the table
-    # @returns bool - true if the string is a valid float, false if not
+    # @returns str - either BS4obj or the actual text
     def get_table_cell(self, row, column, get_text:bool) -> str:
         table_cells = row.find_all('td')
         if get_text:
@@ -86,6 +86,7 @@ class FinViz(Scaper):
     def __init__(self, path: str):
         self.base = super()
         self.soup = self.base.get_data(path)
+        self.news = [] # List of News Events
         return
     
 
@@ -118,26 +119,31 @@ class FinViz(Scaper):
 
 
     # @params (None) 
-    # @descrip - finds the date of the last news article and checks to see if it was in the date ranges specified in utils.
-    # @returns bool - true if we find a news article, false if not
+    # @descrip - finds the date of the last news article and checks to see if it was in the date ranges specified in utils. Also stores off news events.
+    # @returns bool - true if we find a news article, false if not and stores off link,title and date into news field
     def has_finviz_news(self) -> bool:
-        row_count = 0
         table = self.soup.find('table', id='news-table')
         table_rows = table.find_all('tr')
 
-        for row in table_rows:
-            if (row_count >= 15):
-                break
+        for index, row in enumerate(table_rows):
+            news_date = self.base.get_table_cell(row, 0, True)
+            news_date = unicodedata.normalize('NFKD', news_date).strip()  # Drop Ending Bytes
+            news_date = util.string_to_date(news_date)
 
-            latest_news_date = self.base.get_table_cell(row, 0, True)
-            latest_news_date = unicodedata.normalize('NFKD', latest_news_date).strip()  # Drop Ending Bytes
-            latest_news_date = util.string_to_date(latest_news_date)
-            row_count += 1
+            if (news_date != None):
+                if index < 10:
+                    for date in util.get_date_ranges():
+                        if (news_date == date):
+                            return True
 
-            if (latest_news_date != None):
-                for date in util.get_date_ranges():
-                    if (latest_news_date == date):
-                        return True
+                model = News_Event()
+                title = self.base.get_table_cell(row, 1, False)
+                title = title.find('a', href=True)
+                model.data['date_of_article'] = news_date
+                model.data['title_of_article'] = title.get_text()
+                model.data['link'] = title['href']
+                model.data['source'] = 'Finviz'
+                self.news.append(model)
         return False
 
 
@@ -152,26 +158,38 @@ class TDAmeritrade(Scaper):
     # @returns None
     def __init__(self, ticker: str, index=False):
         self.base = super()
+        self.news = []
         if (index):
             self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/charts?symbol=' + ticker)
         else:
-            # self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/summary?fromPage=overview&display=&fromSearch=true&symbol=' + ticker) 
-            self.soup = self.base.get_data('../nostradamus_files/td-' + ticker + '.html')
-        return
+             # self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/summary?fromPage=overview&display=&fromSearch=true&symbol=' + ticker) 
+            self.soup = self.base.get_data('../nostradamus_files/td-' + ticker + '.html')        
+            return
 
 
     # @params (None)
-    # @descrip - finds the date of the last news article and checks to see if it was in the date ranges specified in utils.
+    # @descrip - finds the date of the last news article and checks to see if it was in the date ranges specified in utils. If exception fires, assume there is no news.
     # @returns bool - Yes if TDAmeritrade has news, no if not
     def has_td_news(self) -> bool:
         table = self.soup.find('table', class_='latestNews')
         table_section = table.find_all('tbody')
-        latest_news_date = table_section[0].find('tr').get_text()
-        latest_news_date = util.string_to_date(latest_news_date)
-        if (latest_news_date != None):
-            for date in util.get_date_ranges():
-                if (latest_news_date == date):
-                    return True
+        for index, tbody in enumerate(table_section):
+            row = tbody.find_all('tr')
+            news_date = util.string_to_date(row[0].get_text())
+            if (news_date != None):
+                if index < 10:
+                    for date in util.get_date_ranges():
+                        if (news_date == date):
+                            return True
+                
+                model = News_Event()
+                title = row[1]
+                title = title.find('a', href=True)
+                model.data['date_of_article'] = news_date
+                model.data['title_of_article'] = title.get_text()
+                model.data['link'] = title['href']
+                model.data['source'] = 'TD Ameritrade'
+                self.news.append(model)
         return False
 
 
@@ -223,7 +241,9 @@ class TDAmeritrade(Scaper):
     # @descrip - finds the stocks % change value and parses it
     # @returns float -  either the value or None
     def get_percent_change(self) -> float:
-        change = self.soup.find('span', class_='percent-change')
+        change = self.soup.find_all('span', class_='percent-change')
+        # if we have after hours action, we need to get the days close not the afterhours
+        change = change[len(change) - 1]
         change = change.get_text()
         change = change[2:(len(change) - 2)]      
         if util.isValidFloat(change):
@@ -241,3 +261,13 @@ class TDAmeritrade(Scaper):
         if util.isValidFloat(price):
             return float(price)
         return None
+
+
+    # @params (None)
+    # @descrip - looks for ADR tag to indicate this a ADR
+    # @returns bool - yes its an adr or no its not
+    def get_adr(self) -> bool:
+        adr = self.soup.find_all('div', class_='adr-container')
+        if len(adr) > 0:
+            return True
+        return False

@@ -65,12 +65,12 @@ def string_to_date(date_string: str) -> datetime:
     return dateObj
 
 
-# @params (TD, ticker, sp_inputs) - TD, TdAmeritrade object since we already have it when we call this. ticker, current ticker in iteration. s_p inputs, the dict of sp values for tech model.
+# @params (db_name, TD, ticker, sp_inputs) - db_name, which instance of db to use - TD, TdAmeritrade object since we already have it when we call this. ticker, current ticker in iteration. s_p inputs, the dict of sp values for tech model.
 # @descrip - Main function that gets spun off into different threads. Its here because we need sleep for 30 secs for Alphavantage rate limiting before we spin off.
 # @returns None 
-def process_ticker(TD, ticker: str, s_p_inputs: dict) -> None:
+def process_ticker(db_name:str, TD, FinViz, ticker: str, s_p_inputs: dict) -> None:
     try:
-        db = DB()
+        db = DB(db_name)
         company = Ticker()
         company.basic_info.data['ticker'] = ticker
         company.basic_info.data['date'] = datetime.now().date()
@@ -102,16 +102,27 @@ def process_ticker(TD, ticker: str, s_p_inputs: dict) -> None:
 
         fa = IEX(ticker)
         fa_data = fa.make_fund_indic_model(inputs)
-        fa.data['sector'] = sectors['top-level']
-        fa.data['sub_sector'] = sectors['second-level']
-        fa.data['institutional_ownership'] = TD.get_tute_ownership()
-        fa.data['short_interest_percent'] = TD.get_short_intrest()
+        fa_data.data['sector'] = sectors['top-level']
+        fa_data.data['sub_sector'] = sectors['second-level']
+        fa_data.data['institutional_ownership'] = TD.get_tute_ownership()
+        fa_data.data['short_interest_percent'] = TD.get_short_intrest()
+        fa_data.data['is_adr'] = TD.get_adr()
 
         company.fund_anaylsis = fa_data
 
+        company.news = company.news + FinViz.news
+        company.news = company.news + TD.news
+
+        # SEC get similiar sector cos, and locational cos
+        # Make Comp_Sector and Comp_Phys_loca Models
+        # Keep with the trend, have SEC do a model factory
+        # Append cos to company.comp_sector, and company.comp_geo
+        # SEC get forms
+
         db.save_ticker_model(company)
         return
-    except:
+    except Exception as err:
+        print(repr(err))
         # if whatever reason we fail, dont bother saving
         pass
 
