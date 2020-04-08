@@ -3,13 +3,16 @@
 from bs4 import BeautifulSoup
 import unicodedata
 from datetime import datetime, timedelta
+from time import sleep
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 import requests
+import json
+from math import floor
 
 # ===================== Custom Imports =======================
 import data_operations.utils.helpers as util
-from shared.models import News_Event
+from shared.models import News_Event, Comp_Perfor_Sector, Comp_Perfor_Phys_Location
 
 # ============================================================ # 
 #                   Abstract Class                             #
@@ -25,6 +28,7 @@ class Scaper(object):
     # @descrip - Parses the HTML doc, or the webpage
     # @returns BS4 obj - a soup obj ready for other text extraction
     def get_data(self, path: str, use_firefox=False) -> BeautifulSoup:
+        sleep(1)  # Throttle all requests so we dont piss people off
         try:
             html = open(path, encoding='utf-8')
         except:
@@ -145,6 +149,98 @@ class FinViz(Scaper):
                 model.data['source'] = 'Finviz'
                 self.news.append(model)
         return False
+
+
+ # =========================================================== # 
+ #                 SEC Edgar Files scraper                     #
+ # ============================================================ #
+
+class SEC_Edgar(Scaper):
+    # when converting from ticker to CIK, cut list in half to see if our first
+    # letter is before or after, then keep repeating unless python has a better
+    # search option
+    # keep going through page by page 100, until table is empty then we have reached the end of the form list
+
+    # https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001113866&type=&dateb=&owner=exclude&start=0&count=100
+
+    def __init__(self, ticker:str) -> None:
+        self.base = super()
+        self.cik = None
+        self.soup = None
+        self.is_valid_cik = self.get_cik(ticker) 
+        return
+
+    def get_cik(self, ticker:str) -> bool:
+        with open('./data_operations/utils/cik_ticker.json') as f:
+            cik_json = json.load(f)
+
+        for cik_item in cik_json:
+            if cik_json[cik_item]['ticker'] == ticker:
+                self.cik = str(cik_json[cik_item]['cik_str'])
+                return True
+        return False
+
+
+    #cik is a company/ticker/we
+    def load_cik_data(self, increment: int) -> bool:
+        # self.soup = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.cik + '&type=&dateb=&owner=exclude&start=0&count=100')
+        self.soup = self.base.get_data('./cik-chu-' + str(increment) +'.html')
+        if increment == 0:
+            self.base_data = self.soup
+        table = self.soup.find('table', class_='tableFile2')
+        rows = table.find_all('tr')
+        if len(rows) >= 2:
+            return False
+        
+        return True
+
+
+    # sic is all realated companies
+    # returns a list of CIK numbers
+    def get_sic_data(self, location_code: str, sic_code: str) -> list:
+        # load and parse data here returning a list?
+        inc = 0
+        comps = []
+        sic_html = self.base.get_data('./sic-chu-' + str(inc) + '.html')
+        #sic_html = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&SIC=' + sic_code + '&owner=exclude&match=&start=' + str(inc) +'&count=100&hidefilings=0')
+
+        while not sic_html.find('div', class_='noCompanyMatch'):
+            table = sic_html.find('table', class_='tableFile2')
+            rows = table.find_all('tr')
+            for index,row in enumerate(rows):
+                if index == 0:  # Skip header TR row
+                    continue
+
+                comp_state_code = self.base.get_table_cell(row, 3, True)
+                if location_code == comp_state_code:
+                    comps.append(self.base.get_table_cell(row, 0, True))
+                
+            inc = inc + 100
+            sic_html = self.base.get_data('./sic-chu-' + str(inc) + '.html')
+            #sic_html = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&SIC=' + sic_code + '&owner=exclude&match=&start=' + str(inc) +'&count=100&hidefilings=0')
+
+        return comps
+
+
+    # call related companies after forms so we for sure have the base data
+    def get_related_companies(self) -> list:
+        #make sure to exclude the subject cik, it is included in the results
+        # if related co not in CIK file, maybe they merged?
+        # adr maybe different check up on it
+        links = self.base_data.find('p', class_='identInfo')
+        links = links.find_all('a', href=True)
+        sic_code = links[0].get_text()
+        location_code = links[1].get_text()
+        company_ciks = self.get_sic_data(location_code, sic_code)
+        # convert from cik to ticker here
+        return
+
+
+    def make_peer_performance_model(self, ticker:str) -> Comp_Perfor_Sector:
+        # use yfinace to get ohlc data, custom roll percent change and populate a new model
+        # load cik here
+        ciks = self.get_related_companies()
+        return
 
 
  # =========================================================== # 

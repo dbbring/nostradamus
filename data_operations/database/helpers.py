@@ -104,13 +104,9 @@ class DB(DB_SCHEMA):
             news_model.data['transaction_id'] = trans_id
             self.save(news_model)
 
-        for comp_sector_model in ticker_model.comp_sector:
-            comp_sector_model.data['transaction_id'] = trans_id
-            self.save(comp_sector_model)
-
-        for comp_geo_model in ticker_model.comp_geo:
-            comp_geo_model.data['transaction_id'] = trans_id
-            self.save(comp_geo_model)
+        for peer in ticker_model.peers:
+            peer.data['transaction_id'] = trans_id
+            self.save(peer)
 
         return
 

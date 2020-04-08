@@ -39,11 +39,7 @@ class DB_SCHEMA(object):
     'low, close, volume, avg_volume, percent_change) VALUES '
     '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
 
-    INSERT_SQL['Comp_Perfor_Sector'] = ('INSERT INTO Comp_Perfor_Sector ('
-    'transaction_id, date, open, high, low, close, volume, percent_change, ticker) VALUES '
-    '(%s, %s, %s, %s, %s, %s, %s, %s, %s)')
-
-    INSERT_SQL['Comp_Perfor_Phys_Location'] = ('INSERT INTO Comp_Perfor_Phys_Location (transaction_id, date, open, high, low, close, volume, percent_change, ticker) VALUES '
+    INSERT_SQL['Peer_Performance'] = ('INSERT INTO Peer_Performance (transaction_id, date, open, high, low, close, volume, percent_change, ticker) VALUES '
     '(%s, %s, %s, %s, %s, %s, %s, %s, %s)')
 
     INSERT_SQL['News_Event'] = ('INSERT INTO News_Event ('
@@ -181,23 +177,8 @@ class DB_SCHEMA(object):
     "  PRIMARY KEY (`eod_id`)"
     ") ENGINE=InnoDB")
 
-    TABLES['Comp_Perfor_Sector'] = (
-    "CREATE TABLE IF NOT EXISTS `Comp_Perfor_Sector` ("
-    "`eod_id` INT(11) NOT NULL AUTO_INCREMENT,"
-    "`transaction_id` INT(11) NOT NULL,"
-    "`date` DATE NOT NULL,"
-    "`open` FLOAT(14, 4),"
-    "`high` FLOAT(14, 4),"
-    "`low` FLOAT(14, 4),"
-    "`close` FLOAT(14, 4),"
-    "`volume` FLOAT(14, 4),"
-    "`percent_change` FLOAT(14, 4),"
-    "`ticker` TEXT NOT NULL,"
-    "  PRIMARY KEY (`eod_id`)"
-    ") ENGINE=InnoDB")
-
-    TABLES['Comp_Perfor_Phys_Location'] = (
-    "CREATE TABLE IF NOT EXISTS `Comp_Perfor_Phys_Location` ("
+    TABLES['Peer_Performance'] = (
+    "CREATE TABLE IF NOT EXISTS `Peer_Performance` ("
     "`eod_id` INT(11) NOT NULL AUTO_INCREMENT,"
     "`transaction_id` INT(11) NOT NULL,"
     "`date` DATE NOT NULL,"

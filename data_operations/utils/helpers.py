@@ -114,9 +114,7 @@ def process_ticker(db_name:str, TD, FinViz, ticker: str, s_p_inputs: dict) -> No
         company.news = company.news + TD.news
 
         # SEC get similiar sector cos, and locational cos
-        # Make Comp_Sector and Comp_Phys_loca Models
-        # Keep with the trend, have SEC do a model factory
-        # Append cos to company.comp_sector, and company.comp_geo
+        # sec get related cos and iterate over list to append to company with factory
         # SEC get forms
 
         db.save_ticker_model(company)

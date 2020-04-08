@@ -9,6 +9,12 @@ The ticker model is the top level model that holds all the sub models. Basically
 ## Tranasction Model
 The transaction model is the basic information on the ticker that is trying to be anaylzed. This table merely holds a ID, name, date and percentage change. 
 
+## Main Price Model
+The usual OHLC, volume etc information that everything that uses price action will need.
+
+## Peer Performance Model
+This model is for tracking compentitions performance over the same time period. The competitng company is defined as a company in the same geographical area and in the same sector as the subject company. The Area and sectors are dervied from the SEC Edgar.
+
 ## Price EOD Model
 The Price EOD model represents each trading days activities. We have the standard OHLC plus volume, avg volume and of course the date. All subsqeuent anaylzsis will be done from this data. We only save the last week of information (5 Days) even though we need the last 100 days of trading data for our calculations. This model correspond with each Transaction Entry.
 

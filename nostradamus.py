@@ -13,11 +13,8 @@ from data_operations.utils.api_requests import AlphaVantage
 from data_operations.database.helpers import DB
 
 # ======== TODO ======
-# add geoprahpicaly local companys table
-# add same sector company table
 # limit to 20 tickers for gains and 20 for losers per day?
-# comp by sector table using price eod model use yfinance
-# comp by physical location using price eod model
+# sec is 10 hits per second
 
 
 # ===============================================================

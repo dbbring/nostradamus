@@ -159,21 +159,7 @@ class Price_Weekly(Price):
 #    Competitions Price Performance in the same Sector    #
 # ======================================================= #
 
-class Comp_Perfor_Sector(Price):
-
-  def __init__(self):
-    self.default_float = Base_Model.default_float
-    self.data = Price().data
-
-    self.data['ticker'] = None
-    return
-
-
-# ======================================================= #
-#            Business in the same Geographic Area         #
-# ======================================================= #
-
-class Comp_Perfor_Phys_Location(Price):
+class Peer_Performance(Price):
 
   def __init__(self):
     self.default_float = Base_Model.default_float
@@ -582,6 +568,5 @@ class Ticker(object):
     self.tech_anaylsis = [] # [Technical_Indicators(), Technical_Indicators()]
     self.chart_anaylsis =[] # [Chart_Indicators(), Chart_Indicators()]
     self.news = [] # [News_Event(), News_Event()]
-    self.comp_sector = [] # [Comp_Perfor_Sector(), Comp_Perfor_Sector()]
-    self.comp_geo = [] #[Comp_Perfor_Phys_Location(), Comp_Perfor_Phys_Location()]
+    self.peers = [] # [Peer_Performance(), Peer_Performance()]
     return
