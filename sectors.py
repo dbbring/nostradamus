@@ -6,9 +6,14 @@ from shared.models import Sectors
 from data_operations.utils.helpers import send_mail
 
 from datetime import date, datetime
+import argparse
 
 try:
-  mySQL = DB()
+  args_setup = argparse.ArgumentParser(description='Main Entry Script for Populating DB')
+  args_setup.add_argument('db_name', metavar='Database_Name', type=str, help="Which database instance to use")
+  args = args_setup.parse_args()
+
+  mySQL = DB(args.db_name)
   model = Sectors()
   today = datetime.now().date()
 

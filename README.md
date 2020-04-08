@@ -8,12 +8,14 @@ Alphavantage, and IEX api keys should be stored in the sys enviroment variables:
 - IEX_API_KEY
 - AV_API_KEY
 
+You will also need to install the geckodriver for selenium and put in the .venv enviroment folder (which you also hopefully set up I currently have my bash script and geckodrivers in the .venv folder)
+
 Install the requirements, and set up a cron job to execute the scripts:
-  nostradamus.py
-  sectors.py
+- nostradamus.py
+- sectors.py
 
 
-The nostradmaus scripts takes 3 commandline parameters:
+The nostradmaus scripts takes 3 command line parameters:
 - Database name
 - Upper % limit of stocks your looking to find
 - Lower % limit of stocks your looking to find
