@@ -552,6 +552,107 @@ class Chart_Indicators(Base_Model):
 
 
 # ======================================================= #
+#                SEC Secondary Offering Table (S-3)       #
+# ======================================================= #
+
+class SEC_Secondary_Offering(Base_Model):
+        
+  def __init__(self):
+    self.default_int = Base_Model.default_int
+    self.data = OrderedDict()
+
+    self.data['sec_secondary_offering_id'] = None
+    self.data['sec_id'] = None
+    self.data['date'] = None
+    self.data['additional_shares_issued'] = self.default_int
+    self.data['is_asr'] = None # Automatic Shelf Registration
+    self.data['link'] = None
+
+    return
+
+
+# ======================================================= #
+#                       SEC Merger Table (425)            #
+# ======================================================= #
+
+class SEC_Merger(Base_Model):
+        
+  def __init__(self):
+    self.default_int = Base_Model.default_int
+    self.data = OrderedDict()
+
+    self.data['sec_merger_id'] = None
+    self.data['sec_id'] = None
+    self.data['date'] = None # very first 425
+    self.data['merging_with_company'] = None
+    self.data['merging_with_cik'] = None
+
+    return
+
+
+# ======================================================= #
+#            SEC Employee Stock Program Table (S-8)       #
+# ======================================================= #
+
+class SEC_Employee_Stock(Base_Model):
+        
+  def __init__(self):
+    self.default_int = Base_Model.default_int
+    self.data = OrderedDict()
+
+    self.data['sec_employee_stock_id'] = None
+    self.data['sec_id'] = None
+    self.data['date'] = None
+    self.data['additional_shares_issued'] = self.default_int
+    self.data['link'] = None
+
+    return
+
+
+# ======================================================= #
+#            SEC Changes in Information Table (8-K)       #
+# ======================================================= #
+
+class SEC_Company_Info(Base_Model):
+        
+  def __init__(self):
+    self.default_int = Base_Model.default_int
+    self.data = OrderedDict()
+
+    self.data['sec_company_info_id'] = None
+    self.data['sec_id'] = None
+    self.data['date'] = None 
+    self.data['link'] = None
+    self.data['item_list'] = {} # Key (Item Num) Value (Item Descrip)
+
+    return
+
+
+# ======================================================= #
+#                SEC Info Table                           #
+# ======================================================= #
+
+class SEC(Base_Model):
+        
+  def __init__(self):
+    self.default_int = Base_Model.default_int
+    self.data = OrderedDict()
+
+    self.data['sec_id'] = None
+    self.data['transaction_id'] = None
+    self.data['date_of_ipo'] = None
+    self.data['is_adr'] = None
+    self.data['late_filings'] = self.default_int
+    self.data['ct_orders'] = self.default_int
+    self.data['company_info'] = [] #[SEC_Company_Info(), ..]
+    self.data['secondary_offerings'] = [] # [SEC_Secondary_Offering()..]
+    self.data['mergers'] = [] # [SEC_Merger(), ..]
+    self.data['stock_program'] = [] # [SEC_Employee_Stock, ..]
+
+    return
+
+
+# ======================================================= #
 #                Main Ticker Object                       #
 # ======================================================= #
 
@@ -563,6 +664,7 @@ class Ticker(object):
 
     self.basic_info = Transaction()
     self.fund_anaylsis = None # Fundamental_Indicators()
+    self.sec = None # SEC()
     self.eod = [] # [Price_EOD(), Price_EOD()]
     self.weekly = [] # [Price_Weekly(), Price_Weekly()]
     self.tech_anaylsis = [] # [Technical_Indicators(), Technical_Indicators()]

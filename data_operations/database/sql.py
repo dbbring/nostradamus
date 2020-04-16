@@ -46,6 +46,25 @@ class DB_SCHEMA(object):
     'transaction_id, date_of_article,title_of_article, link, source) VALUES '
     '(%s, %s, %s, %s, %s)')
 
+    INSERT_SQL['SEC'] = ('INSERT INTO SEC ('
+    'transaction_id, date_of_ipo, late_filings, ct_orders, is_adr) VALUES '
+    '(%s, %s, %s, %s, %s)')
+
+    INSERT_SQL['SEC_Company_Info'] = ('INSERT INTO SEC_Company_Info ('
+    'sec_id, date, link, item_list) VALUES '
+    '(%s, %s, %s, %s)')
+
+    INSERT_SQL['SEC_Employee_Stock'] = ('INSERT INTO SEC_Employee_Stock ('
+    'sec_id, date, additional_shares_issued, link) VALUES '
+    '(%s, %s, %s, %s)')
+
+    INSERT_SQL['SEC_Merger'] = ('INSERT INTO SEC_Merger ('
+    'sec_id, date, merging_with_company, merging_with_cik) VALUES '
+    '(%s, %s, %s, %s)')
+
+    INSERT_SQL['SEC_Secondary_Offering'] = ('INSERT INTO SEC_Secondary_Offering (sec_id, date, additional_shares_issued, is_asr, link) VALUES '
+    '(%s, %s, %s, %s, %s)')
+
     INSERT_SQL['Technical_Indicators'] = ('INSERT INTO Technical_Indicators (eod_id,' 
     'atr_3_period, atr_10_period, atr_15_period, atr_20_period, boll_bands_upper_3_period,'    'boll_bands_middle_3_period, boll_bands_lower_3_period, boll_bands_upper_10_period,' 'boll_bands_middle_10_period, boll_bands_lower_10_period, boll_bands_upper_15_period,'    'boll_bands_middle_15_period, boll_bands_lower_15_period, boll_bands_upper_20_period,' 'boll_bands_middle_20_period, boll_bands_lower_20_period, sma_3_period, sma_10_period,'    'sma_15_period, sma_20_period, ema_3_period, ema_10_period, ema_15_period,'    'ema_20_period, average_directional_movement_3_period,' 'average_directional_movement_10_period, average_directional_movement_15_period,'    'average_directional_movement_20_period, chaikin_osc_fast_3_slow_10, '   'chaikin_osc_fast_6_slow_18, chaikin_osc_fast_10_slow_20, chaikin_a_d_line,'    'balance_of_power, commodity_channel_index_3_period, commodity_channel_index_10_period,'    'commodity_channel_index_15_period, commodity_channel_index_20_period,  '  'chande_momentum_oscillator_3_period, chande_momentum_oscillator_10_period, '   'chande_momentum_oscillator_15_period, chande_momentum_oscillator_20_period, '   'pearsons_coeff_close_vol_5_period, pearsons_coeff_close_vol_15_period,  '  'pearsons_coeff_close_vol_30_period, pearsons_coeff_close_avg_vol_5_period,'
     'pearsons_coeff_close_avg_vol_15_period, pearsons_coeff_close_avg_vol_30_period, '   'pearsons_coeff_close_sp_5_period, pearsons_coeff_close_sp_15_period, '   'pearsons_coeff_close_sp_30_period, double_ema_3_period, double_ema_10_period, '   'double_ema_15_period, double_ema_20_period, directional_movement_index_3_period,'    'directional_movement_index_10_period, directional_movement_index_15_period, '   'directional_movement_index_20_period, kaufman_adaptive_ma_5_period, '   'kaufman_adaptive_ma_15_period, kaufman_adaptive_ma_30_period, linear_reg_3_period,'    'linear_reg_10_period, linear_reg_15_period, linear_reg_20_period,'   'linear_reg_angle_3_period, linear_reg_angle_10_period, linear_reg_angle_15_period,'    'linear_reg_angle_20_period, linear_reg_intercept_3_period, linear_reg_intercept_10_period,' 'linear_reg_intercept_15_period, linear_reg_intercept_20_period, linear_reg_slope_3_period,' 'linear_reg_slope_10_period, linear_reg_slope_15_period, linear_reg_slope_20_period, '   'macd_fast_12_slow_26_sig_9, macd_signal_fast_12_slow_26_sig_9,' 'macd_hist_fast_12_slow_26_sig_9, macd_fast_6_slow_13_sig_5,' 'macd_signal_fast_6_slow_13_sig_5, macd_hist_fast_6_slow_13_sig_5,' 'macd_fast_18_slow_39_sig_14, macd_signal_fast_18_slow_39_sig_14,' 'macd_hist_fast_18_slow_39_sig_14, mesa_adaptive_ma_mama, mesa_adaptive_ma_fama,'    'money_flow_index_3_period, money_flow_index_10_period, money_flow_index_15_period,'    'money_flow_index_20_period, momentum_3_period, momentum_10_period, momentum_15_period,'    'momentum_20_period, normalized_atr_3_period, normalized_atr_10_period,'    'normalized_atr_15_period, normalized_atr_20_period, obv, percent_price_osc_fast_6_slow_13,' 'percent_price_osc_fast_12_slow_26, percent_price_osc_fast_18_slow_38, rsi_3_period,'    'rsi_10_period, rsi_15_period, rsi_20_period, parabolic_sar, parabolic_sar_ext,'    'std_deviation_3_period, std_deviation_10_period, std_deviation_15_period,'    'std_deviation_20_period, std_deviation_dbl_3_period, std_deviation_dbl_10_period,'    'std_deviation_dbl_15_period, std_deviation_dbl_20_period,'    'stochastic_sk_fast_5_slow_k_3_slow_d_3, stochastic_sd_fast_5_slow_k_3_slow_d_3,'    'stochastic_sk_fast_20_slow_k_7_slow_d_7, stochastic_sd_fast_20_slow_k_7_slow_d_7,'    'stochastic_sk_fast_20_slow_k_14_slow_d_14, stochastic_sd_fast_20_slow_k_14_slow_d_14,'    'triple_ema_3_period, triple_ema_10_period, triple_ema_15_period, true_range,'    'triangluar_ma_15_period, triangluar_ma_30_period, ultimate_osc_3_6_12_period, '   'ultimate_osc_7_14_28_period, ultimate_osc_10_20_40_period, williams_percent_r_3_period,'  'williams_percent_r_10_period, williams_percent_r_15_period, williams_percent_r_20_period,' 'weighted_ma_3_period, weighted_ma_10_period, weighted_ma_15_period,'    'weighted_ma_20_period) VALUES '
@@ -82,13 +101,13 @@ class DB_SCHEMA(object):
     'avg_30_volume, mvg_avg_200, mvg_avg_50, max_change_percent, '
     'year_5_change_percent, year_2_change_percent, year_1_change_percent, '
     'ytd_change_percent, month_6_change_percent, month_3_change_percent, '
-    'month_1_change_percent, day_30_change_percent, day_5_change_percent,  resistance_point_avg, resistance_point, support_point_avg, support_point, book_value, is_adr ) VALUES '
+    'month_1_change_percent, day_30_change_percent, day_5_change_percent,  resistance_point_avg, resistance_point, support_point_avg, support_point, book_value ) VALUES '
     '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '
     '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,'
     '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,'
     '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,'
     '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,'
-    '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
+    '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
 
     INSERT_SQL['Chart_Indicators'] = ('INSERT INTO Chart_Indicators (eod_id, '
     'two_crows, three_black_crows, three_inside_up_down,three_outside_up_down,'
@@ -217,6 +236,58 @@ class DB_SCHEMA(object):
     "`link` TEXT,"
     "`source` TEXT,"
     "  PRIMARY KEY (`news_event_id`)"
+    ") ENGINE=InnoDB")
+
+    TABLES['SEC'] = (
+    "CREATE TABLE IF NOT EXISTS `SEC` ("
+    "`sec_id` INT(11) NOT NULL AUTO_INCREMENT,"
+    "`transaction_id` INT(11) NOT NULL,"
+    "`date_of_ipo` DATE,"
+    "`late_filings` INT(11),"
+    "`ct_orders` INT(11),"
+    "`is_adr` BOOLEAN,"
+    "  PRIMARY KEY (`sec_id`)"
+    ") ENGINE=InnoDB")
+
+    TABLES['SEC_Company_Info'] = (
+    "CREATE TABLE IF NOT EXISTS `SEC_Company_Info` ("
+    "`sec_company_info_id` INT(11) NOT NULL AUTO_INCREMENT,"
+    "`sec_id` INT(11) NOT NULL,"
+    "`date` DATE,"
+    "`link` TEXT,"
+    "`item_list` JSON,"
+    "  PRIMARY KEY (`sec_company_info_id`)"
+    ") ENGINE=InnoDB")
+
+    TABLES['SEC_Merger'] = (
+    "CREATE TABLE IF NOT EXISTS `SEC_Merger` ("
+    "`sec_merger_id` INT(11) NOT NULL AUTO_INCREMENT,"
+    "`sec_id` INT(11) NOT NULL,"
+    "`date` DATE,"
+    "`merging_with_company` TEXT,"
+    "`merging_with_cik` INT(11),"
+    "  PRIMARY KEY (`sec_merger_id`)"
+    ") ENGINE=InnoDB")
+
+    TABLES['SEC_Employee_Stock'] = (
+    "CREATE TABLE IF NOT EXISTS `SEC_Employee_Stock` ("
+    "`sec_employee_stock_id` INT(11) NOT NULL AUTO_INCREMENT,"
+    "`sec_id` INT(11) NOT NULL,"
+    "`date` DATE,"
+    "`additional_shares_issued` INT(11),"
+    "`link` TEXT,"
+    "  PRIMARY KEY (`sec_employee_stock_id`)"
+    ") ENGINE=InnoDB")
+
+    TABLES['SEC_Secondary_Offering'] = (
+    "CREATE TABLE IF NOT EXISTS `SEC_Secondary_Offering` ("
+    "`sec_secondary_offering_id` INT(11) NOT NULL AUTO_INCREMENT,"
+    "`sec_id` INT(11) NOT NULL,"
+    "`date` DATE,"
+    "`additional_shares_issued` INT(11),"
+    "`is_asr` BOOLEAN,"
+    "`link` TEXT,"
+    "  PRIMARY KEY (`sec_secondary_offering_id`)"
     ") ENGINE=InnoDB")
 
     TABLES['Technical_Indicators'] = (
@@ -487,7 +558,6 @@ class DB_SCHEMA(object):
     "`support_point` FLOAT(14, 4),"
     "`support_point_avg` FLOAT(14, 4),"
     "`book_value` FLOAT(14, 4),"
-    "`is_adr` BOOLEAN,"
     "  CONSTRAINT `fund_indc_ibfk_1` FOREIGN KEY (`transaction_id`) "
     "     REFERENCES `Transaction` (`transaction_id`) ON DELETE CASCADE"
     ") ENGINE=InnoDB")

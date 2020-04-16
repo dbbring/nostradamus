@@ -108,6 +108,38 @@ class DB(DB_SCHEMA):
             peer.data['transaction_id'] = trans_id
             self.save(peer)
 
+        # store off sec info copy list dont reference it
+        company_info = list(ticker_model.sec.data['company_info'])
+        secon_offer = list(ticker_model.sec.data['secondary_offerings'])
+        mergers = list(ticker_model.sec.data['mergers'])
+        stock_program = list(ticker_model.sec.data['stock_program'])
+        # remove arrays so we can save and our model matches up with the table
+        del ticker_model.sec.data['company_info']
+        del ticker_model.sec.data['secondary_offerings']
+        del ticker_model.sec.data['mergers']
+        del ticker_model.sec.data['stock_program']
+
+        ticker_model.sec.data['transaction_id'] = trans_id
+        self.save(ticker_model.sec)
+        sec_id = self.last_insert_id
+        
+        # now save off seperate tables
+        for merger in mergers:
+            merger.data['sec_id'] = sec_id
+            self.save(merger)
+
+        for offering in secon_offer:
+            offering.data['sec_id'] = sec_id
+            self.save(offering)
+
+        for info in company_info:
+            info.data['sec_id'] = sec_id
+            self.save(info)
+
+        for incentive in stock_program:
+            incentive.data['sec_id'] = sec_id
+            self.save(incentive)
+
         return
 
 

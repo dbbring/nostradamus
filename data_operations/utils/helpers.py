@@ -106,7 +106,6 @@ def process_ticker(db_name:str, TD, FinViz, ticker: str, s_p_inputs: dict) -> No
         fa_data.data['sub_sector'] = sectors['second-level']
         fa_data.data['institutional_ownership'] = TD.get_tute_ownership()
         fa_data.data['short_interest_percent'] = TD.get_short_intrest()
-        fa_data.data['is_adr'] = TD.get_adr()
 
         company.fund_anaylsis = fa_data
 

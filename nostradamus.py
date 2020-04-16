@@ -14,7 +14,8 @@ from data_operations.database.helpers import DB
 
 # ======== TODO ======
 # limit to 20 tickers for gains and 20 for losers per day?
-# sec is 10 hits per second
+# sec is 10 hits per second -> dry run, make sure we tripping out
+# do we need to regonalize peer performance? currently state by state basis
 
 
 # ===============================================================

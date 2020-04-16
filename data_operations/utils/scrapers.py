@@ -9,10 +9,15 @@ from selenium.webdriver.firefox.options import Options
 import requests
 import json
 from math import floor
+import yfinance
+from os import path
 
 # ===================== Custom Imports =======================
 import data_operations.utils.helpers as util
-from shared.models import News_Event, Comp_Perfor_Sector, Comp_Perfor_Phys_Location
+from shared.models import News_Event, Peer_Performance, SEC, SEC_Company_Info, SEC_Employee_Stock, SEC_Merger, SEC_Secondary_Offering
+
+
+
 
 # ============================================================ # 
 #                   Abstract Class                             #
@@ -56,6 +61,8 @@ class Scaper(object):
         return table_cells[column]
 
 
+
+
  # =========================================================== # 
  #                 Bloomberg scraper                            #
  # ============================================================ #
@@ -76,6 +83,8 @@ class Bloomberg(Scaper):
             if (util.isValidFloat(sector_performance)):
                 self.sectors[sector_name] = float(sector_performance)
         return
+
+
 
 
  # =========================================================== # 
@@ -151,48 +160,72 @@ class FinViz(Scaper):
         return False
 
 
+
+
  # =========================================================== # 
  #                 SEC Edgar Files scraper                     #
  # ============================================================ #
 
 class SEC_Edgar(Scaper):
-    # when converting from ticker to CIK, cut list in half to see if our first
-    # letter is before or after, then keep repeating unless python has a better
-    # search option
-    # keep going through page by page 100, until table is empty then we have reached the end of the form list
-
     # https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001113866&type=&dateb=&owner=exclude&start=0&count=100
+
+    # NT 10k, NT 10Q, 12b-25 is a late filer
+
+    # ADR's are like 6-ks??
 
     def __init__(self, ticker:str) -> None:
         self.base = super()
+        self.ticker = ticker
+        self.base_data = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + ticker + '&type=&dateb=&owner=exclude&start=0&count=100')
+        #self.base_data = self.base.get_data('./sec_files/cik-' + ticker + '-0.html')
         self.cik = None
+        self.cik_dict = {}
         self.soup = None
-        self.is_valid_cik = self.get_cik(ticker) 
+        self.is_valid = True
+        self.links_s8 = []
+        self.links_425 = []
+        self.links_s3 = []
+        self.links_8k = []
+        self.links_f3 = []
+        self.links_f6 = []
+        self.late_filings = 0
+        self.ct_orders = 0
+        self.ipo_date = None
+        self.is_adr = False
+        # We need to populate cik_dict
+        self.get_cik(ticker)
+
+        if self.base_data.find('h1', text="No matching Ticker Symbol."):
+            self.base_data = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.cik + '&type=&dateb=&owner=exclude&start=0&count=100')
+            # self.base_data = self.base.get_data('./sec_files/cik-' + self.cik + '-0.html')
+            if self.base_data.find('h1', text="No matching CIK."):
+                self.is_valid = False
+
         return
+
 
     def get_cik(self, ticker:str) -> bool:
         with open('./data_operations/utils/cik_ticker.json') as f:
-            cik_json = json.load(f)
+            self.cik_dict = json.load(f)
 
-        for cik_item in cik_json:
-            if cik_json[cik_item]['ticker'] == ticker:
-                self.cik = str(cik_json[cik_item]['cik_str'])
+        for cik_item in self.cik_dict:
+            if self.cik_dict[cik_item]['ticker'] == ticker.upper():
+                self.cik = str(self.cik_dict[cik_item]['cik_str'])
                 return True
         return False
 
 
     #cik is a company/ticker/we
-    def load_cik_data(self, increment: int) -> bool:
-        # self.soup = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.cik + '&type=&dateb=&owner=exclude&start=0&count=100')
-        self.soup = self.base.get_data('./cik-chu-' + str(increment) +'.html')
-        if increment == 0:
-            self.base_data = self.soup
+    # we already init'd with page 0 so start incrementing with 100
+    def load_data(self, inc: int) -> bool:
+        self.soup = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.cik + '&type=&dateb=&owner=exclude&start=' + str(inc) + '&count=100')
+        # self.soup = self.base.get_data('./sec_files/cik-' + self.ticker + '-' + str(inc) +'.html')
         table = self.soup.find('table', class_='tableFile2')
         rows = table.find_all('tr')
         if len(rows) >= 2:
-            return False
+            return True
         
-        return True
+        return False
 
 
     # sic is all realated companies
@@ -201,8 +234,8 @@ class SEC_Edgar(Scaper):
         # load and parse data here returning a list?
         inc = 0
         comps = []
-        sic_html = self.base.get_data('./sic-chu-' + str(inc) + '.html')
-        #sic_html = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&SIC=' + sic_code + '&owner=exclude&match=&start=' + str(inc) +'&count=100&hidefilings=0')
+        # sic_html = self.base.get_data('./sec_files/sic-' + self.ticker + '-' + str(inc) + '.html')
+        sic_html = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&SIC=' + sic_code + '&owner=exclude&match=&start=' + str(inc) +'&count=100&hidefilings=0')
 
         while not sic_html.find('div', class_='noCompanyMatch'):
             table = sic_html.find('table', class_='tableFile2')
@@ -211,12 +244,12 @@ class SEC_Edgar(Scaper):
                 if index == 0:  # Skip header TR row
                     continue
 
-                comp_state_code = self.base.get_table_cell(row, 3, True)
+                comp_state_code = self.base.get_table_cell(row, 2, True)
                 if location_code == comp_state_code:
                     comps.append(self.base.get_table_cell(row, 0, True))
                 
             inc = inc + 100
-            sic_html = self.base.get_data('./sic-chu-' + str(inc) + '.html')
+            sic_html = self.base.get_data('./sec_files/sic-' + self.ticker + '-' + str(inc) + '.html')
             #sic_html = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&SIC=' + sic_code + '&owner=exclude&match=&start=' + str(inc) +'&count=100&hidefilings=0')
 
         return comps
@@ -224,23 +257,375 @@ class SEC_Edgar(Scaper):
 
     # call related companies after forms so we for sure have the base data
     def get_related_companies(self) -> list:
-        #make sure to exclude the subject cik, it is included in the results
         # if related co not in CIK file, maybe they merged?
         # adr maybe different check up on it
+        related_cos = []
         links = self.base_data.find('p', class_='identInfo')
         links = links.find_all('a', href=True)
         sic_code = links[0].get_text()
         location_code = links[1].get_text()
         company_ciks = self.get_sic_data(location_code, sic_code)
-        # convert from cik to ticker here
+        for cik in company_ciks:
+            for cik_item in self.cik_dict:
+                if str(self.cik_dict[cik_item]['cik_str']) in cik and cik != self.cik:
+                    related_cos.append(self.cik_dict[cik_item]['ticker'])
+                    break
+        return related_cos
+
+    # returns list of peer performance models
+    def make_arr_peer_performance_model(self, ticker:str) -> list:
+        sleep(1) # Yfinance rate limiting
+        peer_list = []
+        symbol = yfinance.Ticker(ticker)
+        # Check if ticker is valid!! 
+
+        data = symbol.history(period='5d')
+        for index,row in data.iterrows():
+            try:
+                peer_model = Peer_Performance()
+                peer_model.data['ticker'] = ticker
+                peer_model.data['date'] = index.date()
+                peer_model.data['open'] = row.Open
+                peer_model.data['high'] = row.High
+                peer_model.data['low'] = row.Low
+                peer_model.data['close'] = row.Close
+                peer_model.data['volume'] = row.Volume
+                peer_model.data['percent_change'] = peer_model.to_percent(row.Open, row.Close)
+                peer_list.append(peer_model)
+            except:
+                # Not valid ticker or whatever. Dont add the model.
+                pass
+        
+        return peer_list
+
+
+    def parse_sec_filings(self) -> None:
+        inc = 100
+        while self.load_data(inc):
+            table = self.soup.find('table', class_='tableFile2')
+            rows = table.find_all('tr')
+            for index, row in enumerate(rows):
+                if index == 0:  # Skip header row
+                    continue
+
+                form_id = self.base.get_table_cell(row, 0, True)
+
+                if form_id == '6-K' or form_id == 'F-1' or form_id == 'F-3' or form_id == 'F-6' or form_id == 'F-3ASR' or form_id == '20-F':
+                    # Safe to say this is a ADR 
+                    self.is_adr = True
+                    self.parse_sec_foreign_filings(table)
+                    break
+                elif form_id == 'NT 10-K' or form_id == 'NT 10-Q' or form_id == 'NT 10-D' or form_id == 'NT 11-k':
+                    self.late_filings += 1
+                elif form_id == 'S-8':
+                    link = self.base.get_table_cell(row, 1, False)
+                    link = link.find('a', href=True)
+                    self.links_s8.append('https://www.sec.gov' + link['href'])
+                elif form_id == 'S-3' or form_id == 'S-3ASR':
+                    link = self.base.get_table_cell(row, 1, False)
+                    link = link.find('a', href=True)
+                    self.links_s3.append('https://www.sec.gov' + link['href'])
+                elif form_id == 'CT ORDER':
+                    self.ct_orders += 1
+                elif form_id == '8-K':
+                    link = self.base.get_table_cell(row, 1, False)
+                    link = link.find('a', href=True)
+                    self.links_8k.append('https://www.sec.gov' + link['href'])
+                elif form_id == 'S-1':
+                    self.ipo_date = self.base.get_table_cell(row, 3, True)
+                elif form_id == '425':
+                    link = self.base.get_table_cell(row, 1, False)
+                    link = link.find('a', href=True)
+                    self.links_425.append('https://www.sec.gov' + link['href'])
+
+            inc += 100
         return
 
 
-    def make_peer_performance_model(self, ticker:str) -> Comp_Perfor_Sector:
-        # use yfinace to get ohlc data, custom roll percent change and populate a new model
-        # load cik here
-        ciks = self.get_related_companies()
+    def parse_sec_foreign_filings(self, sec_table) -> None:
+        # check for F-6's (forgein equiv to S-3)
+        # F-3/F-1 can give ipo date? (F-3 = S-1? ) else last occurance of form
+        # 6-k can apperently be used to register somehow
+        rows = sec_table.find_all('tr')
+        for index, row in enumerate(rows):
+                if index == 0:  # Skip header row
+                    continue
+
+                form_id = self.base.get_table_cell(row, 0, True)
+
+                if form_id == 'NT 11-k' or form_id == 'NT 20-F' or form_id == 'NT 10-D':
+                    self.late_filings += 1
+                elif form_id == 'S-8':
+                    link = self.base.get_table_cell(row, 1, False)
+                    link = link.find('a', href=True)
+                    self.links_s8.append('https://www.sec.gov' + link['href'])
+                elif form_id == 'S-3' or form_id == 'S-3ASR':
+                    link = self.base.get_table_cell(row, 1, False)
+                    link = link.find('a', href=True)
+                    self.links_s3.append('https://www.sec.gov' + link['href'])
+                elif form_id == 'CT ORDER':
+                    self.ct_orders += 1
+                elif form_id == '8-K':
+                    link = self.base.get_table_cell(row, 1, False)
+                    link = link.find('a', href=True)
+                    self.links_8k.append('https://www.sec.gov' + link['href'])
+                elif form_id == 'S-1':
+                    self.ipo_date = self.base.get_table_cell(row, 3, True)
+                elif form_id == '425':
+                    link = self.base.get_table_cell(row, 1, False)
+                    link = link.find('a', href=True)
+                    self.links_425.append('https://www.sec.gov' + link['href'])
         return
+
+
+    def make_sec_model(self) -> SEC:
+        self.parse_sec_filings()
+        '''
+        self.links_425 = ['./sec_files/425/' + self.ticker + '-0.html', './sec_files/425/' + self.ticker + '-1.html', './sec_files/425/' + self.ticker + '-2.html', './sec_files/425/' + self.ticker + '-3.html', './sec_files/425/' + self.ticker + '-4.html', './sec_files/425/' + self.ticker + '-5.html', './sec_files/425/' + self.ticker + '-6.html', './sec_files/425/' + self.ticker + '-7.html']
+        self.links_8k = ['./sec_files/8k/' + self.ticker + '-0.html', './sec_files/8k/' + self.ticker + '-1.html', './sec_files/8k/' + self.ticker + '-2.html', './sec_files/8k/' + self.ticker + '-3.html']
+        self.links_s3 = ['./sec_files/s3/' + self.ticker + '-0.html', './sec_files/s3/' + self.ticker + '-1.html', './sec_files/s3/' + self.ticker + '-2.html', './sec_files/s3/' + self.ticker + '-3.html']
+        self.links_s8 = ['./sec_files/s8/' + self.ticker + '-0.html', './sec_files/s8/' + self.ticker + '-1.html', './sec_files/s8/' + self.ticker + '-2.html']
+        '''
+        model = SEC()
+        model.data['date_of_ipo'] = self.ipo_date
+        model.data['late_filings'] = self.late_filings
+        model.data['ct_orders'] = self.ct_orders
+        model.data['is_adr'] = self.is_adr
+        
+        for link in self.links_s3:
+            offering_model = self.make_secondary_offering_model(link)
+            if offering_model.data['date'] != None:
+                model.data['secondary_offerings'].append(offering_model)
+        
+        for link in self.links_425:
+            merger_model = self.make_merger_model(link)
+            same_mergering_co = False
+            
+            for mergering_co in model.data['mergers']:
+                if merger_model.data['merging_with_cik'] == None or merger_model.data['merging_with_cik'] == mergering_co.data['merging_with_cik']:
+                    same_mergering_co = True
+                    break
+
+            if not same_mergering_co:
+                model.data['mergers'].append(merger_model)
+        
+        for link in self.links_8k:
+            info_model = self.make_company_info_model(link)
+            model.data['company_info'].append(info_model)
+        
+        for link in self.links_s8:
+            stock_prog_model = self.make_stock_program_model(link)
+            if stock_prog_model.data['date'] != None:
+                model.data['stock_program'].append(stock_prog_model)
+
+        return model
+
+
+    def make_secondary_offering_model(self, link: str) -> SEC_Secondary_Offering:
+        model = SEC_Secondary_Offering()
+        model.data['link'] = link
+        try:
+            issued_shares = None
+            model.data['is_asr'] = False
+            data = self.base.get_data(link)
+            # Get date from info header
+            submission_date = data.find('div', text='Filing Date')
+            submission_date = submission_date.find_next_sibling('div')
+            model.data['date'] = submission_date.get_text()
+            # parse main table for form type and link to actual submission
+            table = data.find('table', class_='tableFile')
+            rows = table.find_all('tr')
+            form_type = self.base.get_table_cell(rows[1], 3, True)
+            # form = self.base.get_table_cell(rows[1], 2, True)
+            form = self.base.get_table_cell(rows[1], 2, False)
+            form = form.find('a', href=True)
+            form = 'https://www.sec.gov' + form['href']
+
+            if form_type == 'S-3ASR':
+                model.data['is_asr'] = True
+
+            if path.splitext(form)[1] == '.txt':
+                # Currently, we dont parse text files.
+                # Usually means its from over 15 years ago.
+                # Null Date so we dont append
+                model.data['date'] = None
+                return model
+
+            # Parse the actual submission form for information
+            # data = self.base.get_data('./sec_files/s3/' + form)
+            data = self.base.get_data(form)
+            stock_offering_table_rows = None
+            tables = data.find_all('table')
+
+            for table in tables:
+                try:
+                    rows = table.find_all('tr')
+                    title_cell = self.base.get_table_cell(rows[2], 0, True)
+                    title_cell = title_cell.lstrip()
+                    if 'Title of ' in title_cell:
+                        stock_offering_table_rows = rows
+                        break
+                except:
+                    # Who the eff knows what table this is, but pass
+                    continue
+
+            # If its a standard table, try to get where we initial think the issued shares should be then clean it up
+            issued_shares = self.base.get_table_cell(stock_offering_table_rows[3], 2, True)
+            issued_shares = unicodedata.normalize('NFKD', issued_shares)
+            issued_shares = issued_shares.replace(',', '').replace('shares','').strip()
+
+            if util.isValidInt(issued_shares):
+                model.data['additional_shares_issued'] = int(issued_shares) 
+                return model
+
+            # Although Common Stock is in the table twice, we are not breaking. So our "issued shares" is the last occurance of title "common stock"
+            for row in stock_offering_table_rows:
+                row_title = self.base.get_table_cell(row, 0, True).split(',')[0].split('(')[0].strip()
+                if row_title.lower() == 'common stock':
+                    issued_shares = self.base.get_table_cell(row, 2, True).replace(',','').split(' shares')[0].split('(')[0]
+
+            # if we parsed the wrong row, oh well, null it out
+            model.data['additional_shares_issued'] = int(issued_shares) if util.isValidInt(issued_shares) else None
+
+            return model
+        except:
+            # if we blow up just add the link for future reference
+            return model
+
+
+    def make_merger_model(self, link: str) -> SEC_Merger:
+        model = SEC_Merger()
+        merging_cik = None
+        merging_name = None
+        try:
+            data = self.base.get_data(link)
+            # Get date from info header
+            submission_date = data.find('div', text='Filing Date')
+            submission_date = submission_date.find_next_sibling('div').get_text()
+            model.data['date'] = submission_date
+
+            companies = data.find_all('span', class_='companyName')
+            for company in companies:
+                cik = company.find('a').get_text()
+                cik = cik.split(' ')[0]
+
+                if self.cik in cik:
+                    continue
+                
+                merging_cik = cik
+                merging_name = company.get_text().split(' (')[0]
+
+            model.data['merging_with_company'] = merging_name
+            model.data['merging_with_cik'] = merging_cik
+            model.data['date'] = submission_date
+        except:
+            # Dont append because our cik is null
+            model.data['merging_with_cik'] = None
+        finally:
+            return model
+
+
+    def make_company_info_model(self, link: str) -> SEC_Company_Info:
+        model = SEC_Company_Info()
+        model.data['link'] = link
+        try:
+            data = self.base.get_data(link)
+            table = data.find('table', class_='tableFile')
+            rows = table.find_all('tr')
+
+            submission_date = data.find('div', text='Filing Date')
+            submission_date = submission_date.find_next_sibling('div').get_text()
+
+            item_group = data.find('div', text='Items').parent
+            item_group = item_group.find('div', class_='info')
+            item_group = item_group.get_text(separator='|').split('|')
+            for item in item_group:
+                item_details = item.split(': ')
+                item_num = item_details[0].split('Item ')[1]
+                model.data['item_list'][item_num] = item_details[1]
+
+            model.data['date'] = submission_date
+            # model.data['link'] = self.base.get_table_cell(rows[1], 2, True)
+            form_link = self.base.get_table_cell(rows[1], 2, False)
+            form_link = form_link.find('a', href=True)
+            model.data['link'] = 'https://www.sec.gov' + form_link['href']
+        except:
+            # Just save off the link
+            pass
+        finally:
+            return model
+
+
+    def make_stock_program_model(self, link: str) -> SEC_Employee_Stock:
+        # check if file ending is NOT txt
+        model = SEC_Employee_Stock()
+        model.data['link'] = link
+        try:
+            issued_shares = None
+            data = self.base.get_data(link)
+            # Get date from info header
+            submission_date = data.find('div', text='Filing Date')
+            submission_date = submission_date.find_next_sibling('div')
+            model.data['date'] = submission_date.get_text()
+            # parse main table for form type and link to actual submission
+            table = data.find('table', class_='tableFile')
+            rows = table.find_all('tr')
+            form_type = self.base.get_table_cell(rows[1], 3, True)
+            # form = self.base.get_table_cell(rows[1], 2, True)
+            form = self.base.get_table_cell(rows[1], 2, False)
+            form = form.find('a', href=True)
+            form = 'https://www.sec.gov' + form['href']
+
+            if path.splitext(form)[1] == '.txt':
+                # Currently, we dont parse text files.
+                # Usually means its from over 15 years ago.
+                # Null Date so we dont append
+                model.data['date'] = None
+                return model
+
+            # Parse the actual submission form for information
+            # data = self.base.get_data('./sec_files/s8/' + form)
+            data = self.base.get_data(form)
+            stock_offering_table_rows = None
+            tables = data.find_all('table')
+
+            for table in tables:
+                try:
+                    rows = table.find_all('tr')
+                    title_cell = self.base.get_table_cell(rows[2], 0, True)
+                    title_cell = title_cell.lstrip()
+                    if 'Title of ' in title_cell:
+                        stock_offering_table_rows = rows
+                        break
+                except:
+                    # Who the eff knows what table this is, but pass
+                    continue
+
+            # If its a standard table, try to get where we initial think the issued shares should be then clean it up
+            issued_shares = self.base.get_table_cell(stock_offering_table_rows[3], 2, True)
+            issued_shares = unicodedata.normalize('NFKD', issued_shares)
+            issued_shares = issued_shares.replace(',', '').replace('shares','').strip()
+
+            if util.isValidInt(issued_shares):
+                model.data['additional_shares_issued'] = int(issued_shares) 
+                return model
+
+            # Although Common Stock is in the table twice, we are not breaking. So our "issued shares" is the last occurance of title "common stock"
+            for row in stock_offering_table_rows:
+                row_title = self.base.get_table_cell(row, 0, True).split(',')[0].split('(')[0].strip()
+                if row_title.lower() == 'common stock':
+                    issued_shares = self.base.get_table_cell(row, 2, True).replace(',','').split(' shares')[0].split('(')[0]
+
+            # if we parsed the wrong row, oh well, null it out
+            model.data['additional_shares_issued'] = int(issued_shares) if util.isValidInt(issued_shares) else None
+
+        except:
+            # if we blow up just add the link for future reference
+            pass
+        finally:
+            return model
+
+
 
 
  # =========================================================== # 
@@ -357,13 +742,3 @@ class TDAmeritrade(Scaper):
         if util.isValidFloat(price):
             return float(price)
         return None
-
-
-    # @params (None)
-    # @descrip - looks for ADR tag to indicate this a ADR
-    # @returns bool - yes its an adr or no its not
-    def get_adr(self) -> bool:
-        adr = self.soup.find_all('div', class_='adr-container')
-        if len(adr) > 0:
-            return True
-        return False

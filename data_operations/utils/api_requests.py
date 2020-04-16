@@ -14,6 +14,8 @@ from shared.base_model import Base_Model
 from shared.models import Chart_Indicators, Price_EOD, Price_Weekly, Technical_Indicators, Fundamental_Indicators
 
 
+
+
 # ============================================================ # 
 #                   Abstract Class                              #
 # ============================================================= #
@@ -28,6 +30,8 @@ class API_Request(object):
     def get_request(self, _url):
         r = requests.get(url=_url)
         return r.json()
+
+
 
 
 
@@ -499,6 +503,8 @@ class AlphaVantage(API_Request):
         ca.data['three_upside_gap_river'] = int(talib.CDLXSIDEGAP3METHODS(inputs['open'], inputs['high'], inputs['low'], inputs['close'])[index])
 
         return ca
+
+
 
 
  # ============================================================# 

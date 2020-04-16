@@ -14,6 +14,7 @@ kiwisolver==1.1.0
 lazy-object-proxy==1.4.3
 matplotlib==3.2.1
 mccabe==0.6.1
+multitasking==0.0.9
 mysql-connector-python==8.0.19
 networkx==2.4
 numpy==1.18.2
@@ -37,3 +38,4 @@ trendln==0.1.10
 typed-ast==1.4.1
 urllib3==1.25.8
 wrapt==1.11.2
+yfinance==0.1.54
