@@ -142,16 +142,23 @@ class Price_EOD(Price):
 #                Price Weekly Table                       #
 # ======================================================= #
 
-class Price_Weekly(Price):
+class Price_Weekly(Base_Model):
 
   def __init__(self):
     self.default_float = Base_Model.default_float
-    self.data = Price().data
-    del self.data['eod_id']
+    self.data = OrderedDict()
 
     self.data['weekly_id'] = None
+    self.data['transaction_id'] = None
+    self.data['wk_start_date'] = None
     self.data['wk_end_date'] = None
+    self.data['open'] = self.default_float
+    self.data['high'] = self.default_float
+    self.data['low'] = self.default_float
+    self.data['close'] = self.default_float
+    self.data['volume'] = self.default_float
     self.data['avg_volume'] = self.default_float
+    self.data['percent_change'] = self.default_float
     return
 
 
@@ -477,7 +484,6 @@ class Fundamental_Indicators(Base_Model):
     self.data['support_point_avg'] = self.default_float
     self.data['support_point'] = self.default_float
     self.data['book_value'] = self.default_float
-    self.data['is_adr'] = None
     return
 
 
@@ -641,9 +647,9 @@ class SEC(Base_Model):
     self.data['sec_id'] = None
     self.data['transaction_id'] = None
     self.data['date_of_ipo'] = None
-    self.data['is_adr'] = None
     self.data['late_filings'] = self.default_int
     self.data['ct_orders'] = self.default_int
+    self.data['is_adr'] = None
     self.data['company_info'] = [] #[SEC_Company_Info(), ..]
     self.data['secondary_offerings'] = [] # [SEC_Secondary_Offering()..]
     self.data['mergers'] = [] # [SEC_Merger(), ..]

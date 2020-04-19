@@ -3,6 +3,9 @@
 from datetime import datetime, timedelta
 import mysql.connector
 from mysql.connector import errorcode
+from json import dumps
+
+
 
 # =================== Custom Imports ========================
 from data_operations.database.sql import DB_SCHEMA
@@ -18,8 +21,9 @@ class DB(DB_SCHEMA):
     # @params (database_name) - Name of DB instance to be using
     # @descrip - Connects to MySQL Instance and checks for database nostradamus, and loads up table in not present
     # @returns None
-    def __init__(self, database_name:str):
+    def __init__(self, database_name:str, is_nostradamus_db=True):
         self.base = super()
+        self.is_nostradamus_db = is_nostradamus_db
         self.insert_sql = self.base.insert_statements()
         self.update_sql = self.base.update_statements()
         self.last_insert_id = -1
@@ -33,8 +37,8 @@ class DB(DB_SCHEMA):
                 print("Database does not exist")
             else:
                 print(err)
-
-        self.load_tables()
+        base_tables = self.base.nostradamus_tables() if is_nostradamus_db else self.base.sectors_tables()
+        self.load_tables(base_tables)
         return
 
 
@@ -49,10 +53,9 @@ class DB(DB_SCHEMA):
     # @params (None)
     # @descrip - Loads table from SQL file
     # @returns None
-    def load_tables(self):
-        base_tables = self.base.tables()
-        for table_name in base_tables:
-            table_description = base_tables[table_name]
+    def load_tables(self, tables: dict) -> None:
+        for table_name in tables:
+            table_description = tables[table_name]
             try:
                 self.cursor.execute(table_description)
             except mysql.connector.Error as err:
@@ -103,7 +106,7 @@ class DB(DB_SCHEMA):
         for news_model in ticker_model.news:
             news_model.data['transaction_id'] = trans_id
             self.save(news_model)
-
+        
         for peer in ticker_model.peers:
             peer.data['transaction_id'] = trans_id
             self.save(peer)
@@ -134,12 +137,14 @@ class DB(DB_SCHEMA):
 
         for info in company_info:
             info.data['sec_id'] = sec_id
+            # MySQL doesnt coerce dicts to json so we have manually move it over
+            info.data['item_list'] = dumps(info.data['item_list'])
             self.save(info)
 
         for incentive in stock_program:
             incentive.data['sec_id'] = sec_id
             self.save(incentive)
-
+        
         return
 
 
@@ -175,14 +180,16 @@ class DB(DB_SCHEMA):
     # @descrip - Query DB and return all tickers that need the price performance tracked for the last x days
     # @returns list - a list of tuples with id and ticker
     def select_tracking_tickers(self) -> list:
-        tickers = []
-        # get last 5 days, which is actually 7 days from any point in the week
-        lookback_date = datetime.today() - timedelta(days=7)
-        lookback_date = lookback_date.strftime("%Y-%m-%d")
-        sql = "SELECT transaction_id, ticker FROM Transaction WHERE date = '" + lookback_date + "';"
-        self.cursor.execute(sql)
+        if self.is_nostradamus_db:
+            tickers = []
+            # get last 5 days, which is actually 7 days from any point in the week
+            # ^ Holidays might screw us? Meh...
+            lookback_date = datetime.today() - timedelta(days=7)
+            lookback_date = lookback_date.strftime("%Y-%m-%d")
+            sql = "SELECT transaction_id, ticker FROM Transaction WHERE date = '" + lookback_date + "';"
+            self.cursor.execute(sql)
 
-        for ticker in self.cursor:
-            tickers.append(ticker)
+            for ticker in self.cursor:
+                tickers.append(ticker)
 
-        return tickers
+            return tickers

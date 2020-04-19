@@ -1,5 +1,7 @@
 # Data Operations
 
+Data operations is the home of the Scraping and API calls. Data operations estenially performs all the of the data populating tasks. 
+
 ## Database
 Holds all the functions for data processing and communication with the local MySQL Instance.
 
@@ -22,3 +24,6 @@ This is the basis for all web page scraping and functions to process the releven
 
 #### helpers.py
 Misc functions that are used throughout the entire script.
+
+### utils.py
+Holds the main utility functions for data processing.

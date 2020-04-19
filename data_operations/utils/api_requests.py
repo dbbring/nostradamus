@@ -47,17 +47,17 @@ class AlphaVantage(API_Request):
     def __init__(self, ticker: str, is_daily=True):
         self.base = super()
         self.ticker = ticker
-        # One TA indicators needs to go this far back
-        self.total_lookback_days = 100 
+        self.total_lookback_days = 100 # One TA indicator needs to go this far back
         self.api_key = os.environ['AV_API_KEY']
-        #self.data = self.try_api_call(is_daily)
+        self.data = self.try_api_call(is_daily)
+        '''
         if (is_daily):
-            with open('./' + ticker + '.json') as f:
+            with open('./data_operations/' + ticker + '.json') as f:
                 self.data = json.load(f)
         else:
-            with open('./' + ticker + '_weekly.json') as f:
+            with open('./data_operations/' + ticker + '_weekly.json') as f:
                 self.data = json.load(f)
-
+        
         self.data = self.data['Time Series (Daily)'] if is_daily else self.data['Weekly Time Series']
         '''
         try:
@@ -65,7 +65,7 @@ class AlphaVantage(API_Request):
         except KeyError:
             # Let self.data be whatever it is
             pass
-        '''
+        
         return
 
 
@@ -102,7 +102,6 @@ class AlphaVantage(API_Request):
 
         for day in self.data:
             if current_period <= self.total_lookback_days:
-                eod_data = []
                 date_data.append(day)
                 percent_change_data.append(Base_Model.to_percent(self, float(self.data[day]['1. open']), float(self.data[day]['4. close'])))
                 open_data.append(float(self.data[day]['1. open']))
@@ -521,7 +520,7 @@ class IEX(API_Request):
         self.base = super()
         self.ticker = ticker
         self.api_key = os.environ['IEX_API_KEY']
-        '''
+        
         self.data = self.base.get_request('https://sandbox.iexapis.com/stable/stock/' + ticker + '/advanced-stats?token=Tpk_6b5abe0c3d8048fe82f669873de2665f')
 
         bs = self.base.get_request('https://sandbox.iexapis.com/stable/stock/' + ticker + '/balance-sheet?token=Tpk_6b5abe0c3d8048fe82f669873de2665f')
@@ -536,20 +535,21 @@ class IEX(API_Request):
         inc = inc['income'][0]
         self.data = {**inc, **self.data}
         '''
-        with open('./' + ticker + '-advanced-stats.json') as f:
+        with open('./data_operations/' + ticker + '-advanced-stats.json') as f:
             self.data = json.load(f)
-        with open('./' + ticker + '-balance-sheet.json') as f:
+        with open('./data_operations/' + ticker + '-balance-sheet.json') as f:
             bs = json.load(f)
         bs = bs['balancesheet'][0]
         self.data = {**bs, **self.data}
-        with open('./' + ticker + '-cashflows.json') as f:
+        with open('./data_operations/' + ticker + '-cashflows.json') as f:
             cs = json.load(f)
         cs = cs['cashflow'][0]
         self.data = {**cs, **self.data}
-        with open('./' + ticker + '-income.json') as f:
+        with open('./data_operations/' + ticker + '-income.json') as f:
             inc = json.load(f)
         inc = inc['income'][0]
         self.data = {**inc, **self.data}
+        '''
         return
 
 

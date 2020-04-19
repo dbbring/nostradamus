@@ -1,5 +1,5 @@
 # Models
-With the exception of the Ticker Model, all models are mirror images of the database table they represent. The ticker model represents a top level model that holds all the other sub models.
+With the exception of the Ticker Model, all models are mirror images of the database table they represent. The ticker model represents a top level model that holds all the other sub models. The model structure must exactly mimic the table and sql insert structure otherwise the insert will be off.
 
 #### Almost every percent field is stored as a percent already, so dont convert with * 100.
 
@@ -39,3 +39,18 @@ The Sector model is completely segrated from the rest of the models. It merely h
 
 ## News Event Model
 The News event model holds a list of news articles that could be found from Finviz and TD Ameritrade. Although Nostradamus spefically kicks out tickers with a new article within the last 3 days, its helpful to know what previous articles were and how often the company releases news.
+
+## SEC Model
+The SEC Model holds all the information we could find the SEC Edgar. Its the only model that has "sub-models" meaning, the SEC model has an array of SEC_Merger models and so on. SEC information is not deemed highly accurate because of the lack of standards when displaying the information. Therefore it is easy to have null because we simply couldnt find the information requested. Take great care especially when dealing with ADR's. Not only are foreign companies not subject to same reporting requirements, but most of the "shadier" companines only file a 6k so we cant populate most of the sub models.
+
+### SEC_Secondary_Offering (Forms S-3, F-3, F-4, F-6)
+The SEC Secondary offering model, is a model to reflect how many times a company has diluated and how many shares the have issued. Although we can be fairly certain how many times they have isseud, we cant be certain of MUCH the diluated. Particularly because the ASR (Automatic Shelf Registration) which means the can issue at any point in time. Also because the SEC tables are not consistant so we cant be certain we found the shares issued.
+
+### SEC_Merger (Form 425)
+The SEC merger model simply lists the companies that were in contact with our primary company we are researching. This doesnt guarentee the two companies mergered althought it is highly likely. All we gather is the merging companies name and CIK number. It also possible that it is a restructure within a parent corpartion. There are many possiblities here, so double check that the two companies did actually merger before trusting the data.
+
+### SEC_Employee_Stock (Form S-8)
+The Employee stock model list how many times the company has issued additional shares for employee compensation. This gives us a idea of how invested the employees are in the company and also how much more diluation there is.
+
+### SEC_Company_Info (Form 8-K)
+The company info is a very light represtation of a 8-K. Becuase it would be almost impossible to verify the langauge and tone of the actual verbage, we are simply collecting which sections the news event belongs to. Are they delisting? is a finicial update? These are all under different sections. We are collecting the link as well, so we can examine the actual form later if desired.

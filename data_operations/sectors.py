@@ -1,19 +1,28 @@
 #! /usr/bin/env python
+# ======================= Gen Imports ========================
+from datetime import date, datetime
+import json
+import traceback
+import sys
+
+# ==== Add our path to the python path so we can import our modules ====
+
+with open('./data_operations/config.json') as f:
+            config = json.load(f)
+
+sys.path.insert(1, config['project_root'])
+
+# ====================== Custom Imports ======================
 
 from data_operations.utils.scrapers import Bloomberg, TDAmeritrade
 from data_operations.database.helpers import DB
 from shared.models import Sectors
-from data_operations.utils.helpers import send_mail
+from data_operations.utils.util import send_mail
 
-from datetime import date, datetime
-import argparse
+
 
 try:
-  args_setup = argparse.ArgumentParser(description='Main Entry Script for Populating DB')
-  args_setup.add_argument('db_name', metavar='Database_Name', type=str, help="Which database instance to use")
-  args = args_setup.parse_args()
-
-  mySQL = DB(args.db_name)
+  mySQL = DB(config['sectors']['database_name'], False)
   model = Sectors()
   today = datetime.now().date()
 
@@ -52,9 +61,10 @@ try:
 
   mySQL.save(model)
 
-  send_mail('Sectors Script Succesfully Executed')
-except Exception as ex:
-  send_mail('Sectors Script Failed!! ' + str(ex))
+  send_mail('Sectors Script Succesfully Executed', config['sectors']['database_name'])
+except Exception:
+  ex = traceback.format_exc()
+  send_mail('------- Sectors Script Failed!! ------ \n\n' + ex, config['sectors']['database_name'])
 
 
 

@@ -17,6 +17,8 @@ import data_operations.utils.helpers as util
 from shared.models import News_Event, Peer_Performance, SEC, SEC_Company_Info, SEC_Employee_Stock, SEC_Merger, SEC_Secondary_Offering
 
 
+with open('./data_operations/config.json') as f:
+            config = json.load(f)
 
 
 # ============================================================ # 
@@ -40,7 +42,7 @@ class Scaper(object):
             if (use_firefox):
                 options = Options()
                 options.headless = True
-                browser = webdriver.Firefox(executable_path='/home/derek/Desktop/nostradamus/.venv/lib/geckodriver',options=options)
+                browser = webdriver.Firefox(executable_path=config['project_root'] + '.venv/lib/geckodriver',options=options)
                 browser.get(path)
                 html = browser.page_source
                 browser.close()
@@ -112,7 +114,7 @@ class FinViz(Scaper):
         table_rows = self.table.find_all('tr')
         for row in table_rows:
             change = self.base.get_table_cell(row, 9, True)
-            change = change[:-1]
+            change = change.replace('%','').replace('-', '')
             if (util.isValidFloat(change)):
                 if (lower_threhold <= float(change) <= upper_threshold):
                     tickers.append(self.base.get_table_cell(row, 1, True))
@@ -136,6 +138,9 @@ class FinViz(Scaper):
     # @returns bool - true if we find a news article, false if not and stores off link,title and date into news field
     def has_finviz_news(self) -> bool:
         table = self.soup.find('table', id='news-table')
+        if table == None:
+            return False
+
         table_rows = table.find_all('tr')
 
         for index, row in enumerate(table_rows):
@@ -166,18 +171,17 @@ class FinViz(Scaper):
  #                 SEC Edgar Files scraper                     #
  # ============================================================ #
 
+
 class SEC_Edgar(Scaper):
-    # https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001113866&type=&dateb=&owner=exclude&start=0&count=100
 
-    # NT 10k, NT 10Q, 12b-25 is a late filer
-
-    # ADR's are like 6-ks??
-
+    # @params (ticker) - ticker => company we want to gather info on. 
+    # @descrip - Set ups required fields for class use. if we can find info from the ticker, then try to find it from the CIK number.
+    # @returns None
     def __init__(self, ticker:str) -> None:
         self.base = super()
         self.ticker = ticker
         self.base_data = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + ticker + '&type=&dateb=&owner=exclude&start=0&count=100')
-        #self.base_data = self.base.get_data('./sec_files/cik-' + ticker + '-0.html')
+        #self.base_data = self.base.get_data('./data_operations/sec_files/cik-' + ticker + '-0.html')
         self.cik = None
         self.cik_dict = {}
         self.soup = None
@@ -188,38 +192,43 @@ class SEC_Edgar(Scaper):
         self.links_8k = []
         self.links_f3 = []
         self.links_f6 = []
+        self.links_f4 = []
         self.late_filings = 0
         self.ct_orders = 0
-        self.ipo_date = None
+        self.ipo_date = datetime.today().date()
         self.is_adr = False
         # We need to populate cik_dict
-        self.get_cik(ticker)
+        self.get_cik()
 
         if self.base_data.find('h1', text="No matching Ticker Symbol."):
             self.base_data = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.cik + '&type=&dateb=&owner=exclude&start=0&count=100')
-            # self.base_data = self.base.get_data('./sec_files/cik-' + self.cik + '-0.html')
+            #self.base_data = self.base.get_data('./data_operations/sec_files/cik-' + self.cik + '-0.html')
             if self.base_data.find('h1', text="No matching CIK."):
                 self.is_valid = False
 
         return
 
 
-    def get_cik(self, ticker:str) -> bool:
+    # @params (None) 
+    # @descrip - Use json file from SEC to convert from ticker to a CIK number. Also populates the CIK_DICT dictonary for future reference.
+    # @returns bool - if we found the CIK, otherwise false
+    def get_cik(self) -> bool:
         with open('./data_operations/utils/cik_ticker.json') as f:
             self.cik_dict = json.load(f)
 
         for cik_item in self.cik_dict:
-            if self.cik_dict[cik_item]['ticker'] == ticker.upper():
+            if self.cik_dict[cik_item]['ticker'] == self.ticker.upper():
                 self.cik = str(self.cik_dict[cik_item]['cik_str'])
                 return True
         return False
 
 
-    #cik is a company/ticker/we
-    # we already init'd with page 0 so start incrementing with 100
+    # @params (inc) - inc => determines which "page" we are on since SEC maxium display count is 100.
+    # @descrip - Makes the request, and scrapes the given page.
+    # @returns bool - true if we have data, false if we at the end of line.
     def load_data(self, inc: int) -> bool:
         self.soup = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.cik + '&type=&dateb=&owner=exclude&start=' + str(inc) + '&count=100')
-        # self.soup = self.base.get_data('./sec_files/cik-' + self.ticker + '-' + str(inc) +'.html')
+        #self.soup = self.base.get_data('./data_operations/sec_files/cik-' + self.ticker + '-' + str(inc) +'.html')
         table = self.soup.find('table', class_='tableFile2')
         rows = table.find_all('tr')
         if len(rows) >= 2:
@@ -228,13 +237,13 @@ class SEC_Edgar(Scaper):
         return False
 
 
-    # sic is all realated companies
-    # returns a list of CIK numbers
+    # @params (location_code, sic_code) - loc_code => the state in which the company is registerd (a SEC code) / sic_code => the sector in which the company is registered (SEC code) 
+    # @descrip - loads the company search by SIC code, and cross references by location code
+    # @returns list - a list of CIK codes of companies in the same state, and same sector.
     def get_sic_data(self, location_code: str, sic_code: str) -> list:
-        # load and parse data here returning a list?
         inc = 0
         comps = []
-        # sic_html = self.base.get_data('./sec_files/sic-' + self.ticker + '-' + str(inc) + '.html')
+        #sic_html = self.base.get_data('./data_operations/sec_files/sic-' + self.ticker + '-' + str(inc) + '.html')
         sic_html = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&SIC=' + sic_code + '&owner=exclude&match=&start=' + str(inc) +'&count=100&hidefilings=0')
 
         while not sic_html.find('div', class_='noCompanyMatch'):
@@ -249,16 +258,17 @@ class SEC_Edgar(Scaper):
                     comps.append(self.base.get_table_cell(row, 0, True))
                 
             inc = inc + 100
-            sic_html = self.base.get_data('./sec_files/sic-' + self.ticker + '-' + str(inc) + '.html')
-            #sic_html = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&SIC=' + sic_code + '&owner=exclude&match=&start=' + str(inc) +'&count=100&hidefilings=0')
+            #sic_html = self.base.get_data('./data_operations/sec_files/sic-' + self.ticker + '-' + str(inc) + '.html')
+            sic_html = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&SIC=' + sic_code + '&owner=exclude&match=&start=' + str(inc) +'&count=100&hidefilings=0')
 
         return comps
 
 
-    # call related companies after forms so we for sure have the base data
+    # @params (None) 
+    # @descrip - iterates through list of CIKs and converts to a ticker str
+    # @returns list - a list of ticker str's of companies in the same state and same sector.
     def get_related_companies(self) -> list:
         # if related co not in CIK file, maybe they merged?
-        # adr maybe different check up on it
         related_cos = []
         links = self.base_data.find('p', class_='identInfo')
         links = links.find_all('a', href=True)
@@ -272,12 +282,14 @@ class SEC_Edgar(Scaper):
                     break
         return related_cos
 
-    # returns list of peer performance models
+
+    # @params (ticker) - ticker of competeing company
+    # @descrip - Takes a specified ticker and collects the past 5 days price action for it 
+    # @returns list - a list of peer_performance models for each day we have data
     def make_arr_peer_performance_model(self, ticker:str) -> list:
         sleep(1) # Yfinance rate limiting
         peer_list = []
         symbol = yfinance.Ticker(ticker)
-        # Check if ticker is valid!! 
 
         data = symbol.history(period='5d')
         for index,row in data.iterrows():
@@ -299,55 +311,69 @@ class SEC_Edgar(Scaper):
         return peer_list
 
 
+    # @params (None) 
+    # @descrip - Iterates through the filings page by page and pulls out the forms we are looking for. Only for american listed companies which have different reporting requirments.
+    # @returns None
     def parse_sec_filings(self) -> None:
-        inc = 100
+        inc = 0
         while self.load_data(inc):
             table = self.soup.find('table', class_='tableFile2')
             rows = table.find_all('tr')
-            for index, row in enumerate(rows):
-                if index == 0:  # Skip header row
-                    continue
+            if self.is_adr:
+                self.parse_sec_foreign_filings(table)
+            else:
+                for index, row in enumerate(rows):
+                    if index == 0:  # Skip header row
+                        continue
 
-                form_id = self.base.get_table_cell(row, 0, True)
+                    form_id = self.base.get_table_cell(row, 0, True)
 
-                if form_id == '6-K' or form_id == 'F-1' or form_id == 'F-3' or form_id == 'F-6' or form_id == 'F-3ASR' or form_id == '20-F':
-                    # Safe to say this is a ADR 
-                    self.is_adr = True
-                    self.parse_sec_foreign_filings(table)
-                    break
-                elif form_id == 'NT 10-K' or form_id == 'NT 10-Q' or form_id == 'NT 10-D' or form_id == 'NT 11-k':
-                    self.late_filings += 1
-                elif form_id == 'S-8':
-                    link = self.base.get_table_cell(row, 1, False)
-                    link = link.find('a', href=True)
-                    self.links_s8.append('https://www.sec.gov' + link['href'])
-                elif form_id == 'S-3' or form_id == 'S-3ASR':
-                    link = self.base.get_table_cell(row, 1, False)
-                    link = link.find('a', href=True)
-                    self.links_s3.append('https://www.sec.gov' + link['href'])
-                elif form_id == 'CT ORDER':
-                    self.ct_orders += 1
-                elif form_id == '8-K':
-                    link = self.base.get_table_cell(row, 1, False)
-                    link = link.find('a', href=True)
-                    self.links_8k.append('https://www.sec.gov' + link['href'])
-                elif form_id == 'S-1':
-                    self.ipo_date = self.base.get_table_cell(row, 3, True)
-                elif form_id == '425':
-                    link = self.base.get_table_cell(row, 1, False)
-                    link = link.find('a', href=True)
-                    self.links_425.append('https://www.sec.gov' + link['href'])
+                    if form_id == '6-K' or form_id == 'F-1' or form_id == 'F-3' or form_id == 'F-6' or form_id == 'F-3ASR' or form_id == '20-F':
+                        # Safe to say this is a ADR 
+                        self.is_adr = True
+                        self.parse_sec_foreign_filings(table)
+                        break
+                    elif form_id == 'NT 10-K' or form_id == 'NT 10-Q' or form_id == 'NT 10-D' or form_id == 'NT 11-k':
+                        self.late_filings += 1
+                    elif form_id == 'S-8':
+                        link = self.base.get_table_cell(row, 1, False)
+                        link = link.find('a', href=True)
+                        self.links_s8.append('https://www.sec.gov' + link['href'])
+                    elif form_id == 'S-3' or form_id == 'S-3ASR':
+                        link = self.base.get_table_cell(row, 1, False)
+                        link = link.find('a', href=True)
+                        self.links_s3.append('https://www.sec.gov' + link['href'])
+                    elif form_id == 'CT ORDER':
+                        self.ct_orders += 1
+                    elif form_id == '8-K':
+                        link = self.base.get_table_cell(row, 1, False)
+                        link = link.find('a', href=True)
+                        self.links_8k.append('https://www.sec.gov' + link['href'])
+                    elif form_id == 'S-1':
+                        self.ipo_date = self.base.get_table_cell(row, 3, True)
+                    elif form_id == '425':
+                        link = self.base.get_table_cell(row, 1, False)
+                        link = link.find('a', href=True)
+                        self.links_425.append('https://www.sec.gov' + link['href'])
 
             inc += 100
         return
 
 
+    # @params (None) 
+    # @descrip - Iterates through the filings page by page and pulls out the forms we are looking for. Only for foreign listed companies which have different reporting requirments.
+    # @returns None
     def parse_sec_foreign_filings(self, sec_table) -> None:
-        # check for F-6's (forgein equiv to S-3)
-        # F-3/F-1 can give ipo date? (F-3 = S-1? ) else last occurance of form
-        # 6-k can apperently be used to register somehow
+        # 6K can contain just too much disorganized information. Skipping for now.
         rows = sec_table.find_all('tr')
+
+        # Since Foreign issuers dont have to file a S-1, just find the first entry
+        last_parsed_date = self.base.get_table_cell(rows[(len(rows) - 1)], 3, True)
+        if self.ipo_date > util.string_to_date(last_parsed_date):
+                        self.ipo_date = util.string_to_date(last_parsed_date)
+
         for index, row in enumerate(rows):
+                last_parsed_date = None
                 if index == 0:  # Skip header row
                     continue
 
@@ -355,6 +381,16 @@ class SEC_Edgar(Scaper):
 
                 if form_id == 'NT 11-k' or form_id == 'NT 20-F' or form_id == 'NT 10-D':
                     self.late_filings += 1
+                elif form_id == 'F-4':
+                    link = self.base.get_table_cell(row, 1, False)
+                    link = link.find('a', href=True)
+                    self.links_f4.append('https://www.sec.gov' + link['href'])
+                elif form_id == 'F-3' or form_id == 'F-3ASR':
+                    link = self.base.get_table_cell(row, 1, False)
+                    link = link.find('a', href=True)
+                    self.links_f3.append('https://www.sec.gov' + link['href'])
+                elif form_id == 'CT ORDER':
+                    self.ct_orders += 1
                 elif form_id == 'S-8':
                     link = self.base.get_table_cell(row, 1, False)
                     link = link.find('a', href=True)
@@ -363,14 +399,10 @@ class SEC_Edgar(Scaper):
                     link = self.base.get_table_cell(row, 1, False)
                     link = link.find('a', href=True)
                     self.links_s3.append('https://www.sec.gov' + link['href'])
-                elif form_id == 'CT ORDER':
-                    self.ct_orders += 1
-                elif form_id == '8-K':
+                elif form_id == 'F-6':
                     link = self.base.get_table_cell(row, 1, False)
                     link = link.find('a', href=True)
-                    self.links_8k.append('https://www.sec.gov' + link['href'])
-                elif form_id == 'S-1':
-                    self.ipo_date = self.base.get_table_cell(row, 3, True)
+                    self.links_f6.append('https://www.sec.gov' + link['href'])
                 elif form_id == '425':
                     link = self.base.get_table_cell(row, 1, False)
                     link = link.find('a', href=True)
@@ -378,13 +410,16 @@ class SEC_Edgar(Scaper):
         return
 
 
+    # @params (None) 
+    # @descrip - iterate though our forms we want, and scrapes each page trying to find the necessary information.
+    # @returns SEC model with all information
     def make_sec_model(self) -> SEC:
         self.parse_sec_filings()
         '''
-        self.links_425 = ['./sec_files/425/' + self.ticker + '-0.html', './sec_files/425/' + self.ticker + '-1.html', './sec_files/425/' + self.ticker + '-2.html', './sec_files/425/' + self.ticker + '-3.html', './sec_files/425/' + self.ticker + '-4.html', './sec_files/425/' + self.ticker + '-5.html', './sec_files/425/' + self.ticker + '-6.html', './sec_files/425/' + self.ticker + '-7.html']
-        self.links_8k = ['./sec_files/8k/' + self.ticker + '-0.html', './sec_files/8k/' + self.ticker + '-1.html', './sec_files/8k/' + self.ticker + '-2.html', './sec_files/8k/' + self.ticker + '-3.html']
-        self.links_s3 = ['./sec_files/s3/' + self.ticker + '-0.html', './sec_files/s3/' + self.ticker + '-1.html', './sec_files/s3/' + self.ticker + '-2.html', './sec_files/s3/' + self.ticker + '-3.html']
-        self.links_s8 = ['./sec_files/s8/' + self.ticker + '-0.html', './sec_files/s8/' + self.ticker + '-1.html', './sec_files/s8/' + self.ticker + '-2.html']
+        self.links_425 = ['./data_operations/sec_files/425/' + self.ticker + '-0.html', './data_operations/sec_files/425/' + self.ticker + '-1.html', './data_operations/sec_files/425/' + self.ticker + '-2.html', './data_operations/sec_files/425/' + self.ticker + '-3.html', './data_operations/sec_files/425/' + self.ticker + '-4.html', './data_operations/sec_files/425/' + self.ticker + '-5.html', './data_operations/sec_files/425/' + self.ticker + '-6.html', './data_operations/sec_files/425/' + self.ticker + '-7.html']
+        self.links_8k = ['./data_operations/sec_files/8k/' + self.ticker + '-0.html', './data_operations/sec_files/8k/' + self.ticker + '-1.html', './data_operations/sec_files/8k/' + self.ticker + '-2.html', './data_operations/sec_files/8k/' + self.ticker + '-3.html']
+        self.links_s3 = ['./data_operations/sec_files/s3/' + self.ticker + '-0.html', './data_operations/sec_files/s3/' + self.ticker + '-1.html', './data_operations/sec_files/s3/' + self.ticker + '-2.html', './data_operations/sec_files/s3/' + self.ticker + '-3.html']
+        self.links_s8 = ['./data_operations/sec_files/s8/' + self.ticker + '-0.html', './data_operations/sec_files/s8/' + self.ticker + '-1.html', './data_operations/sec_files/s8/' + self.ticker + '-2.html']
         '''
         model = SEC()
         model.data['date_of_ipo'] = self.ipo_date
@@ -392,11 +427,41 @@ class SEC_Edgar(Scaper):
         model.data['ct_orders'] = self.ct_orders
         model.data['is_adr'] = self.is_adr
         
+        # ====================== American Company =========================
+
         for link in self.links_s3:
             offering_model = self.make_secondary_offering_model(link)
             if offering_model.data['date'] != None:
                 model.data['secondary_offerings'].append(offering_model)
         
+        for link in self.links_8k:
+            info_model = self.make_company_info_model(link)
+            model.data['company_info'].append(info_model)
+
+        # ======================== Foreign Company ===========================
+
+        for link in self.links_f3:
+            offering_model = self.make_secondary_offering_model(link)
+            if offering_model.data['date'] != None:
+                model.data['secondary_offerings'].append(offering_model)
+
+        for link in self.links_f4:
+            offering_model = self.make_secondary_offering_model(link)
+            if offering_model.data['date'] != None:
+                model.data['secondary_offerings'].append(offering_model)
+
+        for link in self.links_f6:
+            offering_model = self.make_secondary_offering_model(link)
+            if offering_model.data['date'] != None:
+                model.data['secondary_offerings'].append(offering_model)
+
+        # ======================== Applies to both ======================
+
+        for link in self.links_s8:
+            stock_prog_model = self.make_stock_program_model(link)
+            if stock_prog_model.data['date'] != None:
+                model.data['stock_program'].append(stock_prog_model)
+
         for link in self.links_425:
             merger_model = self.make_merger_model(link)
             same_mergering_co = False
@@ -408,19 +473,13 @@ class SEC_Edgar(Scaper):
 
             if not same_mergering_co:
                 model.data['mergers'].append(merger_model)
-        
-        for link in self.links_8k:
-            info_model = self.make_company_info_model(link)
-            model.data['company_info'].append(info_model)
-        
-        for link in self.links_s8:
-            stock_prog_model = self.make_stock_program_model(link)
-            if stock_prog_model.data['date'] != None:
-                model.data['stock_program'].append(stock_prog_model)
 
         return model
 
 
+    # @params (link) - a link to form index page (Not the actual form)
+    # @descrip - navigates to the form and tries to find the table that specifies how many shares were issued.
+    # @returns SEC_Secondary_Offering Model
     def make_secondary_offering_model(self, link: str) -> SEC_Secondary_Offering:
         model = SEC_Secondary_Offering()
         model.data['link'] = link
@@ -436,7 +495,7 @@ class SEC_Edgar(Scaper):
             table = data.find('table', class_='tableFile')
             rows = table.find_all('tr')
             form_type = self.base.get_table_cell(rows[1], 3, True)
-            # form = self.base.get_table_cell(rows[1], 2, True)
+            #form = self.base.get_table_cell(rows[1], 2, True)
             form = self.base.get_table_cell(rows[1], 2, False)
             form = form.find('a', href=True)
             form = 'https://www.sec.gov' + form['href']
@@ -452,7 +511,7 @@ class SEC_Edgar(Scaper):
                 return model
 
             # Parse the actual submission form for information
-            # data = self.base.get_data('./sec_files/s3/' + form)
+            #data = self.base.get_data('./data_operations/sec_files/s3/' + form)
             data = self.base.get_data(form)
             stock_offering_table_rows = None
             tables = data.find_all('table')
@@ -469,10 +528,10 @@ class SEC_Edgar(Scaper):
                     # Who the eff knows what table this is, but pass
                     continue
 
-            # If its a standard table, try to get where we initial think the issued shares should be then clean it up
+            # If its a standard table, try to get where we initially think the issued shares should be then clean it up
             issued_shares = self.base.get_table_cell(stock_offering_table_rows[3], 2, True)
             issued_shares = unicodedata.normalize('NFKD', issued_shares)
-            issued_shares = issued_shares.replace(',', '').replace('shares','').strip()
+            issued_shares = issued_shares.split(' America')[0].replace(',', '').replace('shares','').strip()
 
             if util.isValidInt(issued_shares):
                 model.data['additional_shares_issued'] = int(issued_shares) 
@@ -482,7 +541,7 @@ class SEC_Edgar(Scaper):
             for row in stock_offering_table_rows:
                 row_title = self.base.get_table_cell(row, 0, True).split(',')[0].split('(')[0].strip()
                 if row_title.lower() == 'common stock':
-                    issued_shares = self.base.get_table_cell(row, 2, True).replace(',','').split(' shares')[0].split('(')[0]
+                    issued_shares = self.base.get_table_cell(row, 2, True).split(' Amercia')[0].replace(',','').split(' shares')[0].split('(')[0]
 
             # if we parsed the wrong row, oh well, null it out
             model.data['additional_shares_issued'] = int(issued_shares) if util.isValidInt(issued_shares) else None
@@ -493,6 +552,9 @@ class SEC_Edgar(Scaper):
             return model
 
 
+    # @params (link) - a link to form index page (Not the actual form)
+    # @descrip - Checks the blue info boxes for the companies that received notification from letters. We are assuming that because the companies have been notified that a merger is taking place. Other options are: Merger failed, Company bought a product from another company etc.
+    # @returns SEC_Merger Model
     def make_merger_model(self, link: str) -> SEC_Merger:
         model = SEC_Merger()
         merging_cik = None
@@ -519,12 +581,15 @@ class SEC_Edgar(Scaper):
             model.data['merging_with_cik'] = merging_cik
             model.data['date'] = submission_date
         except:
-            # Dont append because our cik is null
+            # Dont append to our main model because our cik is null
             model.data['merging_with_cik'] = None
         finally:
             return model
 
 
+    # @params (link) - a link to form index page (Not the actual form)
+    # @descrip - Looks at the header information to find the different sections that the 8-k is reporting on. For more detail, we will have to use the link to view the 8-k ourselves.
+    # @returns SEC_Company_Info
     def make_company_info_model(self, link: str) -> SEC_Company_Info:
         model = SEC_Company_Info()
         model.data['link'] = link
@@ -556,8 +621,10 @@ class SEC_Edgar(Scaper):
             return model
 
 
+    # @params (link) - a link to form index page (Not the actual form)
+    # @descrip - navigates to the form and tries to find the table that specifies how many shares were issued for employee benefits. Although they are issuing more shares, it means the employees are invested in the co.
+    # @returns SEC_Employee_Stock
     def make_stock_program_model(self, link: str) -> SEC_Employee_Stock:
-        # check if file ending is NOT txt
         model = SEC_Employee_Stock()
         model.data['link'] = link
         try:
@@ -570,8 +637,7 @@ class SEC_Edgar(Scaper):
             # parse main table for form type and link to actual submission
             table = data.find('table', class_='tableFile')
             rows = table.find_all('tr')
-            form_type = self.base.get_table_cell(rows[1], 3, True)
-            # form = self.base.get_table_cell(rows[1], 2, True)
+            #form = self.base.get_table_cell(rows[1], 2, True)
             form = self.base.get_table_cell(rows[1], 2, False)
             form = form.find('a', href=True)
             form = 'https://www.sec.gov' + form['href']
@@ -584,7 +650,7 @@ class SEC_Edgar(Scaper):
                 return model
 
             # Parse the actual submission form for information
-            # data = self.base.get_data('./sec_files/s8/' + form)
+            #data = self.base.get_data('./data_operations/sec_files/s8/' + form)
             data = self.base.get_data(form)
             stock_offering_table_rows = None
             tables = data.find_all('table')
@@ -604,7 +670,7 @@ class SEC_Edgar(Scaper):
             # If its a standard table, try to get where we initial think the issued shares should be then clean it up
             issued_shares = self.base.get_table_cell(stock_offering_table_rows[3], 2, True)
             issued_shares = unicodedata.normalize('NFKD', issued_shares)
-            issued_shares = issued_shares.replace(',', '').replace('shares','').strip()
+            issued_shares = issued_shares.split(' America')[0].replace(',', '').replace('shares','').strip()
 
             if util.isValidInt(issued_shares):
                 model.data['additional_shares_issued'] = int(issued_shares) 
@@ -614,7 +680,7 @@ class SEC_Edgar(Scaper):
             for row in stock_offering_table_rows:
                 row_title = self.base.get_table_cell(row, 0, True).split(',')[0].split('(')[0].strip()
                 if row_title.lower() == 'common stock':
-                    issued_shares = self.base.get_table_cell(row, 2, True).replace(',','').split(' shares')[0].split('(')[0]
+                    issued_shares = self.base.get_table_cell(row, 2, True).split(' America')[0].replace(',','').split(' shares')[0].split('(')[0]
 
             # if we parsed the wrong row, oh well, null it out
             model.data['additional_shares_issued'] = int(issued_shares) if util.isValidInt(issued_shares) else None
@@ -643,9 +709,9 @@ class TDAmeritrade(Scaper):
         if (index):
             self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/charts?symbol=' + ticker)
         else:
-             # self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/summary?fromPage=overview&display=&fromSearch=true&symbol=' + ticker) 
-            self.soup = self.base.get_data('../nostradamus_files/td-' + ticker + '.html')        
-            return
+            self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/summary?fromPage=overview&display=&fromSearch=true&symbol=' + ticker) 
+            #self.soup = self.base.get_data('../nostradamus_files/td-' + ticker + '.html')        
+        return
 
 
     # @params (None)
@@ -653,6 +719,9 @@ class TDAmeritrade(Scaper):
     # @returns bool - Yes if TDAmeritrade has news, no if not
     def has_td_news(self) -> bool:
         table = self.soup.find('table', class_='latestNews')
+        if table == None:
+            return False
+
         table_section = table.find_all('tbody')
         for index, tbody in enumerate(table_section):
             row = tbody.find_all('tr')

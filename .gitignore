@@ -359,5 +359,6 @@ MigrationBackup/
 .venv
 .venv/*
 .venv/**.*
+*.log
 
 sec_files/

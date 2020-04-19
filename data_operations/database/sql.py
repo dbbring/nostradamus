@@ -30,8 +30,7 @@ class DB_SCHEMA(object):
     '(%s, %s, %s)')
 
     INSERT_SQL['Price_EOD'] = ('INSERT INTO Price_EOD ('
-    'date, transaction_id, is_tracking_period, '
-    'open, high, low, close, volume, avg_volume, percent_change) VALUES '
+    'transaction_id, date, open, high, low, close, volume, percent_change, is_tracking_period, avg_volume) VALUES '
     '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
 
     INSERT_SQL['Price_Weekly'] = ('INSERT INTO Price_Weekly ('
@@ -141,9 +140,9 @@ class DB_SCHEMA(object):
 
 
   # @params (None)
-  # @descrip - The create table statements for all the tables in nostradamus
+  # @descrip - The create table statements for all the tables in sectors
   # @returns None
-  def tables(self):
+  def sectors_tables(self):
     TABLES = {}
 
     TABLES['Sectors'] = (
@@ -171,6 +170,15 @@ class DB_SCHEMA(object):
     "  PRIMARY KEY (`sector_id`)"
     ") ENGINE=InnoDB")
 
+    return TABLES
+
+
+  # @params (None)
+  # @descrip - The create table statements for all the tables in nostradamus
+  # @returns None
+  def nostradamus_tables(self):
+    TABLES = {}
+
     TABLES['Transaction'] = (
     "CREATE TABLE IF NOT EXISTS `Transaction` ("
     "`transaction_id` INT(11) NOT NULL AUTO_INCREMENT,"
@@ -183,16 +191,16 @@ class DB_SCHEMA(object):
     TABLES['Price_EOD'] = (
     "CREATE TABLE IF NOT EXISTS `Price_EOD` ("
     "`eod_id` INT(11) NOT NULL AUTO_INCREMENT,"
-    "`date` DATE NOT NULL,"
     "`transaction_id` INT(11) NOT NULL,"
-    "`is_tracking_period` BOOLEAN,"
+    "`date` DATE NOT NULL,"
     "`open` FLOAT(14, 4),"
     "`high` FLOAT(14, 4),"
     "`low` FLOAT(14, 4),"
     "`close` FLOAT(14, 4),"
     "`volume` FLOAT(14, 4),"
-    "`avg_volume` FLOAT(14, 4),"
     "`percent_change` FLOAT(14, 4),"
+    "`is_tracking_period` BOOLEAN,"
+    "`avg_volume` FLOAT(14, 4)," 
     "  PRIMARY KEY (`eod_id`)"
     ") ENGINE=InnoDB")
 
