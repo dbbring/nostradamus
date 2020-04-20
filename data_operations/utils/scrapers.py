@@ -181,7 +181,6 @@ class SEC_Edgar(Scaper):
         self.base = super()
         self.ticker = ticker
         self.base_data = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + ticker + '&type=&dateb=&owner=exclude&start=0&count=100')
-        #self.base_data = self.base.get_data('./data_operations/sec_files/cik-' + ticker + '-0.html')
         self.cik = None
         self.cik_dict = {}
         self.soup = None
@@ -202,7 +201,6 @@ class SEC_Edgar(Scaper):
 
         if self.base_data.find('h1', text="No matching Ticker Symbol."):
             self.base_data = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.cik + '&type=&dateb=&owner=exclude&start=0&count=100')
-            #self.base_data = self.base.get_data('./data_operations/sec_files/cik-' + self.cik + '-0.html')
             if self.base_data.find('h1', text="No matching CIK."):
                 self.is_valid = False
 
@@ -228,7 +226,6 @@ class SEC_Edgar(Scaper):
     # @returns bool - true if we have data, false if we at the end of line.
     def load_data(self, inc: int) -> bool:
         self.soup = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.cik + '&type=&dateb=&owner=exclude&start=' + str(inc) + '&count=100')
-        #self.soup = self.base.get_data('./data_operations/sec_files/cik-' + self.ticker + '-' + str(inc) +'.html')
         table = self.soup.find('table', class_='tableFile2')
         rows = table.find_all('tr')
         if len(rows) >= 2:
@@ -243,7 +240,6 @@ class SEC_Edgar(Scaper):
     def get_sic_data(self, location_code: str, sic_code: str) -> list:
         inc = 0
         comps = []
-        #sic_html = self.base.get_data('./data_operations/sec_files/sic-' + self.ticker + '-' + str(inc) + '.html')
         sic_html = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&SIC=' + sic_code + '&owner=exclude&match=&start=' + str(inc) +'&count=100&hidefilings=0')
 
         while not sic_html.find('div', class_='noCompanyMatch'):
@@ -258,7 +254,6 @@ class SEC_Edgar(Scaper):
                     comps.append(self.base.get_table_cell(row, 0, True))
                 
             inc = inc + 100
-            #sic_html = self.base.get_data('./data_operations/sec_files/sic-' + self.ticker + '-' + str(inc) + '.html')
             sic_html = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&SIC=' + sic_code + '&owner=exclude&match=&start=' + str(inc) +'&count=100&hidefilings=0')
 
         return comps
@@ -415,12 +410,6 @@ class SEC_Edgar(Scaper):
     # @returns SEC model with all information
     def make_sec_model(self) -> SEC:
         self.parse_sec_filings()
-        '''
-        self.links_425 = ['./data_operations/sec_files/425/' + self.ticker + '-0.html', './data_operations/sec_files/425/' + self.ticker + '-1.html', './data_operations/sec_files/425/' + self.ticker + '-2.html', './data_operations/sec_files/425/' + self.ticker + '-3.html', './data_operations/sec_files/425/' + self.ticker + '-4.html', './data_operations/sec_files/425/' + self.ticker + '-5.html', './data_operations/sec_files/425/' + self.ticker + '-6.html', './data_operations/sec_files/425/' + self.ticker + '-7.html']
-        self.links_8k = ['./data_operations/sec_files/8k/' + self.ticker + '-0.html', './data_operations/sec_files/8k/' + self.ticker + '-1.html', './data_operations/sec_files/8k/' + self.ticker + '-2.html', './data_operations/sec_files/8k/' + self.ticker + '-3.html']
-        self.links_s3 = ['./data_operations/sec_files/s3/' + self.ticker + '-0.html', './data_operations/sec_files/s3/' + self.ticker + '-1.html', './data_operations/sec_files/s3/' + self.ticker + '-2.html', './data_operations/sec_files/s3/' + self.ticker + '-3.html']
-        self.links_s8 = ['./data_operations/sec_files/s8/' + self.ticker + '-0.html', './data_operations/sec_files/s8/' + self.ticker + '-1.html', './data_operations/sec_files/s8/' + self.ticker + '-2.html']
-        '''
         model = SEC()
         model.data['date_of_ipo'] = self.ipo_date
         model.data['late_filings'] = self.late_filings
@@ -495,7 +484,6 @@ class SEC_Edgar(Scaper):
             table = data.find('table', class_='tableFile')
             rows = table.find_all('tr')
             form_type = self.base.get_table_cell(rows[1], 3, True)
-            #form = self.base.get_table_cell(rows[1], 2, True)
             form = self.base.get_table_cell(rows[1], 2, False)
             form = form.find('a', href=True)
             form = 'https://www.sec.gov' + form['href']
@@ -511,7 +499,6 @@ class SEC_Edgar(Scaper):
                 return model
 
             # Parse the actual submission form for information
-            #data = self.base.get_data('./data_operations/sec_files/s3/' + form)
             data = self.base.get_data(form)
             stock_offering_table_rows = None
             tables = data.find_all('table')
@@ -610,7 +597,6 @@ class SEC_Edgar(Scaper):
                 model.data['item_list'][item_num] = item_details[1]
 
             model.data['date'] = submission_date
-            # model.data['link'] = self.base.get_table_cell(rows[1], 2, True)
             form_link = self.base.get_table_cell(rows[1], 2, False)
             form_link = form_link.find('a', href=True)
             model.data['link'] = 'https://www.sec.gov' + form_link['href']
@@ -637,7 +623,6 @@ class SEC_Edgar(Scaper):
             # parse main table for form type and link to actual submission
             table = data.find('table', class_='tableFile')
             rows = table.find_all('tr')
-            #form = self.base.get_table_cell(rows[1], 2, True)
             form = self.base.get_table_cell(rows[1], 2, False)
             form = form.find('a', href=True)
             form = 'https://www.sec.gov' + form['href']
@@ -650,7 +635,6 @@ class SEC_Edgar(Scaper):
                 return model
 
             # Parse the actual submission form for information
-            #data = self.base.get_data('./data_operations/sec_files/s8/' + form)
             data = self.base.get_data(form)
             stock_offering_table_rows = None
             tables = data.find_all('table')
@@ -709,8 +693,7 @@ class TDAmeritrade(Scaper):
         if (index):
             self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/charts?symbol=' + ticker)
         else:
-            self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/summary?fromPage=overview&display=&fromSearch=true&symbol=' + ticker) 
-            #self.soup = self.base.get_data('../nostradamus_files/td-' + ticker + '.html')        
+            self.soup = self.base.get_data('https://research.tdameritrade.com/grid/public/research/stocks/summary?fromPage=overview&display=&fromSearch=true&symbol=' + ticker)      
         return
 
 

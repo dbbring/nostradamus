@@ -50,16 +50,6 @@ class AlphaVantage(API_Request):
         self.total_lookback_days = 100 # One TA indicator needs to go this far back
         self.api_key = os.environ['AV_API_KEY']
         self.data = self.try_api_call(is_daily)
-        '''
-        if (is_daily):
-            with open('./data_operations/' + ticker + '.json') as f:
-                self.data = json.load(f)
-        else:
-            with open('./data_operations/' + ticker + '_weekly.json') as f:
-                self.data = json.load(f)
-        
-        self.data = self.data['Time Series (Daily)'] if is_daily else self.data['Weekly Time Series']
-        '''
         try:
             self.data = self.data['Time Series (Daily)'] if is_daily else self.data['Weekly Time Series']
         except KeyError:
@@ -534,22 +524,6 @@ class IEX(API_Request):
         inc = self.base.get_request('https://sandbox.iexapis.com/stable/stock/' + ticker + '/income?token=Tpk_6b5abe0c3d8048fe82f669873de2665f')
         inc = inc['income'][0]
         self.data = {**inc, **self.data}
-        '''
-        with open('./data_operations/' + ticker + '-advanced-stats.json') as f:
-            self.data = json.load(f)
-        with open('./data_operations/' + ticker + '-balance-sheet.json') as f:
-            bs = json.load(f)
-        bs = bs['balancesheet'][0]
-        self.data = {**bs, **self.data}
-        with open('./data_operations/' + ticker + '-cashflows.json') as f:
-            cs = json.load(f)
-        cs = cs['cashflow'][0]
-        self.data = {**cs, **self.data}
-        with open('./data_operations/' + ticker + '-income.json') as f:
-            inc = json.load(f)
-        inc = inc['income'][0]
-        self.data = {**inc, **self.data}
-        '''
         return
 
 

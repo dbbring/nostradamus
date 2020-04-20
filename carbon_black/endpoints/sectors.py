@@ -1,7 +1,7 @@
 from carbon_black.endpoints.base_endpoint import Endpoint
 
-class SEC(Endpoint):
+class Sectors(Endpoint):
 
-  def __init__(self, db_name: str, transaction_id: int) -> None:
+  def __init__(self, db_name: str) -> None:
     self.response = {}
     return 

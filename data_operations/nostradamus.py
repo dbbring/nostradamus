@@ -25,13 +25,11 @@ from data_operations.database.helpers import DB
 #                     Init 
 # ===============================================================
 
-
-msg = '--- Main Nostradamus Script Finished!! --- \n\n ' +  '-- Tickers added are: \n\n'
-
 try:
   sp = AlphaVantage('.INX')
   sp_inputs = sp.get_inputs()
   for data_item in config['nostradamus']:
+    msg = '--- Results From '+ data_item['database_name'] +' --- \n\n ' +  '-- Tickers added are: \n\n'
 
     # =============================================================
     #                 Get a list of tickers 
@@ -39,7 +37,7 @@ try:
     finviz_pg_index = 1
     end_id = 1
     end_of_list = False
-    ticker_count = 0
+    ticker_count = 1 # 1 based because humans dont start 0....
     tickers = []
     
     # Fetch all the tickers the meets our criteria
@@ -62,7 +60,6 @@ try:
     for ticker in tickers:
       try:
         FV = FinViz('https://finviz.com/quote.ashx?t=' + ticker)
-        #FV = FinViz('../nostradamus_files/finviz=' + ticker + '.html')
         if (FV.has_finviz_news()):
           tickers.remove(ticker)
         else:
@@ -73,46 +70,47 @@ try:
             sleep(30)   # Rate Limiting for Alphavantage
             new_thread = Process(target=process_ticker, args=(data_item['database_name'], TD, FV, ticker, sp_inputs))
             new_thread.start() 
-            #process_ticker(data_item['database_name'], TD, FV, ticker, sp_inputs)
+
+            if ticker_count == data_item['num_of_tickers_to_process']:
+              break  # We have all the data we need, stop parsing
+
       except Exception as err:
         error_msg = traceback.format_exc()
         send_mail('-- Couldnt Add Ticker '+ ticker +' -- \n\n ' + str(repr(err)) + '\n\n' + error_msg, data_item['database_name'])
 
+    # ===============================================================
+    #                 Update old tickers (Price EOD only) 
+    # ===============================================================
+
+    if data_item['update_tickers']:
+      db = DB(data_item['database_name'])
+      tickers_need_updated = db.select_tracking_tickers()
+      msg += '\n -- Updated Tracking Prices on: \n\n'
+
+      for ticker_info in tickers_need_updated:
+        try:
+          # 60 delay for Rate Limiting on Alphavantage
+          sleep(60)
+          tran_id, tran_ticker = ticker_info
+          symbol = AlphaVantage(tran_ticker)
+          inputs = symbol.get_inputs()
+
+          start = len(inputs['date']) - 1
+          end = start - 5
+
+          for index in range(start, end, -1):
+            eod_data = symbol.make_price_eod_model(inputs, index, is_tracking=True)
+            eod_data.data['transaction_id'] = tran_id
+            db.save(eod_data)
+
+          msg += tran_ticker + '\n'
+        except Exception as err:
+          error_msg = traceback.format_exc()
+          send_mail('-- Updating Tracking Tickers Code Block Failed!! -- \n\n ' + str(repr(err) + '\n\n' + error_msg), data_item['database_name'])
+
+    # Finished with everything (Succesfull or not), send off email notification
+    send_mail(msg, data_item['database_name'])
+
 except Exception as err:
   error_msg = traceback.format_exc()
   send_mail('-- Main Nostradamus Code Block Failed!! -- \n\n ' + str(repr(err)) + '\n\n' + error_msg, data_item['database_name'])
-
-
-
-  # ===============================================================
-  #                 Update old tickers (Price EOD only) 
-  # ===============================================================
-
-  if data_item['update_tickers']:
-    db = DB(data_item['database_name'])
-    tickers_need_updated = db.select_tracking_tickers()
-    msg += '\n -- Updated Tracking Prices on: \n\n'
-
-    for ticker_info in tickers_need_updated:
-      try:
-        # 60 delay for Rate Limiting on Alphavantage
-        sleep(60)
-        tran_id, ticker = ticker_info
-        symbol = AlphaVantage(ticker)
-        inputs = symbol.get_inputs()
-
-        start = len(inputs['date']) - 1
-        end = start - 5
-
-        for index in range(start, end, -1):
-          eod_data = symbol.make_price_eod_model(inputs, index, is_tracking=True)
-          eod_data.data['transaction_id'] = tran_id
-          db.save(eod_data)
-
-        msg += ticker + '\n'
-      except Exception as err:
-        error_msg = traceback.format_exc()
-        send_mail('-- Updating Tracking Tickers Code Block Failed!! -- \n\n ' + str(repr(err) + '\n\n' + error_msg), data_item['database_name'])
-
-  # Successfully finished with everything, send off email notification no errors
-  send_mail(msg, data_item['database_name'])

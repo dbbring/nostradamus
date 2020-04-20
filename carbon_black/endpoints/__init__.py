@@ -8,3 +8,4 @@ from .peer_performance import Peer_Performance
 from .sec import SEC
 from .technical import Technical
 from .weekly import Weekly
+from .sectors import Sectors
