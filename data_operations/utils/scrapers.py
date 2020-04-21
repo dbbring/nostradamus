@@ -17,7 +17,7 @@ import data_operations.utils.helpers as util
 from shared.models import News_Event, Peer_Performance, SEC, SEC_Company_Info, SEC_Employee_Stock, SEC_Merger, SEC_Secondary_Offering
 
 
-with open('./data_operations/config.json') as f:
+with open('../data_operations/config.json') as f:
             config = json.load(f)
 
 

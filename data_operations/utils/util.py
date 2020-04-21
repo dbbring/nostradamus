@@ -71,6 +71,8 @@ def process_ticker(db_name:str, TD, FinViz, ticker: str, s_p_inputs: dict) -> No
         for ticker in comps:
             p_p = sec.make_arr_peer_performance_model(ticker)
             company.peers = company.peers + p_p
+    else:
+        sec_data = SEC()
 
     company.sec = sec_data
     

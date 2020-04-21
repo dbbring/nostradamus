@@ -9,7 +9,7 @@ import traceback
 import sys
 
 # ==== Add our path to the python path so we can import our modules ====
-with open('./data_operations/config.json') as f:
+with open('../data_operations/config.json') as f:
             config = json.load(f)
 
 sys.path.insert(1, config['project_root'])
@@ -109,6 +109,7 @@ try:
           send_mail('-- Updating Tracking Tickers Code Block Failed!! -- \n\n ' + str(repr(err) + '\n\n' + error_msg), data_item['database_name'])
 
     # Finished with everything (Succesfull or not), send off email notification
+    msg += '\n\n**There is not guarentee that all the tickers have been succesfully processed and saved. Please Check the DB to verify..'
     send_mail(msg, data_item['database_name'])
 
 except Exception as err:
