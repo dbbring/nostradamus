@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
+import traceback
 
 
 # ===================== Custom Imports ========================
@@ -62,7 +63,7 @@ def process_ticker(db_name:str, TD, FinViz, ticker: str, s_p_inputs: dict) -> No
 
     company.news = company.news + FinViz.news
     company.news = company.news + TD.news
-  
+
     sec = SEC_Edgar(ticker)
     if sec.is_valid:
         sec_data = sec.make_sec_model()
@@ -79,9 +80,10 @@ def process_ticker(db_name:str, TD, FinViz, ticker: str, s_p_inputs: dict) -> No
     db.save_ticker_model(company)
     return
 
-  except Exception:
-    # if whatever reason we fail, dont bother saving corrupt data
-    pass
+  except Exception as err:
+    error_msg = traceback.format_exc()
+    send_mail('-- Couldnt Save Ticker To DB! '+ ticker +' -- \n\n ' + str(repr(err)) + '\n\n' + error_msg, db_name)
+
 
 
 

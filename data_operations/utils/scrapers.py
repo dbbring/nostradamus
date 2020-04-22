@@ -211,7 +211,7 @@ class SEC_Edgar(Scaper):
     # @descrip - Use json file from SEC to convert from ticker to a CIK number. Also populates the CIK_DICT dictonary for future reference.
     # @returns bool - if we found the CIK, otherwise false
     def get_cik(self) -> bool:
-        with open('./data_operations/utils/cik_ticker.json') as f:
+        with open('../data_operations/utils/cik_ticker.json') as f:
             self.cik_dict = json.load(f)
 
         for cik_item in self.cik_dict:
@@ -311,6 +311,7 @@ class SEC_Edgar(Scaper):
     # @returns None
     def parse_sec_filings(self) -> None:
         inc = 0
+        s1_found = False
         while self.load_data(inc):
             table = self.soup.find('table', class_='tableFile2')
             rows = table.find_all('tr')
@@ -345,11 +346,18 @@ class SEC_Edgar(Scaper):
                         link = link.find('a', href=True)
                         self.links_8k.append('https://www.sec.gov' + link['href'])
                     elif form_id == 'S-1':
+                        s1_found = True
                         self.ipo_date = self.base.get_table_cell(row, 3, True)
                     elif form_id == '425':
                         link = self.base.get_table_cell(row, 1, False)
                         link = link.find('a', href=True)
                         self.links_425.append('https://www.sec.gov' + link['href'])
+
+            if not s1_found:
+                last_parsed_date = self.base.get_table_cell(rows[(len(rows) - 1)], 3, True)
+                if util.string_to_date(last_parsed_date) != None:
+                    if self.ipo_date > util.string_to_date(last_parsed_date):
+                            self.ipo_date = util.string_to_date(last_parsed_date)
 
             inc += 100
         return
@@ -364,8 +372,9 @@ class SEC_Edgar(Scaper):
 
         # Since Foreign issuers dont have to file a S-1, just find the first entry
         last_parsed_date = self.base.get_table_cell(rows[(len(rows) - 1)], 3, True)
-        if self.ipo_date > util.string_to_date(last_parsed_date):
-                        self.ipo_date = util.string_to_date(last_parsed_date)
+        if util.string_to_date(last_parsed_date) != None:
+            if self.ipo_date > util.string_to_date(last_parsed_date):
+                            self.ipo_date = util.string_to_date(last_parsed_date)
 
         for index, row in enumerate(rows):
                 last_parsed_date = None

@@ -44,7 +44,7 @@ def isValidInt(str: str) -> bool:
 # @returns datetime - None if we cant convert, otherwise returns datetime of the string.
 def string_to_date(date_string: str) -> datetime:
     if (date_string == None):
-        return date_string
+        return None
 
     # Format must be June 1, 2005.
     try:

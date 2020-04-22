@@ -37,7 +37,7 @@ try:
     finviz_pg_index = 1
     end_id = 1
     end_of_list = False
-    ticker_count = 1 # 1 based because humans dont start 0....
+    ticker_count = 0
     tickers = []
     
     # Fetch all the tickers the meets our criteria

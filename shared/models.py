@@ -150,8 +150,7 @@ class Price_Weekly(Base_Model):
 
     self.data['weekly_id'] = None
     self.data['transaction_id'] = None
-    self.data['wk_start_date'] = None
-    self.data['wk_end_date'] = None
+    self.data['date'] = None
     self.data['open'] = self.default_float
     self.data['high'] = self.default_float
     self.data['low'] = self.default_float

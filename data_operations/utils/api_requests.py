@@ -140,17 +140,21 @@ class AlphaVantage(API_Request):
     # @returns (Price_Weekly) - a Price_Weekly model that is ready for saving
     def make_price_wk_model(self, inputs: dict, index: int) -> Price_Weekly:
         # Class factory to generate each price weekly 
-        wk_model = Price_Weekly()
+        try:
+            wk_model = Price_Weekly()
 
-        wk_model.data['wk_start_date'] = inputs['date'][index - 1]
-        wk_model.data['wk_end_date'] = inputs['date'][index]
-        wk_model.data['open'] = inputs['open'][index]
-        wk_model.data['high'] = inputs['high'][index]
-        wk_model.data['low'] = inputs['low'][index]
-        wk_model.data['close'] = inputs['close'][index]
-        wk_model.data['volume'] = inputs['volume'][index]
-        wk_model.data['avg_volume'] = inputs['avg_volume'][index]
-        wk_model.data['percent_change'] = inputs['percent_change'][index]
+            wk_model.data['date'] = inputs['date'][index]
+            wk_model.data['open'] = inputs['open'][index]
+            wk_model.data['high'] = inputs['high'][index]
+            wk_model.data['low'] = inputs['low'][index]
+            wk_model.data['close'] = inputs['close'][index]
+            wk_model.data['volume'] = inputs['volume'][index]
+            wk_model.data['avg_volume'] = inputs['avg_volume'][index]
+            wk_model.data['percent_change'] = inputs['percent_change'][index]
+        except Exception:
+            # oh well,we may not have 5 weeks worth of data
+            # thats ok, but if we dont have 5 days worth data, do blow up because we dont want to anaylze a company less than a week old.
+            pass 
 
         return wk_model
 

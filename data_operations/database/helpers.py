@@ -83,13 +83,6 @@ class DB(DB_SCHEMA):
         self.save(ticker_model.basic_info)
         trans_id = self.last_insert_id
 
-        ticker_model.fund_anaylsis.data['transaction_id'] = trans_id
-        self.save(ticker_model.fund_anaylsis)
-
-        for item in ticker_model.weekly:
-            item.data['transaction_id'] = trans_id
-            self.save(item)
-
         for index, item in enumerate(ticker_model.eod):
             item.data['transaction_id'] = trans_id
             self.save(item)
@@ -111,41 +104,46 @@ class DB(DB_SCHEMA):
             peer.data['transaction_id'] = trans_id
             self.save(peer)
 
-        # Make sure our SEC model is valid
-        if ticker_model.sec['late_filings'] != None and ticker_model.sec['ct_orders'] != None:
-            # store off sec info copy list dont reference it
-            company_info = list(ticker_model.sec.data['company_info'])
-            secon_offer = list(ticker_model.sec.data['secondary_offerings'])
-            mergers = list(ticker_model.sec.data['mergers'])
-            stock_program = list(ticker_model.sec.data['stock_program'])
-            # remove arrays so we can save and our model matches up with the table
-            del ticker_model.sec.data['company_info']
-            del ticker_model.sec.data['secondary_offerings']
-            del ticker_model.sec.data['mergers']
-            del ticker_model.sec.data['stock_program']
+        # store off sec info copy list dont reference it
+        company_info = list(ticker_model.sec.data['company_info'])
+        secon_offer = list(ticker_model.sec.data['secondary_offerings'])
+        mergers = list(ticker_model.sec.data['mergers'])
+        stock_program = list(ticker_model.sec.data['stock_program'])
+        # remove arrays so we can save and our model matches up with the table
+        del ticker_model.sec.data['company_info']
+        del ticker_model.sec.data['secondary_offerings']
+        del ticker_model.sec.data['mergers']
+        del ticker_model.sec.data['stock_program']
 
-            ticker_model.sec.data['transaction_id'] = trans_id
-            self.save(ticker_model.sec)
-            sec_id = self.last_insert_id
-            
-            # now save off seperate tables
-            for merger in mergers:
-                merger.data['sec_id'] = sec_id
-                self.save(merger)
+        ticker_model.sec.data['transaction_id'] = trans_id
+        self.save(ticker_model.sec)
+        sec_id = self.last_insert_id
+        
+        # now save off seperate tables
+        for merger in mergers:
+            merger.data['sec_id'] = sec_id
+            self.save(merger)
 
-            for offering in secon_offer:
-                offering.data['sec_id'] = sec_id
-                self.save(offering)
+        for offering in secon_offer:
+            offering.data['sec_id'] = sec_id
+            self.save(offering)
 
-            for info in company_info:
-                info.data['sec_id'] = sec_id
-                # MySQL doesnt coerce dicts to json so we have manually move it over
-                info.data['item_list'] = dumps(info.data['item_list'])
-                self.save(info)
+        for info in company_info:
+            info.data['sec_id'] = sec_id
+            # MySQL doesnt coerce dicts to json so we have manually move it over
+            info.data['item_list'] = dumps(info.data['item_list'])
+            self.save(info)
 
-            for incentive in stock_program:
-                incentive.data['sec_id'] = sec_id
-                self.save(incentive)
+        for incentive in stock_program:
+            incentive.data['sec_id'] = sec_id
+            self.save(incentive)
+
+        ticker_model.fund_anaylsis.data['transaction_id'] = trans_id
+        self.save(ticker_model.fund_anaylsis)
+
+        for item in ticker_model.weekly:
+            item.data['transaction_id'] = trans_id
+            self.save(item)
         
         return
 
@@ -195,3 +193,20 @@ class DB(DB_SCHEMA):
                 tickers.append(ticker)
 
             return tickers
+
+
+    # returns a list of tuples of results
+    def select_where(self, columns: list, table: str, where: str) -> list:
+        items = []
+        sql_columns = ','.join(columns)
+        sql = f"SELECT {columns} FROM {table} {where}"
+        self.cursor.execute(sql)
+
+        for item in self.cursor:
+            items.append(item)
+
+        return items
+
+
+    def select(self, columns: list, table: str) -> list:
+        return self.select_where(columns, table, ';')
