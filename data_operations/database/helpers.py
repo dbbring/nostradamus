@@ -196,17 +196,11 @@ class DB(DB_SCHEMA):
 
 
     # returns a list of tuples of results
-    def select_where(self, columns: list, table: str, where: str) -> list:
+    def select(self, sql: str) -> list:
         items = []
-        sql_columns = ','.join(columns)
-        sql = f"SELECT {columns} FROM {table} {where}"
         self.cursor.execute(sql)
 
         for item in self.cursor:
             items.append(item)
 
         return items
-
-
-    def select(self, columns: list, table: str) -> list:
-        return self.select_where(columns, table, ';')

@@ -151,12 +151,11 @@ class AlphaVantage(API_Request):
             wk_model.data['volume'] = inputs['volume'][index]
             wk_model.data['avg_volume'] = inputs['avg_volume'][index]
             wk_model.data['percent_change'] = inputs['percent_change'][index]
+            return wk_model
         except Exception:
             # oh well,we may not have 5 weeks worth of data
             # thats ok, but if we dont have 5 days worth data, do blow up because we dont want to anaylze a company less than a week old.
-            pass 
-
-        return wk_model
+            return None
 
 
     # @params (inputs, index) -inputs(dict of NP Arrays), index (which ohlc do we want to piece back toeghther)
@@ -518,16 +517,20 @@ class IEX(API_Request):
         self.data = self.base.get_request('https://sandbox.iexapis.com/stable/stock/' + ticker + '/advanced-stats?token=Tpk_6b5abe0c3d8048fe82f669873de2665f')
 
         bs = self.base.get_request('https://sandbox.iexapis.com/stable/stock/' + ticker + '/balance-sheet?token=Tpk_6b5abe0c3d8048fe82f669873de2665f')
-        bs = bs['balancesheet'][0]
-        self.data = {**bs, **self.data}
+        if len(bs['balancesheet']) > 0:
+            bs = bs['balancesheet'][0]
+            self.data = {**bs, **self.data}
 
         cs = self.base.get_request('https://sandbox.iexapis.com/stable/stock/' + ticker + '/cash-flow?token=Tpk_6b5abe0c3d8048fe82f669873de2665f')
-        cs = cs['cashflow'][0]
-        self.data = {**cs, **self.data}
+        if len(cs['cashflow']) > 0:
+            cs = cs['cashflow'][0]
+            self.data = {**cs, **self.data}
 
         inc = self.base.get_request('https://sandbox.iexapis.com/stable/stock/' + ticker + '/income?token=Tpk_6b5abe0c3d8048fe82f669873de2665f')
-        inc = inc['income'][0]
-        self.data = {**inc, **self.data}
+        if len(inc['income']) > 0:
+            inc = inc['income'][0]
+            self.data = {**inc, **self.data}
+
         return
 
 

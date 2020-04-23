@@ -41,7 +41,8 @@ def process_ticker(db_name:str, TD, FinViz, ticker: str, s_p_inputs: dict) -> No
     
     for index in range(start, end, -1):
         wk_data = symbol_wk.make_price_wk_model(wk_inputs, index)
-        company.weekly.append(wk_data)
+        if wk_data != None:
+          company.weekly.append(wk_data)
 
         eod_data = symbol.make_price_eod_model(inputs, index)
         company.eod.append(eod_data)

@@ -27,26 +27,26 @@ from carbon_black.endpoints import *
 app = Flask(__name__)
 api = Api(app)
 
-api.add_resource(Index, '/<string:database_name>')
+api.add_resource(Index, '/<string:api_endpoint>')
 
-api.add_resource(Charting, '/chart/<string:database_name>/<int:transaction_id>')
+api.add_resource(Charting, '/chart/<string:api_endpoint>/<int:transaction_id>')
 
-api.add_resource(DNA, '/chart/<string:database_name>/<int:transaction_id>')
+api.add_resource(DNA, '/chart/<string:api_endpoint>/<int:transaction_id>')
 
-api.add_resource(EOD, '/chart/<string:database_name>/<int:transaction_id>')
+api.add_resource(EOD, '/chart/<string:api_endpoint>/<int:transaction_id>')
 
-api.add_resource(Fundamental, '/chart/<string:database_name>/<int:transaction_id>')
+api.add_resource(Fundamental, '/chart/<string:api_endpoint>/<int:transaction_id>')
 
-api.add_resource(News, '/chart/<string:database_name>/<int:transaction_id>')
+api.add_resource(News, '/chart/<string:api_endpoint>/<int:transaction_id>')
 
-api.add_resource(Peer_Performance, '/chart/<string:database_name>/<int:transaction_id>')
+api.add_resource(Peer_Performance, '/chart/<string:api_endpoint>/<int:transaction_id>')
 
-api.add_resource(SEC, '/chart/<string:database_name>/<int:transaction_id>')
-api.add_resource(Sectors, '/chart/<string:database_name>/<int:transaction_id>')
+api.add_resource(SEC, '/chart/<string:api_endpoint>/<int:transaction_id>')
+api.add_resource(Sectors, '/chart/<string:api_endpoint>/<int:transaction_id>')
 
-api.add_resource(Technical, '/chart/<string:database_name>/<int:transaction_id>')
+api.add_resource(Technical, '/chart/<string:api_endpoint>/<int:transaction_id>')
 
-api.add_resource(Weekly, '/chart/<string:database_name>/<int:transaction_id>')
+api.add_resource(Weekly, '/chart/<string:api_endpoint>/<int:transaction_id>')
 
 
 

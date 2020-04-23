@@ -1,20 +1,36 @@
 from flask_restful import Resource
+from json import load as json_load
+import os
+
 from data_operations.database.helpers import DB
 
 class Endpoint(Resource):
 
   def __init__(self):
     self.db = None
+    if 'carbon_black' not in os.getcwd():
+      with open('./data_operations/config.json') as f:
+                  self.config = json_load(f)
+    else:
+      with open('../data_operations/config.json') as f:
+                  self.config = json_load(f)
     return
 
-  def get_db(self, db_name: str):
-    self.db = DB(db_name)
-    return db
+  def get_db(self, api_endpoint: str):
+    for data_item in self.config['nostradamus']:
+      if data_item['api_endpoint'] == api_endpoint:
+        self.db = DB(data_item['database_name'])
+        return db
 
-  def select_all(self, db_name: str, table: str):
+    return None
+
+  def query(self, api_endpoint: str, query: str):
+    results = []
     if self.db == None:
-      return None
+      if self.get_db(api_endpoint) == None:
+        return
 
+    results = self.db.select(query)
     
-    return
+    return results
 

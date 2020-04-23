@@ -196,36 +196,25 @@ class SEC_Edgar(Scaper):
         self.ct_orders = 0
         self.ipo_date = datetime.today().date()
         self.is_adr = False
-        # We need to populate cik_dict
-        self.get_cik()
-
-        if self.base_data.find('h1', text="No matching Ticker Symbol."):
-            self.base_data = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.cik + '&type=&dateb=&owner=exclude&start=0&count=100')
-            if self.base_data.find('h1', text="No matching CIK."):
-                self.is_valid = False
-
-        return
-
-
-    # @params (None) 
-    # @descrip - Use json file from SEC to convert from ticker to a CIK number. Also populates the CIK_DICT dictonary for future reference.
-    # @returns bool - if we found the CIK, otherwise false
-    def get_cik(self) -> bool:
+        
         with open('../data_operations/utils/cik_ticker.json') as f:
             self.cik_dict = json.load(f)
 
-        for cik_item in self.cik_dict:
-            if self.cik_dict[cik_item]['ticker'] == self.ticker.upper():
-                self.cik = str(self.cik_dict[cik_item]['cik_str'])
-                return True
-        return False
+        if self.base_data.find('h1', text="No matching Ticker Symbol."):
+            self.is_valid = False
+
+        cik = base_data.find('span', class_='companyName')
+        cik = cik.find('a').get_text()
+        self.cik = cik.split(' ')[0]
+
+        return
 
 
     # @params (inc) - inc => determines which "page" we are on since SEC maxium display count is 100.
     # @descrip - Makes the request, and scrapes the given page.
     # @returns bool - true if we have data, false if we at the end of line.
     def load_data(self, inc: int) -> bool:
-        self.soup = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.cik + '&type=&dateb=&owner=exclude&start=' + str(inc) + '&count=100')
+        self.soup = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.ticker + '&type=&dateb=&owner=exclude&start=' + str(inc) + '&count=100')
         table = self.soup.find('table', class_='tableFile2')
         rows = table.find_all('tr')
         if len(rows) >= 2:
