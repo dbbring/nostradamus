@@ -17,7 +17,7 @@ import data_operations.utils.helpers as util
 from shared.models import News_Event, Peer_Performance, SEC, SEC_Company_Info, SEC_Employee_Stock, SEC_Merger, SEC_Secondary_Offering
 
 
-with open('../data_operations/config.json') as f:
+with open('./data_operations/config.json') as f:
             config = json.load(f)
 
 
@@ -180,7 +180,6 @@ class SEC_Edgar(Scaper):
     def __init__(self, ticker:str) -> None:
         self.base = super()
         self.ticker = ticker
-        self.base_data = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + ticker + '&type=&dateb=&owner=exclude&start=0&count=100')
         self.cik = None
         self.cik_dict = {}
         self.soup = None
@@ -196,6 +195,8 @@ class SEC_Edgar(Scaper):
         self.ct_orders = 0
         self.ipo_date = datetime.today().date()
         self.is_adr = False
+
+        self.base_data = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.ticker + '&type=&dateb=&owner=exclude&start=0&count=100')
         
         with open('../data_operations/utils/cik_ticker.json') as f:
             self.cik_dict = json.load(f)

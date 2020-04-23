@@ -7,7 +7,7 @@ import sys
 
 # ==== Add our path to the python path so we can import our modules ====
 
-with open('../data_operations/config.json') as f:
+with open('./data_operations/config.json') as f:
             config = json.load(f)
 
 sys.path.insert(1, config['project_root'])
