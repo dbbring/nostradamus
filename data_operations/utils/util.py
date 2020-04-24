@@ -55,8 +55,11 @@ def process_ticker(db_name:str, TD, FinViz, ticker: str, s_p_inputs: dict) -> No
 
     fa = IEX(ticker)
     fa_data = fa.make_fund_indic_model(inputs)
-    fa_data.data['sector'] = sectors['top-level']
-    fa_data.data['sub_sector'] = sectors['second-level']
+
+    if sectors != None:
+      fa_data.data['sector'] = sectors['top-level']
+      fa_data.data['sub_sector'] = sectors['second-level']
+      
     fa_data.data['institutional_ownership'] = TD.get_tute_ownership()
     fa_data.data['short_interest_percent'] = TD.get_short_intrest()
 

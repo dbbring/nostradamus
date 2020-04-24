@@ -20,11 +20,13 @@ class Endpoint(Resource):
     for data_item in self.config['nostradamus']:
       if data_item['api_endpoint'] == api_endpoint:
         self.db = DB(data_item['database_name'])
-        return db
+        return self.db
 
     return None
 
-  def query(self, api_endpoint: str, query: str):
+
+  # returns a list of tuples from sql execucation
+  def query(self, api_endpoint: str, query: str) -> list:
     results = []
     if self.db == None:
       if self.get_db(api_endpoint) == None:

@@ -198,13 +198,13 @@ class SEC_Edgar(Scaper):
 
         self.base_data = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.ticker + '&type=&dateb=&owner=exclude&start=0&count=100')
         
-        with open('../data_operations/utils/cik_ticker.json') as f:
+        with open('./data_operations/utils/cik_ticker.json') as f:
             self.cik_dict = json.load(f)
 
         if self.base_data.find('h1', text="No matching Ticker Symbol."):
             self.is_valid = False
 
-        cik = base_data.find('span', class_='companyName')
+        cik = self.base_data.find('span', class_='companyName')
         cik = cik.find('a').get_text()
         self.cik = cik.split(' ')[0]
 
@@ -217,6 +217,9 @@ class SEC_Edgar(Scaper):
     def load_data(self, inc: int) -> bool:
         self.soup = self.base.get_data('https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + self.ticker + '&type=&dateb=&owner=exclude&start=' + str(inc) + '&count=100')
         table = self.soup.find('table', class_='tableFile2')
+        if table == None:
+            return False
+
         rows = table.find_all('tr')
         if len(rows) >= 2:
             return True
@@ -731,8 +734,14 @@ class TDAmeritrade(Scaper):
     def get_sector(self) -> dict:
         sectors = {}
         sector = self.soup.find('div', class_='company-detail-information')
-        sector = sector.get_text().split(':') 
+        sector = sector.get_text()
+
+        if len(sector) <= 0:
+            return None
+
+        sector = sector.split(':') 
         tl_sector = unicodedata.normalize('NFKD', sector[0]).strip()
+        
         if len(sector) <= 1:
             sectors['top-level'] = tl_sector.lower()
             sectors['second-level'] = None
