@@ -42,7 +42,6 @@ try:
     end_of_list = False
     ticker_count = 0
     tickers = []
-    
     # Fetch all the tickers the meets our criteria
     while not end_of_list:
       FV = FinViz((data_item['screener_url'] + str(finviz_pg_index)), browser)

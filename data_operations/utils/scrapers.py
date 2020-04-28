@@ -202,11 +202,11 @@ class SEC_Edgar(Scaper):
 
         if self.base_data.find('h1', text="No matching Ticker Symbol."):
             self.is_valid = False
+            return
 
         cik = self.base_data.find('span', class_='companyName')
         cik = cik.find('a').get_text()
         self.cik = cik.split(' ')[0]
-
         return
 
 
