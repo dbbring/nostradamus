@@ -2,6 +2,9 @@
 # ======================= Gen Imports ========================
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+
 
 # ===================== Custom Imports ========================
 
@@ -81,3 +84,58 @@ def string_to_int_abbv(strToConvert: str) -> int:
             return int(float(int_only) * 1000)
         else:
             return 0
+
+
+
+# ============================================================ # 
+#                  FireFox Browser Instance                    #
+# ============================================================ #
+
+class FireFox(object):
+
+    # @params (cls) class instance
+    # @descrip - either returns the current instance or a new instance
+    # @returns one and only instance
+    def __new__(cls):
+      if not hasattr(cls, 'instance'):
+          cls.instance = super(FireFox, cls).__new__(cls)
+      return cls.instance
+
+
+    # @params (None)
+    # @descrip - MUST SET CONFIG BEFORE USE!
+    # @returns None
+    def __init__(self) -> None:
+      self.browser = None
+      self.config = None
+      return
+
+
+    # @params (None) 
+    # @descrip - gets the current browser 
+    # @returns None
+    def start_browser(self) -> None:
+      if self.config is None:
+        return
+
+      if self.browser is None:
+        options = Options()
+        options.headless = True
+        self.browser = webdriver.Firefox(executable_path=self.config['project_root'] + '.venv/lib/geckodriver',options=options)
+      return
+
+
+    # @params (path) a url to navigate to
+    # @descrip - gets the HTML source from the specified url
+    # @returns str - the html source code
+    def get_html(self, path: str) -> str:
+      self.start_browser()
+      self.browser.get(path)
+      return self.browser.page_source
+
+
+    # @params (None)
+    # @descrip - Shuts down the browser on desconstruction
+    # @returns None
+    def __del__(self) -> None:
+      self.browser.close()

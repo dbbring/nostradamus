@@ -67,6 +67,3 @@ try:
 except Exception:
   ex = traceback.format_exc()
   send_mail('------- Sectors Script Failed!! ------ \n\n' + ex, config['sectors']['database_name'])
-
-
-

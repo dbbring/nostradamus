@@ -30,11 +30,11 @@ class Scaper(object):
         return
 
 
-    # @params (path) - url or filepath, (firefox_isntance) - use headless firefox to get html and singleton firefox instance so we dont open and close a bunch of times
+    # @params (path) - url or filepath, (firefox_isntance) - singleton firefox instance so we dont open and close a bunch of times
     # @descrip - Parses the HTML doc, or the webpage
     # @returns BS4 obj - a soup obj ready for other text extraction
-    def get_data(self, path: str, firefox_instance: FireFox) -> BeautifulSoup:
-        sleep(1)  # Throttle all requests so we dont piss people off
+    def get_data(self, path: str, firefox_instance=None) -> BeautifulSoup:
+        sleep(2)  # Throttle all requests so we dont piss people off
         try:
             html = open(path, encoding='utf-8')
         except:
@@ -94,7 +94,7 @@ class FinViz(Scaper):
     # @returns None
     def __init__(self, path: str, firefox_instance=None):
         self.base = super()
-        self.soup = self.base.get_data(self, firefox_instance)
+        self.soup = self.base.get_data(path, firefox_instance)
         self.news = [] # List of News Events
         self.table = None
         return
