@@ -15,7 +15,7 @@ with open('./data_operations/config.json') as f:
 sys.path.insert(1, config['project_root'])
 
 # ====================== Custom Imports ======================
-from data_operations.utils.util import send_mail, process_ticker
+from data_operations.utils.util import send_mail, process_ticker, FireFox
 from data_operations.utils.scrapers import FinViz, TDAmeritrade
 from data_operations.utils.api_requests import AlphaVantage
 from data_operations.database.helpers import DB
@@ -26,6 +26,8 @@ from data_operations.database.helpers import DB
 # ===============================================================
 
 try:
+  browser = FireFox()
+  browser.config = config
   sp = AlphaVantage('.INX')
   sp_inputs = sp.get_inputs()
   for data_item in config['nostradamus']:
@@ -42,7 +44,7 @@ try:
     
     # Fetch all the tickers the meets our criteria
     while not end_of_list:
-      FV = FinViz(data_item['screener_url'] + str(finviz_pg_index))
+      FV = FinViz(data_item['screener_url'] + str(finviz_pg_index), browser)
       pg_tickers = FV.get_tickers(data_item['upper_bound'], data_item['lower_bound'])
       last_id = FV.get_last_finviz_row_id()
       if (end_id != last_id):
@@ -59,7 +61,7 @@ try:
 
     for ticker in tickers:
       try:
-        FV = FinViz('https://finviz.com/quote.ashx?t=' + ticker)
+        FV = FinViz('https://finviz.com/quote.ashx?t=' + ticker, browser)
         if (FV.has_finviz_news()):
           tickers.remove(ticker)
         else:

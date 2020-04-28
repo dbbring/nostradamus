@@ -17,16 +17,18 @@ sys.path.insert(1, config['project_root'])
 from data_operations.utils.scrapers import Bloomberg, TDAmeritrade
 from data_operations.database.helpers import DB
 from shared.models import Sectors
-from data_operations.utils.util import send_mail
+from data_operations.utils.util import send_mail, FireFox
 
 
 
 try:
+  browser = FireFox()
+  browser.config = config
   mySQL = DB(config['sectors']['database_name'], False)
   model = Sectors()
   today = datetime.now().date()
 
-  bloomberg = Bloomberg()
+  bloomberg = Bloomberg(browser)
 
   model.data['date'] = today
   model.data['s_p'] = bloomberg.sectors['all sectors']

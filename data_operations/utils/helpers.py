@@ -81,8 +81,3 @@ def string_to_int_abbv(strToConvert: str) -> int:
             return int(float(int_only) * 1000)
         else:
             return 0
-
-
-
-
-

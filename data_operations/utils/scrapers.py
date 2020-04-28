@@ -4,8 +4,7 @@ from bs4 import BeautifulSoup
 import unicodedata
 from datetime import datetime, timedelta
 from time import sleep
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
+
 import requests
 import json
 from math import floor
@@ -31,21 +30,16 @@ class Scaper(object):
         return
 
 
-    # @params (path) - url or filepath, (use_firefox) - use headless firefox to get html
+    # @params (path) - url or filepath, (firefox_isntance) - use headless firefox to get html and singleton firefox instance so we dont open and close a bunch of times
     # @descrip - Parses the HTML doc, or the webpage
     # @returns BS4 obj - a soup obj ready for other text extraction
-    def get_data(self, path: str, use_firefox=False) -> BeautifulSoup:
+    def get_data(self, path: str, firefox_instance: FireFox) -> BeautifulSoup:
         sleep(1)  # Throttle all requests so we dont piss people off
         try:
             html = open(path, encoding='utf-8')
         except:
-            if (use_firefox):
-                options = Options()
-                options.headless = True
-                browser = webdriver.Firefox(executable_path=config['project_root'] + '.venv/lib/geckodriver',options=options)
-                browser.get(path)
-                html = browser.page_source
-                browser.close()
+            if firefox_instance is not None:
+                html = firefox_instance.get_html(path)
             else:
                 res = requests.get(url=path)
                 html = res.text
@@ -74,9 +68,9 @@ class Bloomberg(Scaper):
     # @params (None) 
     # @descrip - scrapes bloomberg sectors and populates the sectors dict for future use.
     # @returns None
-    def __init__(self):
+    def __init__(self, firefox_instance=None):
         self.sectors = {}
-        soup = super().get_data('https://www.bloomberg.com/markets/sectors', True)
+        soup = super().get_data('https://www.bloomberg.com/markets/sectors', firefox_instance)
         table_rows = soup.find_all('div', class_='sector-data-table__sector-row')
         for row in table_rows:
             sector_name = row.contents[1].get_text().strip().lower()
@@ -95,13 +89,14 @@ class Bloomberg(Scaper):
 
 class FinViz(Scaper):
     
-    # @params (path) - URL or file path of the resource 
+    # @params (path, firefox_instance) - URL or file path of the resource, firefox_instance -> an instance of the firefox browser (FireFox class) 
     # @descrip - scrapes Finviz and populates a BS4 Obj
     # @returns None
-    def __init__(self, path: str):
+    def __init__(self, path: str, firefox_instance=None):
         self.base = super()
-        self.soup = self.base.get_data(path)
+        self.soup = self.base.get_data(self, firefox_instance)
         self.news = [] # List of News Events
+        self.table = None
         return
     
 
@@ -111,6 +106,8 @@ class FinViz(Scaper):
     def get_tickers(self, upper_threshold: float, lower_threhold: float) -> list:
         tickers =[]
         self.table = self.soup.find('table', attrs={'bgcolor': '#d3d3d3', 'border': '0', 'cellpadding': '3', 'cellspacing': '1', 'width': '100%'})
+        if self.table == None:
+            return tickers
         table_rows = self.table.find_all('tr')
         for row in table_rows:
             change = self.base.get_table_cell(row, 9, True)
@@ -125,6 +122,8 @@ class FinViz(Scaper):
     # @descrip - find last row id of the web page. Finviz will give you the same last id for subsquent pages.
     # @returns int - value of last row item on finviz
     def get_last_finviz_row_id(self) -> int:
+        if self.table == None:
+            return 0
         table_rows = self.table.find_all('tr')
         for row in table_rows:
             last_id = self.base.get_table_cell(row, 0, True)

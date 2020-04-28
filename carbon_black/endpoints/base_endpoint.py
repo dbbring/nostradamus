@@ -24,6 +24,16 @@ class Endpoint(Resource):
 
     return None
 
+  def query_db(self, db_name:str, query: str):
+    results = []
+    db = DB(db_name, False)
+    try:
+      results = db.select(query)
+      return results 
+    except Exception as err:
+      print(err)
+      return []
+
 
   # returns a list of tuples from sql execucation
   def query(self, api_endpoint: str, query: str) -> list:
