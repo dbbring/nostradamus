@@ -44,12 +44,18 @@ class AlphaVantage(API_Request):
     # @params (ticker, is daily) - ticker - what we are looking for, and either daily or weekly.
     # @descrip - Init by making api call and populating our data dict.
     # @returns dict - either empty dict for failure or data array dict
-    def __init__(self, ticker: str, is_daily=True):
+    def __init__(self, ticker: str, is_daily=True, url=None):
         self.base = super()
         self.ticker = ticker
         self.total_lookback_days = 100 # One TA indicator needs to go this far back
         self.api_key = os.environ['AV_API_KEY']
-        self.data = self.try_api_call(is_daily)
+        if url is None:
+            url = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=' + self.ticker + '&apikey=' + self.api_key if is_daily else 'https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=' + self.ticker + '&apikey=' + self.api_key
+            self.data = self.try_api_call(url)
+        else:
+            url += self.api_key
+            self.data = self.try_api_call(url)
+    
         try:
             self.data = self.data['Time Series (Daily)'] if is_daily else self.data['Weekly Time Series']
         except KeyError:
@@ -59,21 +65,17 @@ class AlphaVantage(API_Request):
         return
 
 
-    # @params (is_daily: bool) - Whether we should get daily or weekly data.
+    # @params (url: str) - path to api resource
     # @descrip - Try api call, if fails then return empty dict.
     # @returns dict - either empty dict for failure or data array dict
-    def try_api_call(self, is_daily=True) -> dict:
-        if (is_daily):
-            r = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=' + self.ticker + '&apikey=' + self.api_key)
-            res = r.json()
-        else:
-            r = requests.get('https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=' + self.ticker + '&apikey=' + self.api_key)
-            res = r.json()
+    def try_api_call(self, url: str) -> dict:
+        r = requests.get(url)
+        res = r.json()
         if 'note' in res:
             return {}
         elif 'error' in res:
             return {}
-        return res['Time Series (Daily)'] if is_daily else res['Weekly Time Series']
+        return res
 
 
     # @params (None)

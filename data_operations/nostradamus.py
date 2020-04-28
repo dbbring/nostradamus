@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ======================= Gen Imports ========================
 from datetime import date, datetime, timedelta
-from multiprocessing import Process
+#from multiprocessing import Process
 import sys
 from time import sleep
 import json
@@ -42,6 +42,7 @@ try:
     end_of_list = False
     ticker_count = 0
     tickers = []
+
     # Fetch all the tickers the meets our criteria
     while not end_of_list:
       FV = FinViz((data_item['screener_url'] + str(finviz_pg_index)), browser)
@@ -53,7 +54,6 @@ try:
         tickers += pg_tickers
       else:
         end_of_list = True
-    
 
     # =============================================================
     #                  Process List of tickers
@@ -69,9 +69,10 @@ try:
           if not TD.has_td_news() and ticker_count < data_item['num_of_tickers_to_process']:
             ticker_count += 1
             msg += '---- ' + ticker + '\n'
-            sleep(30)   # Rate Limiting for Alphavantage
-            new_thread = Process(target=process_ticker, args=(data_item['database_name'], TD, FV, ticker, sp_inputs))
-            new_thread.start() 
+            #sleep(30)   # Rate Limiting for Alphavantage
+            #new_thread = Process(target=process_ticker, args=(data_item['database_name'], TD, FV, ticker, sp_inputs))
+            #new_thread.start() 
+            process_ticker(data_item['database_name'], TD, FV, ticker, sp_inputs)
 
             if ticker_count == data_item['num_of_tickers_to_process']:
               break  # We have all the data we need, stop parsing

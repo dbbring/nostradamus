@@ -11,16 +11,20 @@ class Settings(Endpoint):
     if not settings_exist:
       init_settings = {
         'primary_color': '#e0e0e0',
+        'secondar_color': '#000'
       }
 
-      for data_item in self.config['nostradamus']:
+      for index, data_item in enumerate(self.config['nostradamus']):
         init_settings[data_item['api_endpoint']] = {
-          'primary_color': '#000'
+          'primary_color': '#228B22' if index % 2 == 0 else '#ff0000'
         }
-        self.settings = init_settings
+
+      self.settings = init_settings
+      with open('settings.json', 'w') as f:
+        json.dump(init_settings, f)
     else:
-      with open("settings.json","a+") as f:
-        self.settings = json.loads(f.read())
+      with open('settings.json') as f:
+        self.settings = json.load(f)
     return
     
   def get(self) -> dict:

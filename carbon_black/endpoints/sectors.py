@@ -3,7 +3,7 @@ from shared.models import Sectors as Sectors_Model
 from datetime import datetime, timedelta
 from data_operations.utils.api_requests import AlphaVantage
 from os import path
-from json import loads as json_loads
+import json
 
 class Sectors(Endpoint):
 
@@ -79,11 +79,18 @@ class Sectors(Endpoint):
 
   def load_monthly_sectors(self):
     timestamp = path.getmtime('sector_performance.json')
-    wk_ago = datetime.today() - timedelta(days=7)
+    timestamp = datetime.fromtimestamp(timestamp)
+    wk_ago = datetime.today() + timedelta(days=7)
+
     if timestamp < wk_ago:
-      # https://www.alphavantage.co/query?function=SECTOR&apikey=KBE1FWN6A9NDD5JR
-      av = 'test'
-      # json dumps into sector_performance.json
+      av = AlphaVantage('', True, 'https://www.alphavantage.co/query?function=SECTOR&apikey=')
+      with open('sector_performance.json') as f:
+        json.dump(av.data, f)
     else:
-      all_sectors = json_loads('sector_performance.json')
+      with open('sector_performance.json') as f:
+        all_sectors = json.load(f)
+
+    # populate 1,5 day etc class variables
+    # how to work into the response???
+
     return
