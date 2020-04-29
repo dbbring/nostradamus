@@ -1,12 +1,13 @@
 #! /usr/bin/env python
 # ======================= Gen Imports ========================
 from datetime import date, datetime, timedelta
-#from multiprocessing import Process
+from multiprocessing import Process
 import sys
 from time import sleep
 import json
 import traceback
 import sys
+import yfinance
 
 # ==== Add our path to the python path so we can import our modules ====
 with open('./data_operations/config.json') as f:
@@ -29,7 +30,8 @@ from data_operations.database.helpers import DB
 try:
   browser = FireFox()
   browser.config = config
-  sp = AlphaVantage('.INX')
+  # Using SPY because ALphavantage is sketchy on .INX (SandP500)
+  sp = AlphaVantage('SPY')
   sp_inputs = sp.get_inputs()
   for data_item in config['nostradamus']:
     msg = '--- Results From '+ data_item['database_name'] +' --- \n\n ' +  '-- Tickers added are: \n\n'
@@ -69,17 +71,16 @@ try:
           if not TD.has_td_news() and ticker_count < data_item['num_of_tickers_to_process']:
             ticker_count += 1
             msg += '---- ' + ticker + '\n'
-            #sleep(30)   # Rate Limiting for Alphavantage
-            #new_thread = Process(target=process_ticker, args=(data_item['database_name'], TD, FV, ticker, sp_inputs))
-            #new_thread.start() 
-            process_ticker(data_item['database_name'], TD, FV, ticker, sp_inputs)
+            sleep(30)   # Rate Limiting for Alphavantage
+            new_thread = Process(target=process_ticker, args=(data_item['database_name'], TD, FV, ticker, sp_inputs))
+            new_thread.start() 
 
             if ticker_count == data_item['num_of_tickers_to_process']:
               break  # We have all the data we need, stop parsing
 
       except Exception as err:
         error_msg = traceback.format_exc()
-        send_mail('-- Couldnt Add Ticker '+ ticker +' -- \n\n ' + str(repr(err)) + '\n\n' + error_msg, data_item['database_name'])
+        send_mail('-- Failed To Add Ticker: '+ ticker +' -- \n\n ' + str(repr(err)) + '\n\n' + error_msg, data_item['database_name'])
 
     # ===============================================================
     #                 Update old tickers (Price EOD only) 
@@ -109,7 +110,7 @@ try:
           msg += tran_ticker + '\n'
         except Exception as err:
           error_msg = traceback.format_exc()
-          send_mail('-- Updating Tracking Tickers Code Block Failed!! -- \n\n ' + str(repr(err) + '\n\n' + error_msg), data_item['database_name'])
+          send_mail('-- Failed To Update Price History on Ticker: '+ ticker +' -- \n\n ' + str(repr(err) + '\n\n' + error_msg), data_item['database_name'])
 
     # Finished with everything (Succesfull or not), send off email notification
     msg += '\n\n**There is not guarentee that all the tickers have been succesfully processed and saved. Please Check the DB to verify..'

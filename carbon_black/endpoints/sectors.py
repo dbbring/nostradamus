@@ -21,11 +21,13 @@ class Sectors(Endpoint):
   def get(self, date: str, sector_name=None) -> dict:
     if sector_name == None:
       results = self.query_db(self.config['sectors']['database_name'], f"SELECT * FROM Sectors WHERE date = '{date}';")
-      return self.make_sector_model(results)
+      model = self.make_sector_model(results)
+      return model[0] if len(model) == 1 else model
     else:
       clean_sector_name = Sectors_Model.get_sector(self, sector_name)
       results = self.query_db(self.config['sectors']['database_name'], f"SELECT sector_id, date, s_p, dji, nasdaq, russell_1000, russell_2000, vix, vix_close, {clean_sector_name} FROM Sectors WHERE date = '{date}';")
-      return self.make_custom_sector_model(results, clean_sector_name)
+      model = self.make_custom_sector_model(results, clean_sector_name)
+      return model[0] if len(model) == 1 else model
 
   def make_sector_model(self, sql_results: list):
     all_results = []
@@ -80,7 +82,7 @@ class Sectors(Endpoint):
   def load_monthly_sectors(self):
     timestamp = path.getmtime('sector_performance.json')
     timestamp = datetime.fromtimestamp(timestamp)
-    wk_ago = datetime.today() + timedelta(days=7)
+    wk_ago = datetime.today() - timedelta(days=7)
 
     if timestamp < wk_ago:
       av = AlphaVantage('', True, 'https://www.alphavantage.co/query?function=SECTOR&apikey=')
@@ -90,7 +92,46 @@ class Sectors(Endpoint):
       with open('sector_performance.json') as f:
         all_sectors = json.load(f)
 
-    # populate 1,5 day etc class variables
-    # how to work into the response???
-
+    self.five_day_performance = all_sectors['Rank C: 5 Day Performance']
+    self.one_month_performance = all_sectors['Rank D: 1 Month Performance']
+    self.three_month_performance = all_sectors['Rank E: 3 Month Performance']
+    self.ytd_performance = all_sectors['Rank F: Year-to-Date (YTD) Performance']
+    self.one_year_performance = all_sectors['Rank G: 1 Year Performance']
+    self.three_year_performance = all_sectors['Rank H: 3 Year Performance']
     return
+
+
+  def make_all_sectors_performance(self, sector_name=None):
+    response = {}
+    if sector_name == None:
+      response['5_day_performance'] = self.five_day_performance
+      response['1_month_performance'] = self.one_month_performance
+      response['3_month_performance'] = self.three_month_performance
+      response['ytd_performance'] = self.ytd_performance
+      response['1_yr_performance'] = self.one_year_performance
+      response['3_yr_performance'] = self.three_year_performance
+      return response
+    else:
+      clean_sector_name = Sectors_Model.get_sector(self, sector_name)
+      converted_key = clean_sector_name.replace('_', ' ').title()
+
+      response['5_day_performance'] = {
+        clean_sector_name: self.five_day_performance[converted_key]
+      }
+      response['1_month_performance'] = {
+        clean_sector_name: self.one_month_performance[converted_key]
+      }
+      response['3_month_performance'] = {
+        clean_sector_name: self.three_month_performance[converted_key]
+      }
+      response['ytd_performance'] = {
+        clean_sector_name: self.ytd_performance[converted_key]
+      }
+      response['1_yr_performance'] = {
+        clean_sector_name: self.one_year_performance[converted_key]
+      }
+      response['3_yr_performance'] = {
+        clean_sector_name: self.three_year_performance[converted_key]
+      }
+
+    return response

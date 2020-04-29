@@ -17,7 +17,8 @@ sys.path.insert(1, config['project_root'])
 from data_operations.utils.scrapers import Bloomberg, TDAmeritrade
 from data_operations.database.helpers import DB
 from shared.models import Sectors
-from data_operations.utils.util import send_mail, FireFox
+from data_operations.utils.util import send_mail
+from data_operations.utils.helpers import FireFox
 
 
 

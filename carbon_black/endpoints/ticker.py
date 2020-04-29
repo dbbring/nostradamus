@@ -39,7 +39,11 @@ class Ticker(Endpoint):
       wk = _weekly.get(self.api_endpoint, item[0])
       nw = _news.get(self.api_endpoint, item[0])
       pe = _peers.get(self.api_endpoint, item[0])
-      sector = _sectors.get(item[1].strftime('%Y-%m-%d'), fa[0]['sector']) if fa[0]['sector'] else _sectors.get(item[1].strftime('%Y-%m-%d'))
+
+      daily_sector = []
+      for eod_item in ed:
+        sect = _sectors.get(eod_item['date'], fa[0]['sector']) if fa[0]['sector'] else _sectors.get(item[1].strftime('%Y-%m-%d'))
+        daily_sector.append(sect)
 
       model['basic_info'] = bi[0] if len(bi) == 1 else bi
       model['fund_anaylsis'] = fa[0] if len(fa) ==1 else fa
@@ -47,8 +51,9 @@ class Ticker(Endpoint):
       model['eod'] = ed[0] if len(ed) == 1 else ed
       model['weekly'] = wk[0] if len(wk) == 1 else wk
       model['news'] = nw[0] if len(nw) == 1 else nw
-      model['peers'] = pe[0] if len(pe) else pe
-      model['sector_performance'] = sector[0] if len(sector) else sector
+      model['peers'] = pe[0] if len(pe) == 1 else pe
+      model['sector_performance'] = daily_sector[0] if len(daily_sector) == 1 else daily_sector
+      model['sector_historic_performance'] = _sectors.make_all_sectors_performance(fa[0]['sector']) if fa[0]['sector'] else _sectors.get(item[1].strftime('%Y-%m-%d'))
 
       all_results.append(model)
 

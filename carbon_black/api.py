@@ -49,9 +49,9 @@ api.add_resource(Sectors, '/api/sectors/<string:date>')
 
 api.add_resource(Ticker, '/api/<string:api_endpoint>/ticker/<int:transaction_id>')
 
-api.add_resource(DNA, '/api/<string:api_endpoint>/dna/<int:transaction_id>')
-
 api.add_resource(Settings, '/api/settings')
+
+
 
 
 app.run(debug=True)

@@ -138,4 +138,5 @@ class FireFox(object):
     # @descrip - Shuts down the browser on desconstruction
     # @returns None
     def __del__(self) -> None:
-      self.browser.close()
+      if self.browser.close is not None:
+        self.browser.close()

@@ -8,11 +8,14 @@ class Peers(Endpoint):
     super().__init__()
     return
     
-  def get(self, api_endpoint:str, transaction_id:int) -> dict:
+  # returns list of dicts?
+  def get(self, api_endpoint:str, transaction_id:int) -> list:
     results = self.query(api_endpoint, f"SELECT * FROM Peer_Performance WHERE transaction_id = {transaction_id};")
+    get_subject_ticker = self.query(api_endpoint, f"SELECT ticker FROM Transaction WHERE transaction_id = {transaction_id};")
+    self.subj_ticker = get_subject_ticker[0][0]
     return self.make_peers_model(results)
 
-  def make_peers_model(self, sql_results: list):
+  def make_peers_model(self, sql_results: list) -> list:
     all_results = []
 
     for item in sql_results:
@@ -27,7 +30,8 @@ class Peers(Endpoint):
       model.data['volume'] = item[7]
       model.data['percent_change'] = item[8]
       model.data['ticker'] = item[9]
-
-      all_results.append(model.data)
+      
+      if model.data['ticker'] != self.subj_ticker:
+        all_results.append(model.data)
 
     return all_results
