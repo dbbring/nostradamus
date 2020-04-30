@@ -1,5 +1,5 @@
 <template>
-  <div class="c-app">
+  <div class="c-app c-dark-theme">
     <TheSidebar/>
     <CWrapper>
       <TheHeader/>

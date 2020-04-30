@@ -1,5 +1,5 @@
 <template>
-  <CHeader fixed with-subheader light>
+  <CHeader fixed with-subheader class="bg-dark color-white">
     <CToggler
       in-header
       class="ml-3 d-lg-none"
@@ -41,15 +41,10 @@
           <CIcon name="cil-list"/>
         </CHeaderNavLink>
       </CHeaderNavItem>
-      <CHeaderNavItem class="d-md-down-none mx-2">
-        <CHeaderNavLink>
-          <CIcon name="cil-envelope-open"/>
-        </CHeaderNavLink>
-      </CHeaderNavItem>
       <TheHeaderDropdownAccnt/>
     </CHeaderNav>
-    <CSubheader class="px-3">
-      <CBreadcrumbRouter class="border-0 mb-0"/>
+    <CSubheader class="px-3 bg-dark">
+      <CBreadcrumbRouter class="border-0 mb-0 color-white"/>
     </CSubheader>
   </CHeader>
 </template>

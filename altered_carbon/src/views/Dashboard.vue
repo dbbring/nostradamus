@@ -31,7 +31,7 @@
       <CCardFooter>
         <CRow class="text-center">
           <CCol md sm="12" class="mb-sm-2 mb-0">
-            <div class="text-muted">Visits</div>
+            <div class="text-muted">Visitors</div>
             <strong>29.703 Users (40%)</strong>
             <CProgress
               class="progress-xs mt-2"
