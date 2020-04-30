@@ -251,9 +251,9 @@ class Technical_Indicators(Base_Model):
     self.data['pearsons_coeff_close_avg_vol_5_period'] = self.default_float 
     self.data['pearsons_coeff_close_avg_vol_15_period'] = self.default_float
     self.data['pearsons_coeff_close_avg_vol_30_period'] = self.default_float
-    self.data['pearsons_coeff_close_sp_5_period'] = self.default_float 
-    self.data['pearsons_coeff_close_sp_15_period'] = self.default_float
-    self.data['pearsons_coeff_close_sp_30_period'] = self.default_float
+    self.data['pearsons_coeff_close_spy_5_period'] = self.default_float 
+    self.data['pearsons_coeff_close_spy_15_period'] = self.default_float
+    self.data['pearsons_coeff_close_spy_30_period'] = self.default_float
     self.data['double_ema_3_period'] = self.default_float
     self.data['double_ema_10_period'] = self.default_float
     self.data['double_ema_15_period'] = self.default_float

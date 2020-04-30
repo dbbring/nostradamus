@@ -236,9 +236,9 @@ class AlphaVantage(API_Request):
         ta.data['pearsons_coeff_close_avg_vol_15_period'] = talib.CORREL(inputs['close'], inputs['avg_volume'], timeperiod=15)[index]
         ta.data['pearsons_coeff_close_avg_vol_30_period'] = talib.CORREL(inputs['close'], inputs['avg_volume'], timeperiod=30)[index]
 
-        ta.data['pearsons_coeff_close_sp_5_period'] = talib.CORREL(inputs['close'], inputs['s_p'], timeperiod=5)[index]
-        ta.data['pearsons_coeff_close_sp_15_period'] = talib.CORREL(inputs['close'], inputs['s_p'], timeperiod=15)[index]
-        ta.data['pearsons_coeff_close_sp_30_period'] = talib.CORREL(inputs['close'], inputs['s_p'], timeperiod=30)[index]
+        ta.data['pearsons_coeff_close_spy_5_period'] = talib.CORREL(inputs['close'], inputs['s_p'], timeperiod=5)[index]
+        ta.data['pearsons_coeff_close_spy_15_period'] = talib.CORREL(inputs['close'], inputs['s_p'], timeperiod=15)[index]
+        ta.data['pearsons_coeff_close_spy_30_period'] = talib.CORREL(inputs['close'], inputs['s_p'], timeperiod=30)[index]
 
         ta.data['double_ema_3_period'] = talib.DEMA(inputs['close'], timeperiod=3)[index]
         ta.data['double_ema_10_period'] = talib.DEMA(inputs['close'], timeperiod=10)[index]
