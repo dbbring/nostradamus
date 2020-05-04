@@ -71,7 +71,7 @@ class DB(DB_SCHEMA):
         data = list(model.data.values())
         if not data[0]:  # if our id is null, then exclude it
             del data[0]
-        self.cursor().execute(self.insert_sql[type(model).__name__], data)
+        self.cursor.execute(self.insert_sql[type(model).__name__], data)
         self.last_insert_id = self.cursor.lastrowid
         self.cnx.commit()
         return

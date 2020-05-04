@@ -14,6 +14,31 @@ from data_operations.utils.scrapers import SEC_Edgar
 from data_operations.utils.api_requests import AlphaVantage, IEX
 from shared.models import Ticker, SEC, Peer_Performance, SEC_Company_Info, SEC_Employee_Stock, SEC_Merger, SEC_Secondary_Offering
 
+# @params (message) the body of the email
+# @descrip - uses disposable email account to send updates
+# @returns None
+
+
+def send_mail(message: str, db_name: str) -> None:
+    gmailUser = 'nostradamus.notifications@gmail.com'
+    gmailPassword = 'gatoradegreengrass'
+    recipient = 'dev.dbbring@gmail.com'
+    email_message = message
+
+    msg = MIMEMultipart()
+    msg['From'] = gmailUser
+    msg['To'] = recipient
+    msg['Subject'] = "Nostradamus Update For " + db_name
+    msg.attach(MIMEText(email_message))
+
+    mailServer = smtplib.SMTP('smtp.gmail.com', 587)
+    mailServer.ehlo()
+    mailServer.starttls()
+    mailServer.ehlo()
+    mailServer.login(gmailUser, gmailPassword)
+    mailServer.sendmail(gmailUser, recipient, msg.as_string())
+    mailServer.close()
+
 
 # @params (db_name, TD, ticker, sp_inputs) - db_name, which instance of db to use - TD, TdAmeritrade object since we already have it when we call this. ticker, current ticker in iteration. s_p inputs, the dict of sp values for tech model.
 # @descrip - Main function that gets spun off into different threads. Its here because we need sleep for 30 secs for Alphavantage rate limiting before we spin off.
@@ -86,27 +111,3 @@ def process_ticker(db_name: str, TD, FinViz, ticker: str, s_p_inputs: dict) -> N
         error_msg = traceback.format_exc()
         send_mail('-- Couldnt Save Ticker To DB! ' + ticker + ' -- \n\n ' +
                   str(repr(err)) + '\n\n' + error_msg + 'Data: \n\n' + locals(), db_name)
-
-
-# @params (message) the body of the email
-# @descrip - uses disposable email account to send updates
-# @returns None
-def send_mail(message: str, db_name: str) -> None:
-    gmailUser = 'nostradamus.notifications@gmail.com'
-    gmailPassword = 'gatoradegreengrass'
-    recipient = 'dev.dbbring@gmail.com'
-    email_message = message
-
-    msg = MIMEMultipart()
-    msg['From'] = gmailUser
-    msg['To'] = recipient
-    msg['Subject'] = "Nostradamus Update For " + db_name
-    msg.attach(MIMEText(email_message))
-
-    mailServer = smtplib.SMTP('smtp.gmail.com', 587)
-    mailServer.ehlo()
-    mailServer.starttls()
-    mailServer.ehlo()
-    mailServer.login(gmailUser, gmailPassword)
-    mailServer.sendmail(gmailUser, recipient, msg.as_string())
-    mailServer.close()

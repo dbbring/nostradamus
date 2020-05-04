@@ -684,22 +684,22 @@ class IEX(API_Request):
         self.sandbox_api_key = 'Tpk_6b5abe0c3d8048fe82f669873de2665f'
 
         self.data = self.base.get_request(
-            'https://sandbox.iexapis.com/stable/stock/' + ticker + '/advanced-stats?token=' + self.api_key)
+            'https://cloud.iexapis.com/stable/stock/' + ticker + '/advanced-stats?token=' + self.api_key)
 
         bs = self.base.get_request(
-            'https://sandbox.iexapis.com/stable/stock/' + ticker + '/balance-sheet?token=' + self.api_key)
+            'https://cloud.iexapis.com/stable/stock/' + ticker + '/balance-sheet?token=' + self.api_key)
         if len(bs['balancesheet']) > 0:
             bs = bs['balancesheet'][0]
             self.data = {**bs, **self.data}
 
         cs = self.base.get_request(
-            'https://sandbox.iexapis.com/stable/stock/' + ticker + '/cash-flow?token=' + self.api_key)
+            'https://cloud.iexapis.com/stable/stock/' + ticker + '/cash-flow?token=' + self.api_key)
         if len(cs['cashflow']) > 0:
             cs = cs['cashflow'][0]
             self.data = {**cs, **self.data}
 
         inc = self.base.get_request(
-            'https://sandbox.iexapis.com/stable/stock/' + ticker + '/income?token=' + self.api_key)
+            'https://cloud.iexapis.com/stable/stock/' + ticker + '/income?token=' + self.api_key)
         if len(inc['income']) > 0:
             inc = inc['income'][0]
             self.data = {**inc, **self.data}
