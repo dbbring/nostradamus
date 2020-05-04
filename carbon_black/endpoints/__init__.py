@@ -8,3 +8,4 @@ from .weekly import Weekly
 from .sectors import Sectors
 from .settings import Settings
 from .ticker import Ticker
+from .nostradamus_settings import Nostradamus_Settings

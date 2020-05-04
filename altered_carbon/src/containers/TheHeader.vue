@@ -29,6 +29,19 @@
           Settings
         </CHeaderNavLink>
       </CHeaderNavItem>
+      <CHeaderNavItem class="px-3 mt-4 ml-5 pl-5">
+        <CInput
+            class=""
+            placeholder="Ticker..."
+          >
+            <template #prepend-content><CIcon name="cil-magnifying-glass"/></template>
+            <template #append>
+            <CHeaderNavLink class="px-0" to="/widgets">
+              <CButton color="info">Search</CButton>
+            </CHeaderNavLink>
+            </template>
+          </CInput>
+        </CHeaderNavItem>
     </CHeaderNav>
     <CHeaderNav class="mr-4">
       <CHeaderNavItem class="d-md-down-none mx-2">

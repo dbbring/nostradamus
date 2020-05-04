@@ -15,90 +15,87 @@ from data_operations.utils.api_requests import AlphaVantage, IEX
 from shared.models import Ticker, SEC, Peer_Performance, SEC_Company_Info, SEC_Employee_Stock, SEC_Merger, SEC_Secondary_Offering
 
 
-
-
 # @params (db_name, TD, ticker, sp_inputs) - db_name, which instance of db to use - TD, TdAmeritrade object since we already have it when we call this. ticker, current ticker in iteration. s_p inputs, the dict of sp values for tech model.
 # @descrip - Main function that gets spun off into different threads. Its here because we need sleep for 30 secs for Alphavantage rate limiting before we spin off.
-# @returns None 
-def process_ticker(db_name:str, TD, FinViz, ticker: str, s_p_inputs: dict) -> None:
-  try:
-    db = DB(db_name)
-    company = Ticker()
-    company.basic_info.data['ticker'] = ticker
-    company.basic_info.data['date'] = datetime.now().date()
-    company.basic_info.data['percent_change'] = TD.get_percent_change()
-    sectors = TD.get_sector()
-    
-    symbol = AlphaVantage(ticker)
-    symbol_wk = AlphaVantage(ticker, False)
-    inputs = symbol.get_inputs()
-    wk_inputs = symbol_wk.get_inputs()
-    inputs['s_p'] = s_p_inputs['close']
+# @returns None
+def process_ticker(db_name: str, TD, FinViz, ticker: str, s_p_inputs: dict) -> None:
+    try:
+        db = DB(db_name)
+        company = Ticker()
+        company.basic_info.data['ticker'] = ticker
+        company.basic_info.data['date'] = datetime.now().date()
+        company.basic_info.data['percent_change'] = TD.get_percent_change()
+        sectors = TD.get_sector()
 
-    # stop each array after x number of days we dont need the whole thing
-    start = len(inputs['date']) - 1
-    end = start - 5
-    
-    for index in range(start, end, -1):
-        wk_data = symbol_wk.make_price_wk_model(wk_inputs, index)
-        if wk_data != None:
-          company.weekly.append(wk_data)
+        symbol = AlphaVantage(ticker)
+        symbol_wk = AlphaVantage(ticker, False)
+        inputs = symbol.get_inputs()
+        wk_inputs = symbol_wk.get_inputs()
+        inputs['s_p'] = s_p_inputs['close']
 
-        eod_data = symbol.make_price_eod_model(inputs, index)
-        company.eod.append(eod_data)
+        # stop each array after x number of days we dont need the whole thing
+        start = len(inputs['date']) - 1
+        end = start - 5
 
-        tech_data = symbol.make_tech_indic_model(inputs, index)
-        company.tech_anaylsis.append(tech_data)
+        for index in range(start, end, -1):
+            wk_data = symbol_wk.make_price_wk_model(wk_inputs, index)
+            if wk_data != None:
+                company.weekly.append(wk_data)
 
-        chart_data = symbol.make_chart_idic_model(inputs, index)
-        company.chart_anaylsis.append(chart_data)
+            eod_data = symbol.make_price_eod_model(inputs, index)
+            company.eod.append(eod_data)
 
-    fa = IEX(ticker)
-    fa_data = fa.make_fund_indic_model(inputs)
+            tech_data = symbol.make_tech_indic_model(inputs, index)
+            company.tech_anaylsis.append(tech_data)
 
-    if sectors != None:
-      fa_data.data['sector'] = sectors['top-level']
-      fa_data.data['sub_sector'] = sectors['second-level']
-      
-    fa_data.data['institutional_ownership'] = TD.get_tute_ownership()
-    fa_data.data['short_interest_percent'] = TD.get_short_intrest()
+            chart_data = symbol.make_chart_idic_model(inputs, index)
+            company.chart_anaylsis.append(chart_data)
 
-    company.fund_anaylsis = fa_data
+        fa = IEX(ticker)
+        fa_data = fa.make_fund_indic_model(inputs)
 
-    company.news = company.news + FinViz.news
-    company.news = company.news + TD.news
+        if sectors != None:
+            fa_data.data['sector'] = sectors['top-level']
+            fa_data.data['sub_sector'] = sectors['second-level']
 
-    sec = SEC_Edgar(ticker)
-    if sec.is_valid:
-        sec_data = sec.make_sec_model()
+        fa_data.data['institutional_ownership'] = TD.get_tute_ownership()
+        fa_data.data['short_interest_percent'] = TD.get_short_intrest()
 
-        comps = sec.get_related_companies()
-        for ticker in comps:
-            p_p = sec.make_arr_peer_performance_model(ticker)
-            company.peers = company.peers + p_p
-    else:
-        sec_data = SEC()
+        company.fund_anaylsis = fa_data
 
-    company.sec = sec_data
-    
-    db.save_ticker_model(company)
-    return
+        company.news = company.news + FinViz.news
+        company.news = company.news + TD.news
 
-  except Exception as err:
-    error_msg = traceback.format_exc()
-    send_mail('-- Couldnt Save Ticker To DB! '+ ticker +' -- \n\n ' + str(repr(err)) + '\n\n' + error_msg, db_name)
+        sec = SEC_Edgar(ticker)
+        if sec.is_valid:
+            sec_data = sec.make_sec_model()
 
+            comps = sec.get_related_companies()
+            for ticker in comps:
+                p_p = sec.make_arr_peer_performance_model(ticker)
+                company.peers = company.peers + p_p
+        else:
+            sec_data = SEC()
 
+        company.sec = sec_data
+
+        db.save_ticker_model(company)
+        return
+
+    except Exception as err:
+        error_msg = traceback.format_exc()
+        send_mail('-- Couldnt Save Ticker To DB! ' + ticker + ' -- \n\n ' +
+                  str(repr(err)) + '\n\n' + error_msg + 'Data: \n\n' + locals(), db_name)
 
 
 # @params (message) the body of the email
 # @descrip - uses disposable email account to send updates
-# @returns None 
+# @returns None
 def send_mail(message: str, db_name: str) -> None:
     gmailUser = 'nostradamus.notifications@gmail.com'
     gmailPassword = 'gatoradegreengrass'
     recipient = 'dev.dbbring@gmail.com'
-    email_message=message
+    email_message = message
 
     msg = MIMEMultipart()
     msg['From'] = gmailUser

@@ -37,7 +37,7 @@ export default {
     fields: {
       type: Array,
       default () {
-        return ['username', 'registered', 'role', 'status'];
+        return [];
       }
     },
     caption: {

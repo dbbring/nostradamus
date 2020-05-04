@@ -7,7 +7,12 @@
         <main class="c-main">
           <CContainer fluid>
             <transition name="fade">
-              <router-view></router-view>
+              <router-view
+                v-if="!$store.state.loading" />
+              <img 
+              id="loader"
+              src="img/loader.svg"
+              v-else />
             </transition>
           </CContainer>
         </main>
@@ -33,6 +38,15 @@ export default {
 </script>
 
 <style scoped>
+#loader {
+  transform: rotateZ(90deg);
+  position: absolute;
+  left: 100px;
+  right: 0;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s;

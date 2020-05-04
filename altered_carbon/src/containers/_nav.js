@@ -11,27 +11,38 @@ export default [
       },
       {
         _name: 'CSidebarNavTitle',
-        _children: ['Theme']
+        _children: ['Anaylze']
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Colors',
-        to: '/theme/colors',
-        icon: 'cil-drop'
+        name: 'Anaylze',
+        to: '/anaylze/all',
+        icon: 'cil-chart-pie'
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Typography',
+        name: 'One To One',
         to: '/theme/typography',
-        icon: 'cil-pencil'
+        icon: 'cil-calculator'
       },
       {
         _name: 'CSidebarNavTitle',
-        _children: ['Components']
+        _children: ['Individual Breakdown']
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Overview',
+        to: '/widgets',
+        icon: 'cil-calculator',
+        badge: {
+          color: 'primary',
+          text: 'NEW',
+          shape: 'pill'
+        }
       },
       {
         _name: 'CSidebarNavDropdown',
-        name: 'Base',
+        name: 'Fundamentals',
         route: '/base',
         icon: 'cil-puzzle',
         items: [
@@ -103,7 +114,7 @@ export default [
       },
       {
         _name: 'CSidebarNavDropdown',
-        name: 'Buttons',
+        name: 'Price Action',
         route: '/buttons',
         icon: 'cil-cursor',
         items: [
@@ -127,13 +138,13 @@ export default [
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Charts',
+        name: 'SEC',
         to: '/charts',
         icon: 'cil-chart-pie'
       },
       {
         _name: 'CSidebarNavDropdown',
-        name: 'Icons',
+        name: 'Price Action',
         route: '/icons',
         icon: 'cil-star',
         items: [
@@ -176,8 +187,12 @@ export default [
         ]
       },
       {
+        _name: 'CSidebarNavTitle',
+        _children: ['Future Price Action']
+      },
+      {
         _name: 'CSidebarNavItem',
-        name: 'Widgets',
+        name: '5 Days After',
         to: '/widgets',
         icon: 'cil-calculator',
         badge: {
@@ -186,38 +201,6 @@ export default [
           shape: 'pill'
         }
       },
-      {
-        _name: 'CSidebarNavDivider',
-        _class: 'm-2'
-      },
-      {
-        _name: 'CSidebarNavTitle',
-        _children: ['Extras']
-      },
-      {
-        _name: 'CSidebarNavDropdown',
-        name: 'Pages',
-        route: '/pages',
-        icon: 'cil-star',
-        items: [
-          {
-            name: 'Login',
-            to: '/pages/login'
-          },
-          {
-            name: 'Register',
-            to: '/pages/register'
-          },
-          {
-            name: 'Error 404',
-            to: '/pages/404'
-          },
-          {
-            name: 'Error 500',
-            to: '/pages/500'
-          }
-        ]
-      }
     ]
   }
-]
+];
