@@ -24,22 +24,22 @@ def get_date_ranges() -> list:
 # @descrip - trys to convert str to float
 # @returns bool - true if the string is a valid float, false if not
 def isValidFloat(str: str) -> bool:
-    try: 
+    try:
         float(str)
         return True
     except ValueError:
-            return False
+        return False
 
 
 # @params (str) - str representation of int value
 # @descrip - trys to convert to str to an int
 # @returns bool - true if str is valid int, false if not
 def isValidInt(str: str) -> bool:
-    try: 
+    try:
         int(str)
         return True
     except ValueError:
-            return False
+        return False
 
 
 # @params (str) - str representation of a date
@@ -62,7 +62,7 @@ def string_to_date(date_string: str) -> datetime:
                 dateObj = datetime.strptime(date_string, '%Y-%m-%d').date()
             except ValueError:
                 dateObj = None
-            
+
     return dateObj
 
 
@@ -85,9 +85,7 @@ def string_to_int_abbv(strToConvert: str) -> int:
         else:
             return 0
 
-
-
-# ============================================================ # 
+# ============================================================ #
 #                  FireFox Browser Instance                    #
 # ============================================================ #
 
@@ -97,46 +95,47 @@ class FireFox(object):
     # @descrip - either returns the current instance or a new instance
     # @returns one and only instance
     def __new__(cls):
-      if not hasattr(cls, 'instance'):
-          cls.instance = super(FireFox, cls).__new__(cls)
-      return cls.instance
-
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(FireFox, cls).__new__(cls)
+        return cls.instance
 
     # @params (None)
     # @descrip - MUST SET CONFIG BEFORE USE!
     # @returns None
+
     def __init__(self) -> None:
-      self.browser = None
-      self.config = None
-      return
-
-
-    # @params (None) 
-    # @descrip - gets the current browser 
-    # @returns None
-    def start_browser(self) -> None:
-      if self.config is None:
+        self.browser = None
+        self.config = None
         return
 
-      if self.browser is None:
-        options = Options()
-        options.headless = True
-        self.browser = webdriver.Firefox(executable_path=self.config['project_root'] + '.venv/lib/geckodriver',options=options)
-      return
+    # @params (None)
+    # @descrip - gets the current browser
+    # @returns None
 
+    def start_browser(self) -> None:
+        if self.config is None:
+            return
+
+        if self.browser is None:
+            options = Options()
+            options.headless = True
+            self.browser = webdriver.Firefox(
+                executable_path=self.config['project_root'] + '.venv/lib/geckodriver', options=options)
+        return
 
     # @params (path) a url to navigate to
     # @descrip - gets the HTML source from the specified url
     # @returns str - the html source code
-    def get_html(self, path: str) -> str:
-      self.start_browser()
-      self.browser.get(path)
-      return self.browser.page_source
 
+    def get_html(self, path: str) -> str:
+        self.start_browser()
+        self.browser.get(path)
+        return self.browser.page_source
 
     # @params (None)
     # @descrip - Shuts down the browser on desconstruction
     # @returns None
+
     def __del__(self) -> None:
-      if self.browser.close is not None:
-        self.browser.close()
+        if self.browser.close is not None:
+            self.browser.close()

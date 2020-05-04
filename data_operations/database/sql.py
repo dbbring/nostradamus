@@ -18,6 +18,7 @@ class DB_SCHEMA(object):
   def insert_statements(self):
     INSERT_SQL = {}
 
+   
     INSERT_SQL['Sectors'] = ('INSERT INTO Sectors ('
     'date, s_p, dji, nasdaq, russell_1000, russell_2000, vix, vix_close,'
     'real_estate, consumer_staples, health_care, utilities, materials,'
@@ -62,7 +63,7 @@ class DB_SCHEMA(object):
     '(%s, %s, %s, %s)')
 
     INSERT_SQL['SEC_Secondary_Offering'] = ('INSERT INTO SEC_Secondary_Offering (sec_id, date, additional_shares_issued, is_asr, link) VALUES '
-    '(%s, %s, %s, %s, %s)')
+    '(%s, %s, %s, %s, %s)') 
 
     INSERT_SQL['Technical_Indicators'] = ('INSERT INTO Technical_Indicators (eod_id,' 
     'atr_3_period, atr_10_period, atr_15_period, atr_20_period, boll_bands_upper_3_period,'    'boll_bands_middle_3_period, boll_bands_lower_3_period, boll_bands_upper_10_period,' 'boll_bands_middle_10_period, boll_bands_lower_10_period, boll_bands_upper_15_period,'    'boll_bands_middle_15_period, boll_bands_lower_15_period, boll_bands_upper_20_period,' 'boll_bands_middle_20_period, boll_bands_lower_20_period, sma_3_period, sma_10_period,'    'sma_15_period, sma_20_period, ema_3_period, ema_10_period, ema_15_period,'    'ema_20_period, average_directional_movement_3_period,' 'average_directional_movement_10_period, average_directional_movement_15_period,'    'average_directional_movement_20_period, chaikin_osc_fast_3_slow_10, '   'chaikin_osc_fast_6_slow_18, chaikin_osc_fast_10_slow_20, chaikin_a_d_line,'    'balance_of_power, commodity_channel_index_3_period, commodity_channel_index_10_period,'    'commodity_channel_index_15_period, commodity_channel_index_20_period,  '  'chande_momentum_oscillator_3_period, chande_momentum_oscillator_10_period, '   'chande_momentum_oscillator_15_period, chande_momentum_oscillator_20_period, '   'pearsons_coeff_close_vol_5_period, pearsons_coeff_close_vol_15_period,  '  'pearsons_coeff_close_vol_30_period, pearsons_coeff_close_avg_vol_5_period,'
