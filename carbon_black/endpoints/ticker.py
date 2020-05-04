@@ -49,7 +49,7 @@ class Ticker(Endpoint):
 
             daily_sector = []
             for eod_item in ed:
-                sect = _sectors.get(eod_item['date'], fa[0]['sector']) if fa[0]['sector'] else _sectors.get(
+                sect = _sectors.get(eod_item['date'], fa[0]['sector']) if len(fa) > 0 and fa[0]['sector'] else _sectors.get(
                     item[1].strftime('%Y-%m-%d'))
                 daily_sector.append(sect)
 
@@ -63,7 +63,7 @@ class Ticker(Endpoint):
             model['sector_performance'] = daily_sector[0] if len(
                 daily_sector) == 1 else daily_sector
             model['sector_historic_performance'] = _sectors.make_all_sectors_performance(
-                fa[0]['sector']) if fa[0]['sector'] else _sectors.get(item[1].strftime('%Y-%m-%d'))
+                fa[0]['sector']) if len(fa) > 0 and fa[0]['sector'] else _sectors.get(item[1].strftime('%Y-%m-%d'))
 
             all_results.append(model)
 

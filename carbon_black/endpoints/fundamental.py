@@ -61,7 +61,8 @@ class Fundamental(Endpoint):
             model.data['dividend_rate_ttm'] = float(
                 item[24]) if item[24] else None
             model.data['employees'] = float(item[25]) if item[25] else None
-            model.data['earnings_date'] = item[26].strftime('%Y-%m-%d')
+            model.data['earnings_date'] = item[26].strftime(
+                '%Y-%m-%d') if item[26] else None
             model.data['pe_ratio'] = float(item[27]) if item[27] else None
             model.data['beta'] = float(item[28]) if item[28] else None
             model.data['total_cash'] = float(item[29]) if item[29] else None
@@ -106,7 +107,8 @@ class Fundamental(Endpoint):
                 item[54]) if item[54] else None
             model.data['cash_flow_financing'] = float(
                 item[55]) if item[55] else None
-            model.data['balance_sheet_date'] = item[56].strftime('%Y-%m-%d')
+            model.data['balance_sheet_date'] = item[56].strftime(
+                '%Y-%m-%d') if item[56] else None
             model.data['current_cash'] = float(item[57]) if item[57] else None
             model.data['short_term_investments'] = float(
                 item[58]) if item[58] else None

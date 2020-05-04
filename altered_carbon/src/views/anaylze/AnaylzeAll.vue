@@ -19,24 +19,45 @@
           </CCol>
         </CRow>
         <CRow>
-          <CCol lg="6">
-            <CTableWrapper 
-              class="bg-dark"
-              :items="transactionData"
-              :fields="['Ticker', 'Last News Article', 'Percent Change', 'Earnings Date']">
-              <template #header>
-                <CIcon name="cil-grid" /> Gainers
-                <div class="card-header-actions">
-                  <small class="text-muted">{{ transactionData.length }}</small>
-                </div>
-              </template>
-            </CTableWrapper>
+          <img 
+            v-if="isLoading"
+            id="loader"
+            src="img/loader.svg">
+          <CCol
+            lg="6"
+            style="min-height: 400px;">
+            <transition name="fade">
+              <CTableWrapper 
+                v-if="!isLoading"
+                class="bg-dark"
+                :items="transactionGainersData"
+                :fields="['Ticker', 'Last News Article', 'Percent Change', 'Earnings Date']">
+                <template #header>
+                  <CIcon name="cil-grid" /> Gainers
+                  <div class="card-header-actions">
+                    <small class="text-muted">{{ transactionGainersData.length }}</small>
+                  </div>
+                </template>
+              </CTableWrapper>
+            </transition>
           </CCol>
-
-          <CCol lg="6">
-            <CTableWrapper
-              striped
-              caption="Striped Table" />
+          <CCol
+            lg="6"
+            style="min-height: 400px;">
+            <transition name="fade">
+              <CTableWrapper 
+                v-if="!isLoading"
+                class="bg-dark"
+                :items="transactionLosersData"
+                :fields="['Ticker', 'Last News Article', 'Percent Change', 'Earnings Date']">
+                <template #header>
+                  <CIcon name="cil-grid" /> Losers
+                  <div class="card-header-actions">
+                    <small class="text-muted">{{ transactionLosersData.length }}</small>
+                  </div>
+                </template>
+              </CTableWrapper>
+            </transition>
           </CCol>
         </CRow>
       </CCardBody>
@@ -95,35 +116,78 @@ export default {
   },
   data() {
     return {
-      transactionData: [],
-      rawData: []
+      isLoading: false,
+      transactionGainersData: [],
+      transactionLosersData: [],
+      rawData: [],
     };
   },
   methods: {
-    updateDate(date) {
+    async updateDate(date) {
+      this.isLoading = true;
       const cleanDate = this.$options.filters.$formatDateForSql(date);
       this.$store.commit('setSelectedDate', date);
-      this.transactionData = [];
+      this.transactionGainersData = [];
       this.rawData = [];
+      
+      await Promise.all([
+        this.updateGainers(cleanDate),
+        this.updateLosers(cleanDate)
+      ]);
+    
+      this.isLoading = false;
+    },
+    async updateGainers(date) {
+      const transactionGainersItems = await axios.get('http://localhost:5000/api/gainers/' + date);
 
-      axios.get('http://localhost:5000/api/gainers/' + cleanDate).then((response) => {
-        response.data.forEach((item) => {
-          axios.get('http://localhost:5000/api/gainers/ticker/' + item.transaction_id).then((ticker_detail) => {
-            this.rawData.push(ticker_detail.data);
-            // console.log(this.rawData);
-            const temp = {
-              'Ticker': ticker_detail.data.basic_info.ticker,
-              'Last News Article': ticker_detail.data.news[0].date_of_article,
-              'Percent Change': ticker_detail.data.basic_info.percent_change,
-              'Earnings Date': ticker_detail.data.fund_anaylsis.earnings_date,
-              'status': 'success'
-            };
-            console.log(temp);
-            this.transactionData.push(temp);
-          });
+      await Promise.all(transactionGainersItems.data.map(async (trans_item) => {
+        const details = await axios.get('http://localhost:5000/api/gainers/ticker/' + trans_item.transaction_id);
+
+        this.transactionGainersData.push({
+          'Ticker': details.data.basic_info.ticker,
+          'Last News Article': details.data.news[0].date_of_article,
+          'Percent Change': details.data.basic_info.percent_change,
+          'Earnings Date': details.data.fund_anaylsis.earnings_date,
+          'status': 'success'
         });
-      });
+      }));
+    },
+    async updateLosers(date) {
+      const transactionLoserItems = await axios.get('http://localhost:5000/api/losers/' + date);
+
+      await Promise.all(transactionLoserItems.data.map(async (trans_item) => {
+        const details = await axios.get('http://localhost:5000/api/losers/ticker/' + trans_item.transaction_id);
+        
+        this.transactionLosersData.push({
+          'Ticker': details.data.basic_info.ticker,
+          'Last News Article': details.data.news[0].date_of_article,
+          'Percent Change': details.data.basic_info.percent_change,
+          'Earnings Date': details.data.fund_anaylsis.earnings_date,
+          'status': 'success'
+        });
+      }));
     }
   }
 };
 </script>
+
+<style scoped>
+#loader {
+  transform: rotateZ(90deg);
+  position: absolute;
+  left: 100px;
+  right: 0;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  height: 400px;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
