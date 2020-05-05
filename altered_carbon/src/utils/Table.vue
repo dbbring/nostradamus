@@ -7,6 +7,7 @@
     </CCardHeader>
     <CCardBody>
       <CDataTable
+        :clickable-rows="true"
         :hover="hover"
         :striped="striped"
         :bordered="bordered"
@@ -14,7 +15,7 @@
         :fixed="fixed"
         :items="items"
         :fields="fields"
-        :items-per-page="small ? 10 : 5"
+        :items-per-page="small ? 15 : 10"
         :dark="dark"
         pagination>
         <template #status="{item}">
@@ -33,7 +34,12 @@
 export default {
   name: 'Table',
   props: {
-    items: Array,
+    items: {
+      type: Array,
+      default () {
+        return [];
+      }
+    },
     fields: {
       type: Array,
       default () {

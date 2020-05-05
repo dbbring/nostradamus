@@ -23,6 +23,8 @@ class SEC(Endpoint):
                     'sec': str(repr(err))
                 }
             }
+        finally:
+            del self.db
 
     def make_sec_model(self, sql_results: list):
         all_results = []
@@ -31,7 +33,8 @@ class SEC(Endpoint):
             model = SEC_Model()
             model.data['sec_id'] = item[0]
             model.data['transaction_id'] = item[1]
-            model.data['date_of_ipo'] = item[2].strftime('%Y-%m-%d') if item[2] else None
+            model.data['date_of_ipo'] = item[2].strftime(
+                '%Y-%m-%d') if item[2] else None
             model.data['late_filings'] = item[3]
             model.data['ct_orders'] = item[4]
             model.data['is_adr'] = bool(item[5])

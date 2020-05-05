@@ -47,7 +47,8 @@ class DB(DB_SCHEMA):
     # @returns None
 
     def __del__(self):
-        self.cnx.close()
+        # self.cursor.close()
+        # self.cnx.close()
         return
 
     # @params (None)

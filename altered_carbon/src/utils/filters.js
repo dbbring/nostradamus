@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import moment from 'moment';
+import moment from 'moment/moment';
 
 Vue.filter('$formatDateForSql', date => {
   return moment(date).format('YYYY-MM-DD');
