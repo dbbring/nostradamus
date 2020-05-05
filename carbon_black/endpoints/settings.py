@@ -33,5 +33,7 @@ class Settings(Endpoint):
             return self.settings
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'settings': str(repr(err))
+                }
             }

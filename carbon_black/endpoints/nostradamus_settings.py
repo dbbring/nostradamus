@@ -22,5 +22,7 @@ class Nostradamus_Settings(Endpoint):
             return self.settings
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'nostradamus_settings': str(repr(err))
+                }
             }

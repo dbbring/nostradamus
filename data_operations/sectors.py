@@ -63,7 +63,9 @@ try:
     mySQL.save(model)
     send_mail('Sectors Script Succesfully Executed',
               config['sectors']['database_name'])
+    del browser
 except Exception:
     ex = traceback.format_exc()
     send_mail('------- Sectors Script Failed!! ------ \n\n' +
               ex, config['sectors']['database_name'])
+    del browser

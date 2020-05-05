@@ -20,7 +20,9 @@ class Peers(Endpoint):
             return self.make_peers_model(results)
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'peers': str(repr(err))
+                }
             }
 
     def make_peers_model(self, sql_results: list) -> list:

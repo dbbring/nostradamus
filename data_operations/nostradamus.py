@@ -120,12 +120,15 @@ try:
                     error_msg = traceback.format_exc()
                     send_mail('-- Failed To Update Price History on Ticker: ' + ticker +
                               ' -- \n\n ' + str(repr(err) + '\n\n' + error_msg), data_item['database_name'])
+            del DB
 
         # Finished with everything (Succesfull or not), send off email notification
         msg += '\n\n**There is not guarentee that all the tickers have been succesfully processed and saved. Please Check the DB to verify..'
         send_mail(msg, data_item['database_name'])
+        del browser
 
 except Exception as err:
     error_msg = traceback.format_exc()
     send_mail('-- Main Nostradamus Code Block Failed!! -- \n\n ' +
               str(repr(err)) + '\n\n' + error_msg, data_item['database_name'])
+    del browser

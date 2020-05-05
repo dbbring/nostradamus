@@ -20,7 +20,9 @@ class Ticker(Endpoint):
             return response[0] if len(response) == 1 else response
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'ticker': str(repr(err))
+                }
             }
 
     def make_ticker_model(self, sql_results: list):

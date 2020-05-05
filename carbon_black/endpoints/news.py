@@ -16,7 +16,9 @@ class News(Endpoint):
             return self.make_news_model(results)
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'news': str(repr(err))
+                }
             }
 
     def make_news_model(self, sql_results: list):

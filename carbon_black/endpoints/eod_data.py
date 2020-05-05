@@ -21,7 +21,9 @@ class EOD(Endpoint):
                 return self.make_eod_model(results)
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'eod_data': str(repr(err))
+                }
             }
 
     def make_eod_model(self, sql_results: list, include_anaysis=False):
@@ -78,7 +80,9 @@ class Charting(Endpoint):
             return self.make_chart_model(results)
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'charting': str(repr(err))
+                }
             }
 
     def make_chart_model(self, sql_results: list):
@@ -162,7 +166,9 @@ class Technical(Endpoint):
             return self.make_technical_model(results)
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'technical': str(repr(err))
+                }
             }
 
     def make_technical_model(self, sql_results: list):

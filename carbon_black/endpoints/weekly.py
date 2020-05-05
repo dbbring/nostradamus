@@ -16,7 +16,9 @@ class Weekly(Endpoint):
             return self.make_weekly_model(results)
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'weekly': str(repr(err))
+                }
             }
 
     def make_weekly_model(self, sql_results: list):

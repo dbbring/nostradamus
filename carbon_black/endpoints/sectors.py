@@ -2,7 +2,7 @@ from carbon_black.endpoints.base_endpoint import Endpoint
 from shared.models import Sectors as Sectors_Model
 from datetime import datetime, timedelta
 from data_operations.utils.api_requests import AlphaVantage
-from os import path
+import os
 import json
 
 
@@ -35,7 +35,9 @@ class Sectors(Endpoint):
                 return model[0] if len(model) == 1 else model
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'sectors': str(repr(err))
+                }
             }
 
     def make_sector_model(self, sql_results: list):
@@ -91,14 +93,16 @@ class Sectors(Endpoint):
         return all_results
 
     def load_monthly_sectors(self):
-        timestamp = path.getmtime('sector_performance.json')
+        timestamp = os.path.getmtime('sector_performance.json')
         timestamp = datetime.fromtimestamp(timestamp)
         wk_ago = datetime.today() - timedelta(days=7)
 
         if timestamp < wk_ago:
             av = AlphaVantage(
                 '', True, 'https://www.alphavantage.co/query?function=SECTOR&apikey=')
-            with open('sector_performance.json') as f:
+                
+            all_sectors = av.data
+            with open('sector_performance.json', 'w') as f:
                 json.dump(av.data, f)
         else:
             with open('sector_performance.json') as f:

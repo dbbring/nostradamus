@@ -17,6 +17,9 @@ class Endpoint(Resource):
                 self.config = json_load(f)
         return
 
+    def __del__(self):
+        del self.db
+
     def get_db(self, api_endpoint: str):
         for data_item in self.config['nostradamus']:
             if data_item['api_endpoint'] == api_endpoint:

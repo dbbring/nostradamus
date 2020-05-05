@@ -16,7 +16,9 @@ class Fundamental(Endpoint):
             return self.make_fundamental_model(results)
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'fundamental': str(repr(err))
+                }
             }
 
     def make_fundamental_model(self, sql_results: list):

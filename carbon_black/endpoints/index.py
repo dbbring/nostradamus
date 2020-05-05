@@ -18,7 +18,9 @@ class Index(Endpoint):
             return {}
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'index': str(repr(err))
+                }
             }
 
     def get_all(self):
@@ -85,5 +87,7 @@ class IndexSpecific(Index):
             return {}
         except Exception as err:
             return {
-                'error': str(repr(err))
+                'error': {
+                    'index_specific': str(repr(err))
+                }
             }
