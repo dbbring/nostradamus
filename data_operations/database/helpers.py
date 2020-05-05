@@ -43,15 +43,6 @@ class DB(DB_SCHEMA):
         return
 
     # @params (None)
-    # @descrip - Destructor, when we are done close up connections
-    # @returns None
-
-    def __del__(self):
-        # self.cursor.close()
-        # self.cnx.close()
-        return
-
-    # @params (None)
     # @descrip - Loads table from SQL file
     # @returns None
 

@@ -23,8 +23,6 @@ class SEC(Endpoint):
                     'sec': str(repr(err))
                 }
             }
-        finally:
-            del self.db
 
     def make_sec_model(self, sql_results: list):
         all_results = []
