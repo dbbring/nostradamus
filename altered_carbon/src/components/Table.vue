@@ -7,7 +7,7 @@
     </CCardHeader>
     <CCardBody>
       <CDataTable
-        :clickable-rows="true"
+        :clickable-rows="clickable"
         :hover="hover"
         :striped="striped"
         :bordered="bordered"
@@ -17,7 +17,8 @@
         :fields="fields"
         :items-per-page="small ? 15 : 10"
         :dark="dark"
-        pagination>
+        pagination
+        @row-clicked="rowClick">
         <template #status="{item}">
           <td>
             <CBadge :color="getBadge(item.status)">
@@ -55,7 +56,8 @@ export default {
     bordered: Boolean,
     small: Boolean,
     fixed: Boolean,
-    dark: Boolean
+    dark: Boolean,
+    clickable: Boolean,
   },
   methods: {
     getBadge (status) {
@@ -63,6 +65,9 @@ export default {
         : status === 'Inactive' ? 'secondary'
           : status === 'Pending' ? 'warning'
             : status === 'Banned' ? 'danger' : 'primary';
+    },
+    rowClick(payload) {
+      this.$emit('row-clicked', payload);
     }
   }
 };

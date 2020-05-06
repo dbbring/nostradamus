@@ -7,7 +7,7 @@ const state = {
   sidebarShow: 'responsive',
   sidebarMinimize: false,
   loading: false,
-  currentSelectedDate: Date.now()
+  currentSelectedDate: null
 };
 
 const mutations = {
