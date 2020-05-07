@@ -172,15 +172,13 @@
 </template>
 
 <script>
-import axios from 'axios';
 import datepicker from 'vuejs-datepicker';
-import LineChart from '../components/LineChart';
+import LineChart from '../../components/LineChart';
 
-import { greenColors, redColors } from '../utils/colors';
-import { largeFundAnaylsisLabels, mediumFundAnaylsisLabels, smallFundAnaylsisLabels } from '../utils/const';
+import { largeFundAnaylsisLabels, mediumFundAnaylsisLabels, smallFundAnaylsisLabels } from '../../utils/const';
 
 export default {
-  name: 'Dashboard',
+  name: 'Fundamental',
   components: { 
     LineChart,
     datepicker 
@@ -229,83 +227,6 @@ export default {
         this.activeItem = this.activeItem[0];
       }
       return;
-    },
-    async updateDate(date) {
-      this.isLoading = true;
-      const cleanDate = this.$options.filters.$formatDateForSql(date);
-      this.$store.commit('setSelectedDate', date);
-
-      this.tableGainersData = [];
-      this.tableLosersData = [];
-      this.gainersData = [];
-      this.losersData = [];
-      this.gainersRawData = [];
-      this.losersRawData = [];
-      
-      await Promise.all([
-        this.updateGainers(cleanDate),
-        this.updateLosers(cleanDate)
-      ]);
-    
-      this.isLoading = false;
-    },
-    async updateGainers(date) {
-      let counter = 0;
-
-      const transactionGainersItems = await axios.get('http://localhost:5000/api/gainers/' + date);
-
-      await Promise.all(transactionGainersItems.data.map(async (trans_item) => {
-        const details = await axios.get('http://localhost:5000/api/gainers/ticker/' + trans_item.transaction_id);
-        const additionalData = {
-          'color': greenColors[counter],
-          'category': 'Gainers'
-        };
-
-        const combinedData = {...additionalData, ...details.data};
-
-        this.gainersData.push(combinedData);
-        this.gainersRawData.push(combinedData);
-
-        this.tableGainersData.push({
-          'Ticker': details.data.basic_info.ticker,
-          'Last News Article': details.data.news[0].date_of_article || '',
-          'Percent Change': details.data.basic_info.percent_change,
-          'Earnings Date': details.data.fund_anaylsis.earnings_date || '',
-          'Display': true,
-          'id': details.data.basic_info.transaction_id,
-          'category': 'Gainers',
-          '_classes': `text-green-${counter}`,
-        });
-
-        counter++;
-      }));
-    },
-    async updateLosers(date) {
-      let counter = 0;
-
-      const transactionLoserItems = await axios.get('http://localhost:5000/api/losers/' + date);
-
-      await Promise.all(transactionLoserItems.data.map(async (trans_item) => {
-        const details = await axios.get('http://localhost:5000/api/losers/ticker/' + trans_item.transaction_id);
-        
-        this.losersData.push(details.data);
-        this.losersRawData.push(details.data);
-
-
-        this.tableLosersData.push({
-          'Ticker': details.data.basic_info.ticker,
-          'Last News Article': details.data.news[0].date_of_article || '',
-          'Percent Change': details.data.basic_info.percent_change,
-          'Earnings Date': details.data.fund_anaylsis.earnings_date || '',
-          'Display': true,
-          'id': details.data.basic_info.transaction_id,
-          'category': 'Losers',
-          'color': redColors[counter],
-          '_classes': `text-red-${counter}`,
-        });
-
-        counter++;
-      }));
     },
     toggleDisplay(tableItem) {
       if (this.hoverCellTicker === tableItem.Ticker) {

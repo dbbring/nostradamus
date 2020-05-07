@@ -22,184 +22,52 @@ export default [
       {
         _name: 'CSidebarNavItem',
         name: 'One To One',
-        to: '/theme/typography',
+        to: '/anaylze/one-to-one',
         icon: 'cil-calculator'
       },
       {
         _name: 'CSidebarNavTitle',
-        _children: ['Individual Breakdown']
+        _children: ['Breakdown']
       },
       {
         _name: 'CSidebarNavItem',
         name: 'Overview',
-        to: '/widgets',
+        to: '/breakdown/overview',
         icon: 'cil-calculator',
-        badge: {
-          color: 'primary',
-          text: 'NEW',
-          shape: 'pill'
-        }
-      },
-      {
-        _name: 'CSidebarNavDropdown',
-        name: 'Fundamentals',
-        route: '/base',
-        icon: 'cil-puzzle',
-        items: [
-          {
-            name: 'Breadcrumbs',
-            to: '/base/breadcrumbs'
-          },
-          {
-            name: 'Cards',
-            to: '/base/cards'
-          },
-          {
-            name: 'Carousels',
-            to: '/base/carousels'
-          },
-          {
-            name: 'Collapses',
-            to: '/base/collapses'
-          },
-          {
-            name: 'Forms',
-            to: '/base/forms'
-          },
-          {
-            name: 'Jumbotrons',
-            to: '/base/jumbotrons'
-          },
-          {
-            name: 'List Groups',
-            to: '/base/list-groups'
-          },
-          {
-            name: 'Navs',
-            to: '/base/navs'
-          },
-          {
-            name: 'Navbars',
-            to: '/base/navbars'
-          },
-          {
-            name: 'Paginations',
-            to: '/base/paginations'
-          },
-          {
-            name: 'Popovers',
-            to: '/base/popovers'
-          },
-          {
-            name: 'Progress Bars',
-            to: '/base/progress-bars'
-          },
-          {
-            name: 'Switches',
-            to: '/base/switches'
-          },
-          {
-            name: 'Tables',
-            to: '/base/tables'
-          },
-          {
-            name: 'Tabs',
-            to: '/base/tabs'
-          },
-          {
-            name: 'Tooltips',
-            to: '/base/tooltips'
-          }
-        ]
-      },
-      {
-        _name: 'CSidebarNavDropdown',
-        name: 'Price Action',
-        route: '/buttons',
-        icon: 'cil-cursor',
-        items: [
-          {
-            name: 'Buttons',
-            to: '/buttons/standard-buttons'
-          },
-          {
-            name: 'Button Dropdowns',
-            to: '/buttons/dropdowns'
-          },
-          {
-            name: 'Button Groups',
-            to: '/buttons/button-groups'
-          },
-          {
-            name: 'Brand Buttons',
-            to: '/buttons/brand-buttons'
-          }
-        ]
       },
       {
         _name: 'CSidebarNavItem',
         name: 'SEC',
-        to: '/charts',
+        to: '/breakdown/sec',
         icon: 'cil-chart-pie'
       },
       {
-        _name: 'CSidebarNavDropdown',
-        name: 'Price Action',
-        route: '/icons',
-        icon: 'cil-star',
-        items: [
-          {
-            name: 'CoreUI Icons',
-            to: '/icons/coreui-icons',
-            badge: {
-              color: 'info',
-              text: 'NEW'
-            }
-          },
-          {
-            name: 'Brands',
-            to: '/icons/brands'
-          },
-          {
-            name: 'Flags',
-            to: '/icons/flags'
-          }
-        ]
-      },
-      {
-        _name: 'CSidebarNavDropdown',
-        name: 'Notifications',
-        route: '/notifications',
-        icon: 'cil-bell',
-        items: [
-          {
-            name: 'Alerts',
-            to: '/notifications/alerts'
-          },
-          {
-            name: 'Badges',
-            to: '/notifications/badges'
-          },
-          {
-            name: 'Modals',
-            to: '/notifications/modals'
-          }
-        ]
-      },
-      {
-        _name: 'CSidebarNavTitle',
-        _children: ['Future Price Action']
+        _name: 'CSidebarNavItem',
+        name: 'Fundamentals',
+        to: '/breakdown/fundamentals',
+        icon: 'cil-chart-pie'
       },
       {
         _name: 'CSidebarNavItem',
-        name: '5 Days After',
-        to: '/widgets',
-        icon: 'cil-calculator',
-        badge: {
-          color: 'primary',
-          text: 'NEW',
-          shape: 'pill'
-        }
+        name: 'Technicals',
+        to: '/breakdown/technicals',
+        icon: 'cil-chart-pie'
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: 'Price Action',
+        to: '/breakdown/price',
+        icon: 'cil-chart-pie'
+      },
+      {
+        _name: 'CSidebarNavTitle',
+        _children: ['Future Price Movement']
+      },
+      {
+        _name: 'CSidebarNavItem',
+        name: '5 Days From The Date',
+        to: '/future/price',
+        icon: 'cil-calculator'
       },
     ]
   }

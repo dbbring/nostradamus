@@ -174,13 +174,13 @@
 <script>
 import axios from 'axios';
 import datepicker from 'vuejs-datepicker';
-import LineChart from '../components/LineChart';
+import LineChart from '../../components/LineChart';
 
-import { greenColors, redColors } from '../utils/colors';
-import { largeFundAnaylsisLabels, mediumFundAnaylsisLabels, smallFundAnaylsisLabels } from '../utils/const';
+import { greenColors, redColors } from '../../utils/colors';
+import { largeFundAnaylsisLabels, mediumFundAnaylsisLabels, smallFundAnaylsisLabels } from '../../utils/const';
 
 export default {
-  name: 'Dashboard',
+  name: 'Overview',
   components: { 
     LineChart,
     datepicker 

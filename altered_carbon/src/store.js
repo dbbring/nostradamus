@@ -7,7 +7,11 @@ const state = {
   sidebarShow: 'responsive',
   sidebarMinimize: false,
   loading: false,
-  currentSelectedDate: null
+  currentSelectedDate: null,
+  mutatableGainersData: [],
+  immutatableGainersData: [],
+  mutatableLosersData: [],
+  immutatableLosersData: [],
 };
 
 const mutations = {
@@ -22,11 +26,44 @@ const mutations = {
   set(state, [variable, value]) {
     state[variable] = value;
   },
-  toggleLoading(state, value) {
-    state.loading = value;
-  },
   setSelectedDate(state, newDate) {
     state.currentSelectedDate = newDate;
+  },
+  addToDataArray(state, [array, data]) {
+    state[array].push(data);
+  },
+  clearData(state) {
+    state.mutatableGainersData = [];
+    state.immutatableGainersData = [];
+    state.mutatableLosersData = [];
+    state.immutatableLosersData = [];
+  },
+  toggleChartDisplay(state, tableItem) {
+    if (tableItem.category === 'Gainers') {
+
+      if (tableItem.Display) {
+        const addItem = state.immutatableGainersData.filter(ticker_item => ticker_item.basic_info.ticker === tableItem.Ticker);
+
+        if (addItem.length) {
+          state.mutatableGainersData.push(addItem[0]);
+        }
+        return;
+      }
+      state.mutatableGainersData = state.mutatableGainersData.filter(ticker_item => ticker_item.basic_info.ticker !== tableItem.Ticker);
+
+    } else {
+
+      if (tableItem.Display) {
+        const addItem = state.immutatableLosersData.filter(ticker_item => ticker_item.basic_info.ticker === tableItem.Ticker);
+
+        if (addItem.length) {
+          state.mutatableLosersData.push(addItem[0]);
+        }
+        return;
+      }
+      state.mutatableLosersData = state.mutatableLosersData.filter(ticker_item => ticker_item.basic_info.ticker !== tableItem.Ticker);
+
+    }
   }
 };
 
