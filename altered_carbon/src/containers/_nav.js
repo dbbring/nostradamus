@@ -37,26 +37,20 @@ export default [
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'SEC',
-        to: '/breakdown/sec',
-        icon: 'cil-chart-pie'
-      },
-      {
-        _name: 'CSidebarNavItem',
         name: 'Fundamentals',
         to: '/breakdown/fundamentals',
         icon: 'cil-chart-pie'
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Technicals',
-        to: '/breakdown/technicals',
+        name: 'Price Movement',
+        to: '/breakdown/price',
         icon: 'cil-chart-pie'
       },
       {
         _name: 'CSidebarNavItem',
-        name: 'Price Action',
-        to: '/breakdown/price',
+        name: 'SEC',
+        to: '/breakdown/sec',
         icon: 'cil-chart-pie'
       },
       {
@@ -65,7 +59,7 @@ export default [
       },
       {
         _name: 'CSidebarNavItem',
-        name: '5 Days From The Date',
+        name: 'Future Prices',
         to: '/future/price',
         icon: 'cil-calculator'
       },

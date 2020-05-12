@@ -7,7 +7,7 @@
       <CChartLine
         :datasets="transformDataSet"
         :options="defaultOptions"
-        :labels="labels" />
+        :labels="labelProxy" />
     </CCardBody>
   </CCard>
 </template>
@@ -31,7 +31,8 @@ export default {
       default: () => {}
     },
     title: {
-      required: true,
+      default: '',
+      required: false,
       type: String
     },
     labels: {
@@ -39,11 +40,22 @@ export default {
       type: Array
     }
   },
+  data() {
+    return {
+      labelProxy: this.labels
+    };
+  },
   computed: {
     transformDataSet() {
       const dataObj = [];
+
+      if (Array.isArray(this.dataSet[0])) {
+        return this.handleNestedArray();
+      }
+
       this.dataSet.forEach((ticker_item) => {
         const pointData = [];
+
         this.labels.forEach((dataKey) => {
           pointData.push(ticker_item[dataKey]);
         });
@@ -57,6 +69,7 @@ export default {
           data: pointData
         });
       });
+      
       return dataObj;
     },
     defaultOptions() {
@@ -96,6 +109,49 @@ export default {
       }
 
       return this.options;
+    }
+  },
+  methods: {
+    handleNestedArray() {
+      const dataObj = [];
+      const modLabels = [];
+
+      this.dataSet.forEach((arrayItem) => {
+        this.labels.forEach((_label) => {
+          modLabels.push(`${arrayItem[0].date}-${_label}`);
+        });
+      });
+
+      this.dataSet[0].forEach((item) => {
+        this.labels.forEach((lbl) => { 
+          dataObj.push({
+            label: item.ticker,
+            backgroundColor: 'transparent',
+            borderColor: item.color,
+            pointHoverBackgroundColor: item.color,
+            borderWidth: 1,
+            data: this.getPointData(item.ticker, lbl)
+          });
+        });
+      });
+      
+      
+
+      this.labelProxy = modLabels;
+      return dataObj;
+    },
+    getPointData(ticker, key) {
+      const results = [];
+
+      this.dataSet.forEach((arrayItem) => {
+        arrayItem.forEach((item) => {
+          if (item.ticker === ticker) {
+            results.push(item[key]);
+          }
+        });
+      });
+
+      return results;
     }
   }
 };

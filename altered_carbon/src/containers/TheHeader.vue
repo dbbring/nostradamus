@@ -41,7 +41,9 @@
         <datepicker
           :value="$store.state.currentSelectedDate"
           calendar-class="bg-light"
+          input-class="date-input"
           class="ml-3"
+          format="MM dd yyyy"
           placeholder="Pick a Date"
           @input="updateDate" />
         <h2
@@ -154,3 +156,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.date-input {
+  width: 20rem;
+}
+</style>

@@ -12,9 +12,8 @@ const OneToOne = () => import('@/views/anaylze/OneToOne');
 
 const Overview = () => import('@/views/breakdown/Overview');
 const Fundamental = () => import('@/views/breakdown/Fundamental');
-const Technical = () => import('@/views/breakdown/Technical');
 const Sec = () => import('@/views/breakdown/Sec');
-const PriceAction = () => import('@/views/breakdown/PriceAction');
+const PriceAction = () => import('@/views/breakdown/EOD_Statistics/PriceAction');
 
 const FuturePriceAction = () => import('@/views/future/FuturePriceAction');
 
@@ -78,11 +77,6 @@ function configRoutes() {
               path: 'fundamentals',
               name: 'Fundamentals',
               component: Fundamental
-            },
-            {
-              path: 'technicals',
-              name: 'Technicals',
-              component: Technical
             },
             {
               path: 'price',

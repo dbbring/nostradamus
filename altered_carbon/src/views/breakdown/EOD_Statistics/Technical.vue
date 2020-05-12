@@ -8,26 +8,24 @@
       <CCard v-else>
         <CCardBody class="bg-light">
           <CRow>
-            <CCol>
+            <CCol lg="12">
               <LineChart 
                 :labels="lgFALabels"
-                :data-set="filterData"
+                :data-set="groupData('fund_anaylsis', filterData)"
                 title="Gainers Fundamental Anaylsis" />
             </CCol>
           </CRow>
           <CRow>
-            <CCol>
+            <CCol lg="6">
               <LineChart 
                 :labels="mdFALabels"
-                :data-set="filterData"
+                :data-set="groupData('fund_anaylsis', filterData)"
                 title="Gainers Fundamental Anaylsis" />
             </CCol>
-          </CRow>
-          <CRow>
-            <CCol>
+            <CCol lg="6">
               <LineChart 
                 :labels="smFALabels"
-                :data-set="filterData"
+                :data-set="groupData('fund_anaylsis', filterData)"
                 title="Gainers Fundamental Anaylsis" />
             </CCol>
           </CRow>
@@ -59,16 +57,19 @@ export default {
   },
   computed: {
     filterData() {
+      return this.filteredDataset(this.Dataset);
+    }
+  },
+  methods: {
+    groupData(key, tickerArray) {
       const data = [];
-      const dataArray = this.filteredDataset(this.Dataset);
 
-      dataArray.forEach((tickerItem) => {
+      tickerArray.forEach((tickerItem) => {
         const additionalData = {
           color: tickerItem.table_info.color,
           ticker: tickerItem.basic_info.ticker
         };
-
-        data.push({...tickerItem['fund_anaylsis'], ...additionalData});
+        data.push({...tickerItem[key], ...additionalData});
       });
 
       return data;
