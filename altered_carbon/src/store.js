@@ -32,6 +32,9 @@ const mutations = {
   addToDataArray(state, [array, data]) {
     state[array].push(data);
   },
+  removeFromDataArray(state, [array, item]) {
+    state[array] = state[array].filter(ticker_item => ticker_item.basic_info.ticker !== item.basic_info.ticker);
+  },
   clearData(state) {
     state.mutatableGainersData = [];
     state.immutatableGainersData = [];

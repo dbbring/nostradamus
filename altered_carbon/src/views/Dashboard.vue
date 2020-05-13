@@ -1,180 +1,517 @@
 <template>
   <div>
-    <CCard class="bg-light">
-      <CCardHeader>
-        <CRow>
-          <h4 class="h4 ml-2 text-white text-center">
-            Select Date:
-          </h4>
-          <datepicker
-            :value="$store.state.currentSelectedDate"
-            class="ml-3"
-            placeholder="Pick a Date"
-            @input="updateDate" />
-        </CRow>
-      </CCardHeader>
-      <CCardBody>
-        <CRow class="text-center text-info py-2 mb-2">
-          <CCol>
-            <h2 v-if="$store.state.currentSelectedDate">
-              {{ $store.state.currentSelectedDate | $formatDateForDisplay }}
-            </h2>
-          </CCol>
-        </CRow>
-        <CRow>
-          <img 
-            v-if="isLoading"
-            id="loader"
-            src="img/loader.svg">
-          <CCol
-            lg="12"
-            style="min-height: 400px;">
-            <transition name="fade">
-              <CCard
-                v-if="!isLoading"
-                class="bg-dark">
-                <CCardHeader>
-                  <CIcon name="cil-grid" /> Gainers
-                  <div class="card-header-actions">
-                    <small class="text-muted">{{ tableGainersData.length }}</small>
-                  </div>
-                </CCardHeader>
-                <CCardBody>
-                  <CDataTable
-                    class="bg-dark border-dark"
-                    :items="tableGainersData"
-                    :fields="['Ticker', 'Last News Article', 'Percent Change', 'Earnings Date', 'Display']"
-                    :items-per-page="8"
-                    border
-                    pagination
-                    hover
-                    clickable-rows
-                    sorter
-                    :sorter-value="{asc: false, column: 'Percent Change'}"
-                    @row-clicked="toggleDisplay">
-                    <template #Ticker="{item}">
-                      <td @mouseover="hoverCellTicker = item.Ticker">
-                        {{ item.Ticker }}
-                      </td>
-                    </template>
-                    <template #Display="{item}">
-                      <td>
-                        <CSwitch
-                          :checked="item.Display"
-                          class="mx-1"
-                          color="success"
-                          variant="3d" />
-                      </td>
-                    </template>
-                  </CDataTable>
-                </CCardBody>
-              </CCard>
-            </transition>
-          </CCol>
-          <CCol
-            lg="12"
-            style="min-height: 400px;">
-            <transition name="fade">
-              <CCard
-                v-if="!isLoading"
-                class="bg-dark">
-                <CCardHeader>
-                  <CIcon name="cil-grid" /> Losers
-                  <div class="card-header-actions">
-                    <small class="text-muted">{{ tableLosersData.length }}</small>
-                  </div>
-                </CCardHeader>
-                <CCardBody>
-                  <CDataTable
-                    class="bg-dark border-dark text-white"
-                    :items="tableLosersData"
-                    :fields="['Ticker', 'Last News Article', 'Percent Change', 'Earnings Date', 'Display']"
-                    :items-per-page="8"
-                    border
-                    pagination
-                    hover
-                    clickable-rows
-                    sorter
-                    :sorter-value="{asc: true, column: 'Percent Change'}"
-                    @row-clicked="toggleDisplay">
-                    <template #Ticker="{item}">
-                      <td @mouseover="hoverCellTicker = item.Ticker">
-                        {{ item.Ticker }}
-                      </td>
-                    </template>
-                    <template #Display="{item}">
-                      <td>
-                        <CSwitch
-                          :checked="item.Display"
-                          class="mx-1"
-                          color="success"
-                          variant="3d" />
-                      </td>
-                    </template>
-                  </CDataTable>
-                </CCardBody>
-              </CCard>
-            </transition>
-          </CCol>
-        </CRow>
-      </CCardBody>
-    </CCard>
-    
-    <CCard v-if="!isLoading">
-      <CCardBody class="bg-light">
-        <CRow>
-          <CCol lg="12">
-            <LineChart 
-              :labels="lgFALabels"
-              :data-set="groupData('fund_anaylsis', gainersData)"
-              title="Gainers Fundamental Anaylsis" />
-          </CCol>
-        </CRow>
-        <CRow>
-          <CCol lg="6">
-            <LineChart 
-              :labels="mdFALabels"
-              :data-set="groupData('fund_anaylsis', gainersData)"
-              title="Gainers Fundamental Anaylsis" />
-          </CCol>
-          <CCol lg="6">
-            <LineChart 
-              :labels="smFALabels"
-              :data-set="groupData('fund_anaylsis', gainersData)"
-              title="Gainers Fundamental Anaylsis" />
-          </CCol>
-        </CRow>
-      </CCardBody>
-    </CCard>
-
-    <CModal
-      v-if="activeItem"
-      color="primary"
-      centered
-      :show.sync="showModal">
-      <div slot="header">
-        <h5 class="modal-title text-center">
-          {{ `News and SEC For ${activeItem.basic_info.ticker}` }}
-        </h5>
-      </div>
-      News component goes here
-
-      SEC componet goes here
-      <div slot="footer">
-        <CButton
+    <CRow>
+      <CCol
+        sm="6"
+        lg="3">
+        <CWidgetDropdown
           color="primary"
-          @click="showModal = false">
-          OK
-        </CButton>
-      </div>
-    </CModal>
+          header="9.823"
+          text="Members online">
+          <template #default>
+            <CDropdown
+              color="transparent p-0"
+              placement="bottom-end">
+              <template #toggler-content>
+                <CIcon name="cil-settings" />
+              </template>
+              <CDropdownItem>Action</CDropdownItem>
+              <CDropdownItem>Another action</CDropdownItem>
+              <CDropdownItem>Something else here...</CDropdownItem>
+              <CDropdownItem disabled>
+                Disabled action
+              </CDropdownItem>
+            </CDropdown>
+          </template>
+          <template #footer>
+            <CChartLineSimple
+              pointed
+              class="mt-3 mx-3"
+              style="height:70px"
+              :data-points="[65, 59, 84, 84, 51, 55, 40]"
+              point-hover-background-color="primary"
+              label="Members"
+              labels="months" />
+          </template>
+        </CWidgetDropdown>
+      </CCol>
+      <CCol
+        sm="6"
+        lg="3">
+        <CWidgetDropdown
+          color="info"
+          header="9.823"
+          text="Members online">
+          <template #default>
+            <CDropdown
+              color="transparent p-0"
+              placement="bottom-end"
+              :caret="false">
+              <template #toggler-content>
+                <CIcon name="cil-location-pin" />
+              </template>
+              <CDropdownItem>Action</CDropdownItem>
+              <CDropdownItem>Another action</CDropdownItem>
+              <CDropdownItem>Something else here...</CDropdownItem>
+              <CDropdownItem disabled>
+                Disabled action
+              </CDropdownItem>
+            </CDropdown>
+          </template>
+          <template #footer>
+            <CChartLineSimple
+              pointed
+              class="mt-3 mx-3"
+              style="height:70px"
+              :data-points="[1, 18, 9, 17, 34, 22, 11]"
+              point-hover-background-color="info"
+              :options="{ elements: { line: { tension: 0.00001 }}}"
+              label="Members"
+              labels="months" />
+          </template>
+        </CWidgetDropdown>
+      </CCol>
+      <CCol
+        sm="6"
+        lg="3">
+        <CWidgetDropdown
+          color="warning"
+          header="9.823"
+          text="Members online">
+          <template #default>
+            <CDropdown
+              color="transparent p-0"
+              placement="bottom-end">
+              <template #toggler-content>
+                <CIcon name="cil-settings" />
+              </template>
+              <CDropdownItem>Action</CDropdownItem>
+              <CDropdownItem>Another action</CDropdownItem>
+              <CDropdownItem>Something else here...</CDropdownItem>
+              <CDropdownItem disabled>
+                Disabled action
+              </CDropdownItem>
+            </CDropdown>
+          </template>
+          <template #footer>
+            <CChartLineSimple
+              class="mt-3"
+              style="height:70px"
+              background-color="rgba(255,255,255,.2)"
+              :data-points="[78, 81, 80, 45, 34, 12, 40]"
+              :options="{ elements: { line: { borderWidth: 2.5 }}}"
+              point-hover-background-color="warning"
+              label="Members"
+              labels="months" />
+          </template>
+        </CWidgetDropdown>
+      </CCol>
+      <CCol
+        sm="6"
+        lg="3">
+        <CWidgetDropdown
+          color="danger"
+          header="9.823"
+          text="Members online">
+          <template #default>
+            <CDropdown
+              color="transparent p-0"
+              placement="bottom-end">
+              <template #toggler-content>
+                <CIcon name="cil-settings" />
+              </template>
+              <CDropdownItem>Action</CDropdownItem>
+              <CDropdownItem>Another action</CDropdownItem>
+              <CDropdownItem>Something else here...</CDropdownItem>
+              <CDropdownItem disabled>
+                Disabled action
+              </CDropdownItem>
+            </CDropdown>
+          </template>
+          <template #footer>
+            <CChartBarSimple
+              class="mt-3 mx-3"
+              style="height:70px"
+              background-color="rgb(250, 152, 152)"
+              label="Members"
+              labels="months" />
+          </template>
+        </CWidgetDropdown>
+      </CCol>
+    </CRow>
+    <CRow>
+      <CCol md="12">
+        <CCard class="bg-light text-white">
+          <CCardHeader>
+            Traffic &amp; Sales
+          </CCardHeader>
+          <CCardBody>
+            <CRow>
+              <CCol
+                sm="12"
+                lg="6">
+                <CRow>
+                  <CCol sm="6">
+                    <CCallout color="info">
+                      <small class="text-muted">New Clients</small><br>
+                      <strong class="h4">9,123</strong>
+                    </CCallout>
+                  </CCol>
+                  <CCol sm="6">
+                    <CCallout color="danger">
+                      <small class="text-muted">Recurring Clients</small><br>
+                      <strong class="h4">22,643</strong>
+                    </CCallout>
+                  </CCol>
+                </CRow>
+                <hr class="mt-0">
+                <div class="progress-group mb-4">
+                  <div class="progress-group-prepend">
+                    <span class="progress-group-text">
+                      Monday
+                    </span>
+                  </div>
+                  <div class="progress-group-bars">
+                    <CProgress
+                      class="progress-xs"
+                      color="info"
+                      :value="34" />
+                    <CProgress
+                      class="progress-xs"
+                      color="danger"
+                      :value="78" />
+                  </div>
+                </div>
+                <div class="progress-group mb-4">
+                  <div class="progress-group-prepend">
+                    <span class="progress-group-text">
+                      Tuesday
+                    </span>
+                  </div>
+                  <div class="progress-group-bars">
+                    <CProgress
+                      class="progress-xs"
+                      :value="56"
+                      color="info" />
+                    <CProgress
+                      class="progress-xs"
+                      :value="94"
+                      color="danger" />
+                  </div>
+                </div>
+                <div class="progress-group mb-4">
+                  <div class="progress-group-prepend">
+                    <span class="progress-group-text">
+                      Wednesday
+                    </span>
+                  </div>
+                  <div class="progress-group-bars">
+                    <CProgress
+                      class="progress-xs"
+                      :value="12"
+                      color="info" />
+                    <CProgress
+                      class="progress-xs"
+                      :value="67"
+                      color="danger" />
+                  </div>
+                </div>
+                <div class="progress-group mb-4">
+                  <div class="progress-group-prepend">
+                    <span class="progress-group-text">
+                      Thursday
+                    </span>
+                  </div>
+                  <div class="progress-group-bars">
+                    <CProgress
+                      class="progress-xs"
+                      :value="43"
+                      color="info" />
+                    <CProgress
+                      class="progress-xs"
+                      :value="91"
+                      color="danger" />
+                  </div>
+                </div>
+                <div class="progress-group mb-4">
+                  <div class="progress-group-prepend">
+                    <span class="progress-group-text">
+                      Friday
+                    </span>
+                  </div>
+                  <div class="progress-group-bars">
+                    <CProgress
+                      class="progress-xs"
+                      :value="22"
+                      color="info" />
+                    <CProgress
+                      class="progress-xs"
+                      :value="73"
+                      color="danger" />
+                  </div>
+                </div>
+                <div class="progress-group mb-4">
+                  <div class="progress-group-prepend">
+                    <span class="progress-group-text">
+                      Saturday
+                    </span>
+                  </div>
+                  <div class="progress-group-bars">
+                    <CProgress
+                      class="progress-xs"
+                      :value="53"
+                      color="info" />
+                    <CProgress
+                      class="progress-xs"
+                      :value="82"
+                      color="danger" />
+                  </div>
+                </div>
+                <div class="progress-group mb-4">
+                  <div class="progress-group-prepend">
+                    <span class="progress-group-text">
+                      Sunday
+                    </span>
+                  </div>
+                  <div class="progress-group-bars">
+                    <CProgress
+                      class="progress-xs"
+                      :value="9"
+                      color="info" />
+                    <CProgress
+                      class="progress-xs"
+                      :value="69"
+                      color="danger" />
+                  </div>
+                </div>
+                <div class="legend text-center">
+                  <small>
+                    <sup><CBadge
+                      shape="pill"
+                      color="info">&nbsp;</CBadge></sup>
+                    New clients
+                    &nbsp;&nbsp;
+                    <sup><CBadge
+                      shape="pill"
+                      color="danger">&nbsp;</CBadge></sup>
+                    Recurring clients
+                  </small>
+                </div>
+              </CCol>
+              <CCol
+                sm="12"
+                lg="6">
+                <CRow>
+                  <CCol sm="6">
+                    <CCallout color="warning">
+                      <small class="text-muted">Pageviews</small><br>
+                      <strong class="h4">78,623</strong>
+                    </CCallout>
+                  </CCol>
+                  <CCol sm="6">
+                    <CCallout color="success">
+                      <small class="text-muted">Organic</small><br>
+                      <strong class="h4">49,123</strong>
+                    </CCallout>
+                  </CCol>
+                </CRow>
+                <hr class="mt-0">
+                <ul class="horizontal-bars type-2">
+                  <div class="progress-group">
+                    <div class="progress-group-header">
+                      <CIcon
+                        name="cil-user"
+                        class="progress-group-icon" />
+                      <span class="title">Male</span>
+                      <span class="ml-auto font-weight-bold">43%</span>
+                    </div>
+                    <div class="progress-group-bars">
+                      <CProgress
+                        class="progress-xs"
+                        :value="43"
+                        color="warning" />
+                    </div>
+                  </div>
+                  <div class="progress-group mb-5">
+                    <div class="progress-group-header">
+                      <CIcon
+                        name="cil-user-female"
+                        class="progress-group-icon" />
+                      <span class="title">Female</span>
+                      <span class="ml-auto font-weight-bold">37%</span>
+                    </div>
+                    <div class="progress-group-bars">
+                      <CProgress
+                        class="progress-xs"
+                        :value="37"
+                        color="warning" />
+                    </div>
+                  </div>
+                  <div class="progress-group">
+                    <div class="progress-group-header">
+                      <CIcon
+                        name="cil-globe-alt"
+                        class="progress-group-icon" />
+                      <span class="title">Organic Search</span>
+                      <span class="ml-auto font-weight-bold">
+                        191,235 <span class="text-muted small">(56%)</span>
+                      </span>
+                    </div>
+                    <div class="progress-group-bars">
+                      <CProgress
+                        class="progress-xs"
+                        :value="56"
+                        color="success" />
+                    </div>
+                  </div>
+                  <div class="progress-group">
+                    <div class="progress-group-header">
+                      <CIcon
+                        name="cib-facebook"
+                        height="17"
+                        class="progress-group-icon" />
+                      <span class="title">Facebook</span>
+                      <span class="ml-auto font-weight-bold">
+                        51,223 <span class="text-muted small">(15%)</span>
+                      </span>
+                    </div>
+                    <div class="progress-group-bars">
+                      <CProgress
+                        class="progress-xs"
+                        :value="15"
+                        color="success" />
+                    </div>
+                  </div>
+                  <div class="progress-group">
+                    <div class="progress-group-header">
+                      <CIcon
+                        name="cib-twitter"
+                        height="17"
+                        class="progress-group-icon" />
+                      <span class="title">Twitter</span>
+                      <span class="ml-auto font-weight-bold">
+                        37,564 <span class="text-muted small">(11%)</span>
+                      </span>
+                    </div>
+                    <div class="progress-group-bars">
+                      <CProgress
+                        class="progress-xs"
+                        :value="11"
+                        color="success" />
+                    </div>
+                  </div>
+                  <div class="progress-group">
+                    <div class="progress-group-header">
+                      <CIcon
+                        name="cib-linkedin"
+                        height="17"
+                        class="progress-group-icon" />
+                      <span class="title">LinkedIn</span>
+                      <span class="ml-auto font-weight-bold">
+                        27,319 <span class="text-muted small">&nbsp;(8%)</span>
+                      </span>
+                    </div>
+                    <div class="progress-group-bars">
+                      <CProgress
+                        class="progress-xs"
+                        :value="8"
+                        color="success" />
+                    </div>
+                  </div>
+                  <div class="divider text-center">
+                    <CButton
+                      color="link"
+                      size="sm"
+                      class="text-muted">
+                      <CIcon name="cil-options" />
+                    </CButton>
+                  </div>
+                </ul>
+              </CCol>
+            </CRow>
+            <br>
+            <CDataTable
+              class="mb-0 table-outline"
+              hover
+              :items="tableItems"
+              :fields="tableFields"
+              head-color="light"
+              no-sorting>
+              <td
+                slot="avatar"
+                slot-scope="{item}"
+                class="text-center">
+                <div class="c-avatar">
+                  <img
+                    :src="item.avatar.url"
+                    class="c-avatar-img"
+                    alt="">
+                  <span
+                    class="c-avatar-status"
+                    :class="`bg-${item.avatar.status || 'secondary'}`" />
+                </div>
+              </td>
+              <td
+                slot="user"
+                slot-scope="{item}">
+                <div>{{ item.user.name }}</div>
+                <div class="small text-muted">
+                  <span>
+                    <template v-if="item.user.new">New</template>
+                    <template v-else>Recurring</template>
+                  </span> | Registered: {{ item.user.registered }}
+                </div>
+              </td>
+              <td
+                slot="country"
+                slot-scope="{item}"
+                class="text-center">
+                <CIcon
+                  :name="item.country.flag"
+                  height="25" />
+              </td>
+              <td
+                slot="usage"
+                slot-scope="{item}">
+                <div class="clearfix">
+                  <div class="float-left">
+                    <strong>{{ item.usage.value }}%</strong>
+                  </div>
+                  <div class="float-right">
+                    <small class="text-muted">{{ item.usage.period }}</small>
+                  </div>
+                </div>
+                <CProgress
+                  v-model="item.usage.value"
+                  class="progress-xs"
+                  :color="color(item.usage.value)" />
+              </td>
+              <td
+                slot="payment"
+                slot-scope="{item}"
+                class="text-center">
+                <CIcon
+                  :name="item.payment.icon"
+                  height="25" />
+              </td>
+              <td
+                slot="activity"
+                slot-scope="{item}">
+                <div class="small text-muted">
+                  Last login
+                </div>
+                <strong>{{ item.activity }}</strong>
+              </td>
+            </CDataTable>
+          </CCardBody>
+        </CCard>
+      </CCol>
+    </CRow>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import datepicker from 'vuejs-datepicker';
-import LineChart from '../components/LineChart';
 
 import { greenColors, redColors } from '../utils/colors';
 import { largeFundAnaylsisLabels, mediumFundAnaylsisLabels, smallFundAnaylsisLabels } from '../utils/const';
@@ -182,8 +519,6 @@ import { largeFundAnaylsisLabels, mediumFundAnaylsisLabels, smallFundAnaylsisLab
 export default {
   name: 'Dashboard',
   components: { 
-    LineChart,
-    datepicker 
   },
   data() {
     return {
