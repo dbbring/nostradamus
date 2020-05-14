@@ -1,4 +1,4 @@
-from .eod_data import EOD, Charting, Technical
+from .eod_data import EOD, Future_EOD, Charting, Technical
 from .fundamental import Fundamental
 from .index import Index, IndexSpecific
 from .news import News

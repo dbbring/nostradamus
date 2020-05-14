@@ -14,7 +14,7 @@ class EOD(Endpoint):
         try:
             self.api_endpoint = api_endpoint
             results = self.query(
-                api_endpoint, f"SELECT * FROM Price_EOD WHERE transaction_id = {transaction_id};")
+                api_endpoint, f"SELECT * FROM Price_EOD WHERE transaction_id = {transaction_id} AND is_tracking_period = 0;")
             if include_anaylsis:
                 return self.make_eod_model(results, True)
             else:
@@ -61,6 +61,53 @@ class EOD(Endpoint):
                 _technical = Technical()
                 _ta = _technical.get(self.api_endpoint, item[0])
                 model.data['technical'] = _ta[0] if len(_ta) == 1 else _ta
+
+            all_results.append(model.data)
+
+        return all_results
+
+
+class Future_EOD(Endpoint):
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.api_endpoint = None
+        return
+
+    def get(self, api_endpoint: str, date: str) -> dict:
+        try:
+            self.api_endpoint = api_endpoint
+            results = []
+            transaction_ids = self.query(
+                api_endpoint, f"SELECT transaction_id FROM Transaction WHERE date = '{date}';")
+            for t_id in transaction_ids:
+                results = results + self.query(
+                    api_endpoint, f"SELECT * FROM Price_EOD WHERE transaction_id = {t_id[0]} AND is_tracking_period = 1;")
+            return self.make_eod_model(results)
+        except Exception as err:
+            return {
+                'error': {
+                    'future_eod_data': str(repr(err))
+                }
+            }
+
+    def make_eod_model(self, sql_results: list):
+        all_results = []
+
+        for item in sql_results:
+            model = Price_EOD()
+            model.data['eod_id'] = item[0]
+            model.data['transaction_id'] = item[1]
+            model.data['date'] = item[2].strftime(
+                '%Y-%m-%d') if item[2] else None
+            model.data['open'] = item[3]
+            model.data['high'] = item[4]
+            model.data['low'] = item[5]
+            model.data['close'] = item[6]
+            model.data['volume'] = item[7]
+            model.data['percent_change'] = item[8]
+            model.data['is_tracking_period'] = bool(item[9])
+            model.data['avg_volume'] = item[10]
 
             all_results.append(model.data)
 

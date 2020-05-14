@@ -31,6 +31,9 @@ api.add_resource(IndexSpecific, '/api/<string:api_endpoint>',
                  '/api/<string:api_endpoint>/<string:date>')
 
 api.add_resource(
+    Future_EOD, '/api/<string:api_endpoint>/future/<string:date>')
+
+api.add_resource(
     EOD, '/api/<string:api_endpoint>/price-eod/<int:transaction_id>/<string:include_anaylsis>')
 
 api.add_resource(
