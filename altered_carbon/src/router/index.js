@@ -13,7 +13,7 @@ const OneToOne = () => import('@/views/anaylze/OneToOne');
 const Overview = () => import('@/views/breakdown/Overview');
 const Fundamental = () => import('@/views/breakdown/Fundamental');
 const Sec = () => import('@/views/breakdown/Sec');
-const PriceAction = () => import('@/views/breakdown/EOD_Statistics/PriceAction');
+const PriceMovement = () => import('@/views/breakdown/PriceMovement');
 
 const FuturePriceAction = () => import('@/views/future/FuturePriceAction');
 
@@ -80,8 +80,8 @@ function configRoutes() {
             },
             {
               path: 'price',
-              name: 'Price Action',
-              component: PriceAction
+              name: 'Price Movement',
+              component: PriceMovement
             },
             {
               path: 'sec',

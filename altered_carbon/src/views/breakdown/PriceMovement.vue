@@ -130,13 +130,13 @@
 </template>
 
 <script>
-import LineChart from '../../../components/LineChart';
-import chartMixin from '../../../mixins/mixin';
+import LineChart from '../../components/LineChart';
+import chartMixin from '../../mixins/mixin';
 
-import { eodPriceActionLabels, wkPriceActionLabels, largeTechAnaylsisLabels, mediumTechAnaylsisLabels, smallTechAnaylsisLabels, chartAnaylsisLabels } from '../../../utils/const';
+import { eodPriceActionLabels, wkPriceActionLabels, largeTechAnaylsisLabels, mediumTechAnaylsisLabels, smallTechAnaylsisLabels, chartAnaylsisLabels } from '../../utils/const';
 
 export default {
-  name: 'PriceAction',
+  name: 'PriceMovement',
   components: { 
     LineChart
   },

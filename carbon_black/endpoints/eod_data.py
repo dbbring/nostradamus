@@ -74,15 +74,11 @@ class Future_EOD(Endpoint):
         self.api_endpoint = None
         return
 
-    def get(self, api_endpoint: str, date: str) -> dict:
+    def get(self, api_endpoint: str, transaction_id: int) -> dict:
         try:
             self.api_endpoint = api_endpoint
-            results = []
-            transaction_ids = self.query(
-                api_endpoint, f"SELECT transaction_id FROM Transaction WHERE date = '{date}';")
-            for t_id in transaction_ids:
-                results = results + self.query(
-                    api_endpoint, f"SELECT * FROM Price_EOD WHERE transaction_id = {t_id[0]} AND is_tracking_period = 1;")
+            results = self.query(
+                api_endpoint, f"SELECT * FROM Price_EOD WHERE transaction_id = {transaction_id} AND is_tracking_period = 1;")
             return self.make_eod_model(results)
         except Exception as err:
             return {

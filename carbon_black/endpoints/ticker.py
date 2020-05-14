@@ -1,5 +1,5 @@
 from carbon_black.endpoints.base_endpoint import Endpoint
-from carbon_black.endpoints import Charting, EOD, Fundamental, News, Peers, SEC, Sectors, Technical, Weekly, Index
+from carbon_black.endpoints import Charting, EOD, Future_EOD, Fundamental, News, Peers, SEC, Sectors, Technical, Weekly, Index
 from shared.models import Ticker as Ticker_Model
 from datetime import datetime
 
@@ -40,6 +40,7 @@ class Ticker(Endpoint):
             _peers = Peers()
             _weekly = Weekly()
             _sectors = Sectors()
+            _fut = Future_EOD()
 
             bi = _index.get_by_id(self.api_endpoint, item[0])
             fa = _fa.get(self.api_endpoint, item[0])
@@ -48,6 +49,7 @@ class Ticker(Endpoint):
             wk = _weekly.get(self.api_endpoint, item[0])
             nw = _news.get(self.api_endpoint, item[0])
             pe = _peers.get(self.api_endpoint, item[0])
+            future = _fut.get(self.api_endpoint, item[0])
 
             daily_sector = []
             for eod_item in ed:
@@ -60,6 +62,7 @@ class Ticker(Endpoint):
             model['sec'] = sc[0] if len(sc) == 1 else sc
             model['eod'] = ed[0] if len(ed) == 1 else ed
             model['weekly'] = wk[0] if len(wk) == 1 else wk
+            model['future_prices'] = future[0] if len(future) == 1 else future
             model['news'] = nw[0] if len(nw) == 1 else nw
             model['peers'] = pe[0] if len(pe) == 1 else pe
             model['sector_performance'] = daily_sector[0] if len(

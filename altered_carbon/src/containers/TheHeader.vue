@@ -140,7 +140,7 @@ export default {
       const transactionGainersItems = await axios.get('http://localhost:5000/api/gainers/' + date);
 
       await Promise.all(transactionGainersItems.data.map(async (trans_item) => {
-        const details = await axios.get('http://localhost:5000/api/gainers/ticker/' + trans_item.transaction_id);
+        const details = await ('http://localhost:5000/api/gainers/ticker/' + trans_item.transaction_id);
         const tableData = {
           table_info: {
             'Ticker': details.data.basic_info.ticker,

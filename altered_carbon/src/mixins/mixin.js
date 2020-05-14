@@ -16,6 +16,10 @@ var chartMixin = {
       }
 
       return data;
+    },
+    toPercent(initialValue, newValue) {
+      const difference = (newValue === initialValue) ? initialValue : newValue - initialValue;
+      return (difference / initialValue) * 100;
     }
   }
 };

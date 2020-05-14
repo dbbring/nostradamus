@@ -31,7 +31,7 @@ api.add_resource(IndexSpecific, '/api/<string:api_endpoint>',
                  '/api/<string:api_endpoint>/<string:date>')
 
 api.add_resource(
-    Future_EOD, '/api/<string:api_endpoint>/future/<string:date>')
+    Future_EOD, '/api/<string:api_endpoint>/future/<int:transaction_id>')
 
 api.add_resource(
     EOD, '/api/<string:api_endpoint>/price-eod/<int:transaction_id>/<string:include_anaylsis>')
@@ -50,6 +50,8 @@ api.add_resource(
     Weekly, '/api/<string:api_endpoint>/price-weekly/<int:transaction_id>')
 
 api.add_resource(Sectors, '/api/sectors/<string:date>')
+
+api.add_resource(Stats, '/api/stats')
 
 # ============= Non Table Related (custom rolled) ===================
 
