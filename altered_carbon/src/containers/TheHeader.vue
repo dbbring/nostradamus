@@ -81,7 +81,8 @@
               color="danger"
               :checked.sync="item.table_info.Display"
               :label-on="item.basic_info.ticker"
-              :label-off="item.basic_info.ticker" />
+              :label-off="item.basic_info.ticker"
+              @update:checked="updateMutatableData('mutatableLosersData', index, item)" />
             <CHeaderNavLink />
           </CHeaderNavItem>
         </CHeaderNav>
@@ -140,15 +141,9 @@ export default {
       const transactionGainersItems = await axios.get('http://localhost:5000/api/gainers/' + date);
 
       await Promise.all(transactionGainersItems.data.map(async (trans_item) => {
-        const details = await ('http://localhost:5000/api/gainers/ticker/' + trans_item.transaction_id);
+        const details = await axios.get('http://localhost:5000/api/gainers/ticker/' + trans_item.transaction_id);
         const tableData = {
           table_info: {
-            'Ticker': details.data.basic_info.ticker,
-            'Last News Article': details.data.news[0].date_of_article || '',
-            'Percent Change': details.data.basic_info.percent_change,
-            'Earnings Date': details.data.fund_anaylsis.earnings_date || '',
-            'Display': true,
-            'id': details.data.basic_info.transaction_id,
             'category': 'Gainers',
             'color': greenColors[counter],
             '_classes': `text-green-${counter}`,
@@ -171,12 +166,6 @@ export default {
 
         const tableData = {
           table_info: {
-            'Ticker': details.data.basic_info.ticker,
-            'Last News Article': details.data.news[0].date_of_article || '',
-            'Percent Change': details.data.basic_info.percent_change,
-            'Earnings Date': details.data.fund_anaylsis.earnings_date || '',
-            'Display': true,
-            'id': details.data.basic_info.transaction_id,
             'category': 'Losers',
             'color': redColors[counter],
             '_classes': `text-red-${counter}`,

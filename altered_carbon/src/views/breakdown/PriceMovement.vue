@@ -150,7 +150,7 @@ export default {
       lgTALabels: largeTechAnaylsisLabels,
       mdTALabels: mediumTechAnaylsisLabels,
       smTALabels: smallTechAnaylsisLabels,
-      Dataset: 'Gainers',
+      Dataset: 'Both',
     };
   },
   methods: {

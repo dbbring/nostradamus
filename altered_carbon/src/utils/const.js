@@ -320,3 +320,27 @@ export const wkPriceActionLabels = [
   'vol_diff_from_avg',
   'price_diff_open_to_low'
 ];
+
+export const tableInfoLabels = [
+  'Ticker',
+  'Last News Article',
+  'Percent Change',
+  'Earnings Date',
+  'ADR',
+  'Date of IPO'
+];
+
+export const secTableLabels = [
+  'Ticker',
+  'Date of IPO',
+  'ADR'
+];
+
+export const secLabels = [
+  'CT Orders',
+  '# of Mergers',
+  'Late Filings',
+  '# of Employee Diluations',
+  '# of Company Diluations',
+  'Total # of Diluations'
+];

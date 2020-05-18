@@ -6,11 +6,27 @@
         id="loader"
         src="img/loader.svg">
       <div v-else>
-        <CCard style="min-height:800px;">
+        <CCard
+          v-if="noData"
+          class="bg-light">
           <CCardHeader class="bg-light">
             <CRow>
               <h2 class="text-white mx-auto">
-                5 Days after the selected date
+                No Data Tard. Hasnt Been 5 Days.
+              </h2>
+            </CRow>
+          </CCardHeader>
+          <CCardBody class="bg-dark mx-auto p-5 m-5">
+            <img src="img/giphy.gif">
+          </CCardBody>
+        </CCard>
+        <CCard
+          v-else
+          style="min-height:800px;">
+          <CCardHeader class="bg-light">
+            <CRow>
+              <h2 class="text-white mx-auto">
+                Performance Over The Following Week
               </h2>
             </CRow>
           </CCardHeader>
@@ -39,7 +55,16 @@ export default {
   data() {
     return {
       Dataset: 'Gainers',
+      noData: false
     };
+  },
+  mounted() {
+    let wkAgo = new Date();
+    wkAgo.setDate(wkAgo.getDate() - 7);
+
+    if (this.$store.state.currentSelectedDate > wkAgo) {
+      this.noData = true;
+    }
   },
   methods: {
     filterData(key) {

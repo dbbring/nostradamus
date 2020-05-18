@@ -54,7 +54,7 @@ export default {
       lgFALabels: largeFundAnaylsisLabels,
       mdFALabels: mediumFundAnaylsisLabels,
       smFALabels: smallFundAnaylsisLabels,
-      Dataset: 'Gainers'
+      Dataset: 'Both'
     };
   },
   computed: {
