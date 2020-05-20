@@ -344,3 +344,17 @@ export const secLabels = [
   '# of Company Diluations',
   'Total # of Diluations'
 ];
+
+export const overviewLabels = [
+  'Company Age',
+  'Total News Articles'
+];
+
+export const overviewSectorLabels = [
+  'sector_5_day_performance',
+  'sector_1_month_performance',
+  'sector_3_month_performance',
+  'sector_ytd_performance',
+  'sector_1_yr_performance',
+  'sector_3_yr_performance',
+];

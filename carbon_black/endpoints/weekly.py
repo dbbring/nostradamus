@@ -37,6 +37,10 @@ class Weekly(Endpoint):
             model.data['volume'] = item[7]
             model.data['avg_volume'] = item[8]
             model.data['percent_change'] = item[9]
+            model.data['price_diff_open_to_low'] = model.to_percent(
+                item[3], item[5])
+            model.data['vol_diff_from_avg'] = model.to_percent(
+                item[8], item[7])
 
             all_results.append(model.data)
 

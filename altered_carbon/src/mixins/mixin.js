@@ -20,6 +20,26 @@ var chartMixin = {
     toPercent(initialValue, newValue) {
       const difference = (newValue === initialValue) ? initialValue : newValue - initialValue;
       return (difference / initialValue) * 100;
+    },
+    sortedData(filteredData) {
+      const groupings = [];
+      let individualGroup = [];
+      let currentDate = '';
+
+      filteredData.forEach((item) => {
+        if (item.date !== currentDate) {
+          if (individualGroup.length) {
+            groupings.push(individualGroup);
+            individualGroup = [];
+          }
+
+          currentDate = item.date;
+        }
+
+        individualGroup.push(item);
+      });
+
+      return groupings;
     }
   }
 };

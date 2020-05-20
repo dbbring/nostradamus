@@ -121,16 +121,12 @@
                     sm="12"
                     lg="6">
                     <CRow>
-                      <CCol sm="6">
+                      <CCol
+                        class="mx-auto"
+                        sm="2">
                         <CCallout color="success">
                           <small class="text-muted">Gainers</small><br>
                           <strong class="h4">{{ stats[0].total_items || 0 }}</strong>
-                        </CCallout>
-                      </CCol>
-                      <CCol sm="6">
-                        <CCallout color="danger">
-                          <small class="text-muted">Losers</small><br>
-                          <strong class="h4">{{ stats[1].total_items || 0 }}</strong>
                         </CCallout>
                       </CCol>
                     </CRow>
@@ -152,23 +148,6 @@
                           :value="toPercent( dup.count, topGainerOccurances)" />
                       </div>
                     </div>
-                    <div
-                      v-for="(dup) in stats[1].duplicate_items"
-                      :key="dup.ticker"
-                      class="progress-group mb-4">
-                      <div
-                        class="progress-group-prepend">
-                        <span class="progress-group-text">
-                          {{ `${dup.ticker} (${dup.count})` }}
-                        </span>
-                      </div>
-                      <div class="progress-group-bars">
-                        <CProgress
-                          class="progress-xs"
-                          color="danger"
-                          :value="toPercent( dup.count, topLoserOccurances)" />
-                      </div>
-                    </div>
                   </CCol>
                   <CCol
                     sm="12"
@@ -181,122 +160,30 @@
                         </CCallout>
                       </CCol>
                       <CCol sm="6">
-                        <CCallout color="success">
-                          <small class="text-muted">TBD</small><br>
-                          <strong class="h4">0</strong>
+                        <CCallout color="danger">
+                          <small class="text-muted">Losers</small><br>
+                          <strong class="h4">{{ stats[1].total_items || 0 }}</strong>
                         </CCallout>
                       </CCol>
                     </CRow>
                     <hr class="mt-0">
                     <ul class="horizontal-bars type-2">
-                      <div class="progress-group">
-                        <div class="progress-group-header">
-                          <CIcon
-                            name="cil-user"
-                            class="progress-group-icon" />
-                          <span class="title">Male</span>
-                          <span class="ml-auto font-weight-bold">43%</span>
-                        </div>
-                        <div class="progress-group-bars">
-                          <CProgress
-                            class="progress-xs"
-                            :value="43"
-                            color="warning" />
-                        </div>
-                      </div>
-                      <div class="progress-group mb-5">
-                        <div class="progress-group-header">
-                          <CIcon
-                            name="cil-user-female"
-                            class="progress-group-icon" />
-                          <span class="title">Female</span>
-                          <span class="ml-auto font-weight-bold">37%</span>
-                        </div>
-                        <div class="progress-group-bars">
-                          <CProgress
-                            class="progress-xs"
-                            :value="37"
-                            color="warning" />
-                        </div>
-                      </div>
-                      <div class="progress-group">
-                        <div class="progress-group-header">
-                          <CIcon
-                            name="cil-globe-alt"
-                            class="progress-group-icon" />
-                          <span class="title">Organic Search</span>
-                          <span class="ml-auto font-weight-bold">
-                            191,235 <span class="text-muted small">(56%)</span>
+                      <div
+                        v-for="(dup) in stats[1].duplicate_items"
+                        :key="dup.ticker"
+                        class="progress-group mb-4">
+                        <div
+                          class="progress-group-prepend">
+                          <span class="progress-group-text">
+                            {{ `${dup.ticker} (${dup.count})` }}
                           </span>
                         </div>
                         <div class="progress-group-bars">
                           <CProgress
                             class="progress-xs"
-                            :value="56"
-                            color="success" />
+                            color="danger"
+                            :value="toPercent( dup.count, topLoserOccurances)" />
                         </div>
-                      </div>
-                      <div class="progress-group">
-                        <div class="progress-group-header">
-                          <CIcon
-                            name="cib-facebook"
-                            height="17"
-                            class="progress-group-icon" />
-                          <span class="title">Facebook</span>
-                          <span class="ml-auto font-weight-bold">
-                            51,223 <span class="text-muted small">(15%)</span>
-                          </span>
-                        </div>
-                        <div class="progress-group-bars">
-                          <CProgress
-                            class="progress-xs"
-                            :value="15"
-                            color="success" />
-                        </div>
-                      </div>
-                      <div class="progress-group">
-                        <div class="progress-group-header">
-                          <CIcon
-                            name="cib-twitter"
-                            height="17"
-                            class="progress-group-icon" />
-                          <span class="title">Twitter</span>
-                          <span class="ml-auto font-weight-bold">
-                            37,564 <span class="text-muted small">(11%)</span>
-                          </span>
-                        </div>
-                        <div class="progress-group-bars">
-                          <CProgress
-                            class="progress-xs"
-                            :value="11"
-                            color="success" />
-                        </div>
-                      </div>
-                      <div class="progress-group">
-                        <div class="progress-group-header">
-                          <CIcon
-                            name="cib-linkedin"
-                            height="17"
-                            class="progress-group-icon" />
-                          <span class="title">LinkedIn</span>
-                          <span class="ml-auto font-weight-bold">
-                            27,319 <span class="text-muted small">&nbsp;(8%)</span>
-                          </span>
-                        </div>
-                        <div class="progress-group-bars">
-                          <CProgress
-                            class="progress-xs"
-                            :value="8"
-                            color="success" />
-                        </div>
-                      </div>
-                      <div class="divider text-center">
-                        <CButton
-                          color="link"
-                          size="sm"
-                          class="text-muted">
-                          <CIcon name="cil-options" />
-                        </CButton>
                       </div>
                     </ul>
                   </CCol>

@@ -144,6 +144,7 @@ export default {
         const details = await axios.get('http://localhost:5000/api/gainers/ticker/' + trans_item.transaction_id);
         const tableData = {
           table_info: {
+            'Display': true,
             'category': 'Gainers',
             'color': greenColors[counter],
             '_classes': `text-green-${counter}`,
@@ -166,6 +167,7 @@ export default {
 
         const tableData = {
           table_info: {
+            'Display': true,
             'category': 'Losers',
             'color': redColors[counter],
             '_classes': `text-red-${counter}`,

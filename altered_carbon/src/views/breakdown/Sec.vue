@@ -59,7 +59,7 @@ export default {
           '# of Mergers': tickerItem.sec.mergers.length,
           'Late Filings': (tickerItem.sec.late_filings === null) ? '' : tickerItem.sec.late_filings,
           '# of Employee Diluations': tickerItem.sec.stock_program.length,
-          '# of Company Diluations': tickerItem.sec.secondary_offerings.length,
+          '# of Company Diluations': tickerItem.sec.secondary_offerings.length ,
           'Total # of Diluations': (tickerItem.sec.stock_program.length + tickerItem.sec.secondary_offerings.length),
         };
 
@@ -70,12 +70,6 @@ export default {
     }
   },
   methods: {
-    fillChartData() {
-      // count how many times diluated 
-      // how many mergers
-      // how many occurances of each form in item list
-      // maybe have occraunaces in differnt chart with labels?
-    }
   }
 };
 </script>

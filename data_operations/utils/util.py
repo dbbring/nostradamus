@@ -111,5 +111,5 @@ def process_ticker(db_name: str, TD, FinViz, ticker: str, s_p_inputs: dict) -> N
     except Exception as err:
         error_msg = traceback.format_exc()
         send_mail('-- Couldnt Save Ticker To DB! ' + ticker + ' -- \n\n ' +
-                  str(repr(err)) + '\n\n' + error_msg + 'Data: \n\n' + locals(), db_name)
+                  str(repr(err)) + '\n\n' + error_msg + 'Data: \n\n' + str(locals()), db_name)
         del db

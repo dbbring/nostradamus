@@ -100,7 +100,7 @@ class Sectors(Endpoint):
         if timestamp < wk_ago:
             av = AlphaVantage(
                 '', True, 'https://www.alphavantage.co/query?function=SECTOR&apikey=')
-                
+
             all_sectors = av.data
             with open('sector_performance.json', 'w') as f:
                 json.dump(av.data, f)
@@ -119,13 +119,7 @@ class Sectors(Endpoint):
     def make_all_sectors_performance(self, sector_name=None):
         response = {}
         if sector_name == None:
-            response['5_day_performance'] = self.five_day_performance
-            response['1_month_performance'] = self.one_month_performance
-            response['3_month_performance'] = self.three_month_performance
-            response['ytd_performance'] = self.ytd_performance
-            response['1_yr_performance'] = self.one_year_performance
-            response['3_yr_performance'] = self.three_year_performance
-            return response
+            return
         else:
             clean_sector_name = Sectors_Model.get_sector(self, sector_name)
             converted_key = clean_sector_name.replace('_', ' ').title()

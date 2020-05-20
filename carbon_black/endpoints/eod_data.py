@@ -43,6 +43,10 @@ class EOD(Endpoint):
             model.data['percent_change'] = item[8]
             model.data['is_tracking_period'] = bool(item[9])
             model.data['avg_volume'] = item[10]
+            model.data['price_diff_open_to_low'] = model.to_percent(
+                item[3], item[5])
+            model.data['vol_diff_from_avg'] = model.to_percent(
+                item[10], item[7])
 
             if include_anaysis == 'ca':
                 _chart = Charting()

@@ -161,9 +161,7 @@ export default {
       dataArray.forEach((tickerItem) => {
         const additionalData = {
           color: tickerItem.table_info.color,
-          ticker: tickerItem.basic_info.ticker,
-          vol_diff_from_avg: 3.0,
-          price_diff_open_to_low: 6
+          ticker: tickerItem.basic_info.ticker
         };
 
         tickerItem[key].forEach((item) => {
@@ -190,27 +188,7 @@ export default {
       });
 
       return data;
-    },
-    sortedData(filteredData) {
-      const groupings = [];
-      let individualGroup = [];
-      let currentDate = '';
-      
-      filteredData.forEach((item) => {
-        if (item.date !== currentDate) {
-          if (individualGroup.length) {
-            groupings.push(individualGroup);
-            individualGroup = [];
-          }
-          
-          currentDate = item.date;
-        }
-        
-        individualGroup.push(item);
-      });
-
-      return groupings;
-    },
+    }
   }
 };
 </script>
