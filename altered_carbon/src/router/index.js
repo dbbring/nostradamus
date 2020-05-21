@@ -8,7 +8,6 @@ const TheContainer = () => import('@/containers/TheContainer');
 const Dashboard = () => import('@/views/Dashboard');
 
 const AnaylzeAll = () => import('@/views/anaylze/AnaylzeAll');
-const OneToOne = () => import('@/views/anaylze/OneToOne');
 
 const Overview = () => import('@/views/breakdown/Overview');
 const Fundamental = () => import('@/views/breakdown/Fundamental');
@@ -52,11 +51,6 @@ function configRoutes() {
               path: 'all',
               name: 'Anaylze',
               component: AnaylzeAll
-            },
-            {
-              path: 'one-to-one',
-              name: 'One To One',
-              component: OneToOne
             }
           ]
         },

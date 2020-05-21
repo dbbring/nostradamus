@@ -20,22 +20,11 @@
                 <CTabs 
                   fill>
                   <CTab
-                    title="Percent Change"
-                    active>
+                    v-for="(eodStatLabel, index) in eodChartLabel"
+                    :key="index"
+                    :title="formatTitle(eodStatLabel)">
                     <LineChart 
-                      :labels="[eodChartLabel[0]]"
-                      :data-set="sortedData(filterData('eod'))"
-                      title="Gainers Fundamental Anaylsis" />
-                  </CTab>
-                  <CTab title="Volume Change">
-                    <LineChart 
-                      :labels="[eodChartLabel[1]]"
-                      :data-set="sortedData(filterData('eod'))"
-                      title="Gainers Fundamental Anaylsis" />
-                  </CTab>
-                  <CTab title="Price Change">
-                    <LineChart 
-                      :labels="[eodChartLabel[2]]"
+                      :labels="[eodStatLabel]"
                       :data-set="sortedData(filterData('eod'))"
                       title="Gainers Fundamental Anaylsis" />
                   </CTab>
@@ -58,22 +47,11 @@
                 <CTabs 
                   fill>
                   <CTab
-                    title="Percent Change"
-                    active>
+                    v-for="(wkStatLabel, index) in wkChartLabel"
+                    :key="index"
+                    :title="formatTitle(wkStatLabel)">
                     <LineChart 
-                      :labels="[wkChartLabel[0]]"
-                      :data-set="sortedData(filterData('weekly'))"
-                      title="Gainers Fundamental Anaylsis" />
-                  </CTab>
-                  <CTab title="Volume Change">
-                    <LineChart 
-                      :labels="[wkChartLabel[1]]"
-                      :data-set="sortedData(filterData('weekly'))"
-                      title="Gainers Fundamental Anaylsis" />
-                  </CTab>
-                  <CTab title="Price Change">
-                    <LineChart 
-                      :labels="[wkChartLabel[2]]"
+                      :labels="[wkStatLabel]"
                       :data-set="sortedData(filterData('weekly'))"
                       title="Gainers Fundamental Anaylsis" />
                   </CTab>
@@ -85,7 +63,7 @@
         <CCard>
           <CCardBody 
             v-for="(eodArray, index) in sortedData(filterData('eod'))"
-            :key="`${index}`"
+            :key="index"
             class="bg-dark">
             <CCardHeader class="bg-light text-center">
               <h1 class="text-white">
@@ -150,15 +128,13 @@ export default {
       lgTALabels: largeTechAnaylsisLabels,
       mdTALabels: mediumTechAnaylsisLabels,
       smTALabels: smallTechAnaylsisLabels,
-      Dataset: 'Both',
     };
   },
   methods: {
     filterData(key) {
       const data = [];
-      const dataArray = this.filteredDataset(this.Dataset);
 
-      dataArray.forEach((tickerItem) => {
+      this.dataset.forEach((tickerItem) => {
         const additionalData = {
           color: tickerItem.table_info.color,
           ticker: tickerItem.basic_info.ticker
@@ -176,6 +152,11 @@ export default {
       });
       return data;
     },
+    formatTitle(titleStr) {
+      let formatted = titleStr.charAt(0).toUpperCase() + titleStr.slice(1);
+      formatted = formatted.replace(/_/gi, ' ');
+      return formatted;
+    },
     groupData(key, array) {
       const data = [];
 
@@ -192,24 +173,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-#loader {
-  transform: rotateZ(90deg);
-  position: absolute;
-  left: 100px;
-  right: 0;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  height: 400px;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

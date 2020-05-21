@@ -1,9 +1,9 @@
 var chartMixin = {
-  methods: {
-    filteredDataset(Dataset) {
+  computed: {
+    dataset() {
       let data = null;
       /* eslint-disable indent */
-      switch (Dataset) {
+      switch (this.$store.state.dataset) {
         case 'Gainers':
           data = this.$store.state.mutatableGainersData;
           break;
@@ -16,7 +16,9 @@ var chartMixin = {
       }
 
       return data;
-    },
+    }
+  },
+  methods: {
     toPercent(initialValue, newValue) {
       const difference = (newValue === initialValue) ? initialValue : newValue - initialValue;
       return (difference / initialValue) * 100;
@@ -32,10 +34,8 @@ var chartMixin = {
             groupings.push(individualGroup);
             individualGroup = [];
           }
-
           currentDate = item.date;
         }
-
         individualGroup.push(item);
       });
 

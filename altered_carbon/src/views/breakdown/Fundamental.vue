@@ -53,16 +53,13 @@ export default {
     return {
       lgFALabels: largeFundAnaylsisLabels,
       mdFALabels: mediumFundAnaylsisLabels,
-      smFALabels: smallFundAnaylsisLabels,
-      Dataset: 'Both'
+      smFALabels: smallFundAnaylsisLabels
     };
   },
   computed: {
     filterData() {
       const data = [];
-      const dataArray = this.filteredDataset(this.Dataset);
-
-      dataArray.forEach((tickerItem) => {
+      this.dataset.forEach((tickerItem) => {
         const additionalData = {
           color: tickerItem.table_info.color,
           ticker: tickerItem.basic_info.ticker
@@ -76,24 +73,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-#loader {
-  transform: rotateZ(90deg);
-  position: absolute;
-  left: 100px;
-  right: 0;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  height: 400px;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

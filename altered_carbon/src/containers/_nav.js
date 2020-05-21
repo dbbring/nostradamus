@@ -20,12 +20,6 @@ export default [
         icon: 'cil-chart-pie'
       },
       {
-        _name: 'CSidebarNavItem',
-        name: 'One To One',
-        to: '/anaylze/one-to-one',
-        icon: 'cil-calculator'
-      },
-      {
         _name: 'CSidebarNavTitle',
         _children: ['Breakdown']
       },

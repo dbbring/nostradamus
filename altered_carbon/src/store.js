@@ -12,6 +12,7 @@ const state = {
   immutatableGainersData: [],
   mutatableLosersData: [],
   immutatableLosersData: [],
+  dataset: 'Both'
 };
 
 const mutations = {

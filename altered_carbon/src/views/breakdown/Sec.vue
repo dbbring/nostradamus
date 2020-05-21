@@ -29,8 +29,9 @@
 
 <script>
 import LineChart from '../../components/LineChart';
-import { secTableLabels, secLabels } from '../../utils/const';
 import chartMixin from '../../mixins/mixin';
+
+import { secTableLabels, secLabels } from '../../utils/const';
 
 export default {
   name: 'Sec',
@@ -40,7 +41,6 @@ export default {
   mixins: [chartMixin],
   data() {
     return {
-      Dataset: 'Both',
       tableLabels: secTableLabels,
       chartLabels: secLabels
     };
@@ -48,10 +48,7 @@ export default {
   computed: {
     filterData() {
       const data = [];
-      const dataArray = this.filteredDataset(this.Dataset);
-
-      dataArray.forEach((tickerItem) => {
-
+      this.dataset.forEach((tickerItem) => {
         const additionalData = {
           color: tickerItem.table_info.color,
           ticker: tickerItem.basic_info.ticker,
@@ -68,29 +65,6 @@ export default {
 
       return data;
     }
-  },
-  methods: {
   }
 };
 </script>
-
-<style scoped>
-#loader {
-  transform: rotateZ(90deg);
-  position: absolute;
-  left: 100px;
-  right: 0;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  height: 400px;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

@@ -350,11 +350,17 @@ export const overviewLabels = [
   'Total News Articles'
 ];
 
-export const overviewSectorLabels = [
+export const overviewSectorHistoricLabels = [
   'sector_5_day_performance',
   'sector_1_month_performance',
   'sector_3_month_performance',
   'sector_ytd_performance',
   'sector_1_yr_performance',
   'sector_3_yr_performance',
+];
+
+export const overviewSectorLabels = [
+  'dji',
+  'nasdaq',
+  's_p'
 ];

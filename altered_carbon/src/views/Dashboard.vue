@@ -123,16 +123,16 @@
                     <CRow>
                       <CCol
                         class="mx-auto"
-                        sm="2">
+                        sm="6">
                         <CCallout color="success">
                           <small class="text-muted">Gainers</small><br>
-                          <strong class="h4">{{ stats[0].total_items || 0 }}</strong>
+                          <strong class="h4">{{ stats.data[0].total_items || 0 }}</strong>
                         </CCallout>
                       </CCol>
                     </CRow>
                     <hr class="mt-0">
                     <div
-                      v-for="(dup) in stats[0].duplicate_items"
+                      v-for="(dup) in stats.data[0].duplicate_items"
                       :key="dup.ticker"
                       class="progress-group mb-4">
                       <div
@@ -145,7 +145,7 @@
                         <CProgress
                           class="progress-xs"
                           color="success"
-                          :value="toPercent( dup.count, topGainerOccurances)" />
+                          :value="toPercent(dup.count, topGainerOccurances)" />
                       </div>
                     </div>
                   </CCol>
@@ -162,14 +162,14 @@
                       <CCol sm="6">
                         <CCallout color="danger">
                           <small class="text-muted">Losers</small><br>
-                          <strong class="h4">{{ stats[1].total_items || 0 }}</strong>
+                          <strong class="h4">{{ stats.data[1].total_items || 0 }}</strong>
                         </CCallout>
                       </CCol>
                     </CRow>
                     <hr class="mt-0">
                     <ul class="horizontal-bars type-2">
                       <div
-                        v-for="(dup) in stats[1].duplicate_items"
+                        v-for="(dup) in stats.data[1].duplicate_items"
                         :key="dup.ticker"
                         class="progress-group mb-4">
                         <div
@@ -182,7 +182,7 @@
                           <CProgress
                             class="progress-xs"
                             color="danger"
-                            :value="toPercent( dup.count, topLoserOccurances)" />
+                            :value="toPercent(dup.count, topLoserOccurances)" />
                         </div>
                       </div>
                     </ul>
@@ -200,17 +200,15 @@
 
 <script>
 import axios from 'axios';
-import chartMixin from '../mixins/mixin';
 
+import chartMixin from '../mixins/mixin';
 
 export default {
   name: 'Dashboard',
-  components: { 
-  },
   mixins: [chartMixin],
   data() {
     return {
-      loading: false,
+      loading: true,
       stats: [],
       totalItems: null,
       topGainerOccurances: 0,
@@ -218,49 +216,23 @@ export default {
     };
   },
   mounted() {
-    this.loading = true;
-    this.getStats().then(() => this.loading = false);
+    this.getStats();
   },
   methods: {
     async getStats() {
-      const response = await axios.get('http://localhost:5000/api/stats');
-      this.stats = response.data;
-      this.stats.forEach((stat) => {
-        this.totalItems += stat.total_items;
-
-        if (stat.api_endpoint == 'gainers') {
-          stat.duplicate_items.forEach((dup) => {
-            this.topGainerOccurances = (this.topGainerOccurances < dup.count) ? dup.count : this.topGainerOccurances;
-          });
-        }
-        if (stat.api_endpoint == 'losers') {
-          stat.duplicate_items.forEach((dup) => {
-            this.topLoserOccurances = (this.topLoserOccurances < dup.count) ? dup.count : this.topLoserOccurances;
-          });
-        }
+      this.loading = true;
+      this.stats = await axios.get('http://localhost:5000/api/stats');
+  
+      this.stats.data[0].duplicate_items.forEach((dup) => {
+        this.topGainerOccurances = (this.topGainerOccurances < dup.count) ? dup.count : this.topGainerOccurances;
       });
+
+      this.stats.data[1].duplicate_items.forEach((dup) => {
+        this.topLoserOccurances = (this.topLoserOccurances < dup.count) ? dup.count : this.topLoserOccurances;
+      });
+
+      this.loading = false;
     }
   }
 };
 </script>
-
-<style scoped>
-#loader {
-  transform: rotateZ(90deg);
-  position: absolute;
-  left: 100px;
-  right: 0;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  height: 400px;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

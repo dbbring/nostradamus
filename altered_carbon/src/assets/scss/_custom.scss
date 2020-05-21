@@ -9,6 +9,25 @@
   background-color: #4c4f54;
 }
 
+#loader {
+  transform: rotateZ(90deg);
+  position: absolute;
+  left: 100px;
+  right: 0;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  height: 400px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
 
 // one to one with the arrays in utils/color.js
 .text-green-0 {

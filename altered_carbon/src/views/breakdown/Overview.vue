@@ -30,15 +30,31 @@
                 </CCardBody>
               </CCard>
             </CCol>
-            <CCol lg="12">
-              <CCard>
-                <CCardBody class="bg-dark">
+            <CCol>
+              <CTabs 
+                fill>
+                <!-- use v for here to dynamically add tabs? -->
+                <CTab
+                  title="Vs DJI"
+                  active>
                   <LineChart 
-                    :labels="peersAndSectorsLabels"
-                    :data-set="peersAndSectors"
+                    :labels="[peersAndSectorsLabels[0]]"
+                    :data-set="sortedData(peersAndSectors)"
                     title="Gainers Fundamental Anaylsis" />
-                </CCardBody>
-              </CCard>
+                </CTab>
+                <CTab title="Vs Nasdaq">
+                  <LineChart 
+                    :labels="[peersAndSectorsLabels[1]]"
+                    :data-set="sortedData(peersAndSectors)"
+                    title="Gainers Fundamental Anaylsis" />
+                </CTab>
+                <CTab title="Vs SP">
+                  <LineChart 
+                    :labels="[peersAndSectorsLabels[2]]"
+                    :data-set="sortedData(peersAndSectors)"
+                    title="Gainers Fundamental Anaylsis" />
+                </CTab>
+              </CTabs>
             </CCol>
           </CRow>
         </CCardBody>
@@ -49,7 +65,7 @@
 
 <script>
 import LineChart from '../../components/LineChart';
-import { overviewLabels, overviewSectorLabels } from '../../utils/const';
+import { overviewLabels, overviewSectorHistoricLabels, overviewSectorLabels } from '../../utils/const';
 import chartMixin from '../../mixins/mixin';
 
 export default {
@@ -62,8 +78,8 @@ export default {
     return {
       Dataset: 'Both',
       chartLabels: overviewLabels,
-      sectorChartLabels: overviewSectorLabels,
-      peersAndSectorsLabels: [],
+      sectorChartLabels: overviewSectorHistoricLabels,
+      peersAndSectorsLabels: overviewSectorLabels,
       peersAndSectors: [],
     };
   },
@@ -79,7 +95,7 @@ export default {
       const dataArray = this.filteredDataset(this.Dataset);
 
       dataArray.forEach((tickerItem) => {
-
+        this.peersAndSectors.concat(this.filterPeerAndSectorPerformance(tickerItem));
         const co_age = (tickerItem.sec.date_of_ipo) ? 
           ((today - new Date(tickerItem.sec.date_of_ipo)) / 31536000000).toFixed(0) : 
           -1;
@@ -95,8 +111,6 @@ export default {
           additionalData = {...additionalData, ...sectorObj};
         });
 
-        this.peersAndSectors = this.filterPeerAndSectorPerformance(tickerItem);
-        console.log(this.filterPeerAndSectorPerformance(tickerItem));
 
         data.push(additionalData);
       });
@@ -111,15 +125,20 @@ export default {
       // 10 -50? 50 ^
       // avg the peers out and show the ticker % change vs avg change
       // need LABELSSSS
-      const sectorAndPeers = tickerItem.sector_performance.concat(tickerItem.peers);
+      const sectors = tickerItem.sector_performance.map((sectorItem) => {
+        const addData = {
+          ticker: tickerItem.basic_info.ticker,
+        };
+        return {...sectorItem, ...addData};
+      });
 
-      sectorAndPeers.sort((a,b) => {
+      sectors.sort((a,b) => {
         const firstDate = new Date(a.date);
         const secondDate = new Date(b.date);
         return firstDate - secondDate;
       });
 
-      return sectorAndPeers;
+      return sectors;
     },
     filterSectorHistoricPerformance(tickerItem) {
       const data = [];

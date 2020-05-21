@@ -54,7 +54,6 @@ export default {
   mixins: [chartMixin],
   data() {
     return {
-      Dataset: 'Gainers',
       noData: false
     };
   },
@@ -69,9 +68,11 @@ export default {
   methods: {
     filterData(key) {
       const data = [];
-      const dataArray = this.filteredDataset(this.Dataset);
+      this.dataset.forEach((tickerItem) => {
+        if (!tickerItem[key]) {
+          return;
+        }
 
-      dataArray.forEach((tickerItem) => {
         const additionalData = {
           color: tickerItem.table_info.color,
           ticker: tickerItem.basic_info.ticker,
@@ -89,61 +90,7 @@ export default {
       });
 
       return data;
-    },
-    groupData(key, array) {
-      const data = [];
-
-      array.forEach((tickerItem) => {
-        const additionalData = {
-          color: tickerItem.color,
-          ticker: tickerItem.ticker
-        };
-        data.push({...tickerItem[key], ...additionalData});
-      });
-
-      return data;
-    },
-    sortedData(filteredData) {
-      const groupings = [];
-      let individualGroup = [];
-      let currentDate = '';
-      
-      filteredData.forEach((item) => {
-        if (item.date !== currentDate) {
-          if (individualGroup.length) {
-            groupings.push(individualGroup);
-            individualGroup = [];
-          }
-          
-          currentDate = item.date;
-        }
-        
-        individualGroup.push(item);
-      });
-
-      return groupings;
-    },
+    }
   }
 };
 </script>
-
-<style scoped>
-#loader {
-  transform: rotateZ(90deg);
-  position: absolute;
-  left: 100px;
-  right: 0;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  height: 400px;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
